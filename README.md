@@ -13,7 +13,7 @@ Ce projet est une application Laravel 12 utilisant Tailwind CSS v4 pour la mise 
 
 1. **Cloner le dépôt**
    ```bash
-   git clone <url-du-repo>
+   git clone <https://github.com/Trapo6x7/RefactoEriFinal>
    cd baseDeConnaissance
    ```
 
