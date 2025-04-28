@@ -1,0 +1,113 @@
+<nav x-data="{ open: false }" class="bg-secondary-grey">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+            <!-- Logo -->
+            <div class="flex w-1/4 justify-center items-center">
+                <a href="{{ route('dashboard') }}">
+                    <img src="{{ asset('imgs/logoligne.png') }}" alt="logo" class="lg:w-1/2 md:w-auto sm:w-auto">
+                </a>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="w-2/4 gap-5 hidden lg:flex justify-center items-center">
+                <a href="{{ route('dashboard') }}"
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-accent' : '' }}">
+                    ACCUEIL
+                </a>
+                <a href="#"
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('societes*') ? 'border-b-2 border-blue-accent' : '' }}">
+                    SOCIETES
+                </a>
+                <a href="#"
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('interlocuteurs*') ? 'border-b-2 border-blue-accent' : '' }}">
+                    INTERLOCUTEURS
+                </a>
+                <a href="#"
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('environnements*') ? 'border-b-2 border-blue-accent' : '' }}">
+                    ENVIRONNEMENTS
+                </a>
+                <a href="#"
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('outils*') ? 'border-b-2 border-blue-accent' : '' }}">
+                    OUTILS
+                </a>
+                <a href="#"
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('problemes*') ? 'border-b-2 border-blue-accent' : '' }}">
+                    PROBLEMES
+                </a>
+            </nav>
+
+            <!-- User Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button
+                            class="uppercase hidden lg:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-grey bg-secondary-grey hover:text-blue-accent focus:outline-none transition ease-in-out duration-150">
+                            <div>{{ Auth::user()->name }}</div>
+                            <div class="ms-1">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
+                    <x-slot name="content">
+                        <x-dropdown-link :href="route('profile.edit')">
+                            {{ __('PROFIL') }}
+                        </x-dropdown-link>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <x-dropdown-link :href="route('logout')"
+                                onclick="event.preventDefault(); this.closest('form').submit();" class="text-red-accent hover:text-red-800">
+                                {{ __('SE DECONNECTER') }}
+                            </x-dropdown-link>
+                        </form>
+                    </x-slot>
+                </x-dropdown>
+            </div>
+
+            <!-- Hamburger -->
+            <div class="lg:hidden flex items-center">
+                <button @click="open = !open" class="focus:outline-none transition-transform duration-300"
+                    :class="{ 'rotate-90': open }">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Responsive Navigation Menu -->
+    <nav x-show="open" @click.away="open = false"
+        class="absolute top-20 left-0 w-full bg-secondary-grey flex flex-col items-center gap-4 py-4 lg:hidden z-50">
+        <a href="#"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">ACCUEIL</a>
+        <a href="#"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">SOCIETES</a>
+        <a href="#"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">INTERLOCUTEURS</a>
+        <a href="#"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">ENVIRONNEMENTS</a>
+        <a href="#"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">OUTILS</a>
+        <a href="#"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">PROBLEMES</a>
+        <x-responsive-nav-link :href="route('profile.edit')">
+            {{ __('PROFIL') }}
+        </x-responsive-nav-link>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();" class="text-red-accent hover:text-red-800">
+                {{ __('SE DECONNECTER') }}
+            </x-responsive-nav-link>
+        </form>
+
+    </nav>
+</nav>

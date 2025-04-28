@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Env extends Model
+{
+    protected $table = 'env';
+
+    protected $fillable = [
+        'name',
+    ];
+}
