@@ -7,18 +7,18 @@
 @endphp
 
 @if ($user && $user->role === 'superadmin')
-    <x-backpack::menu-item title="Users" icon="la la-question" :link="backpack_url('user')" />
-    <x-backpack::menu-item title="Techniciens" icon="la la-question" :link="backpack_url('tech')" />
-    <x-backpack::menu-item title="Statut Problème" icon="la la-question" :link="backpack_url('problem-status')" />
+    <x-backpack::menu-item title="Users"  :link="backpack_url('user')" />
+    <x-backpack::menu-item title="Techniciens" :link="backpack_url('tech')" />
+    <x-backpack::menu-item title="Statuts" :link="backpack_url('problem-status')" />
 @endif
 
 
-<x-backpack::menu-item title="Societés" icon="la la-question" :link="backpack_url('society')" />
-<x-backpack::menu-item title="Interlocuteurs" icon="la la-question" :link="backpack_url('interlocutor')" />
-<x-backpack::menu-item title="Problèmes" icon="la la-question" :link="backpack_url('problem')" />
-<x-backpack::menu-item title="Environnements" icon="la la-question" :link="backpack_url('env')" />
-<x-backpack::menu-item title="Outils" icon="la la-question" :link="backpack_url('tool')" />
+<x-backpack::menu-item title="Societés" :link="backpack_url('society')" />
+<x-backpack::menu-item title="Interlocuteurs" :link="backpack_url('interlocutor')" />
+<x-backpack::menu-item title="Problèmes" :link="backpack_url('problem')" />
+<x-backpack::menu-item title="Environnements" :link="backpack_url('env')" />
+<x-backpack::menu-item title="Outils" :link="backpack_url('tool')" />
 
 @if ($user && $user->role === 'superadmin')
-    <x-backpack::menu-item title="Menus" icon="la la-question" :link="backpack_url('menu')" />
+    <x-backpack::menu-item title="Menus" :link="backpack_url('menu')" />
 @endif

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\GlobalSearchController;
+use App\Http\Controllers\ContextualSearchController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +19,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::get('/global-search', [GlobalSearchController::class, 'index'])->name('global-search');
+Route::get('/global-suggestions', [GlobalSearchController::class, 'suggestions'])->name('global-suggestions');
+
+Route::get('/contextual-search', [ContextualSearchController::class, 'index'])->name('contextual-search');
+Route::get('/contextual-suggestions', [ContextualSearchController::class, 'suggestions'])->name('contextual-suggestions');
+
+require __DIR__ . '/auth.php';
