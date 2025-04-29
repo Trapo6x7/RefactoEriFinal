@@ -27,7 +27,7 @@ class TechCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Tech::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/tech');
-        CRUD::setEntityNameStrings('tech', 'teches');
+        CRUD::setEntityNameStrings('tech', 'techniciens');
     }
 
     /**

@@ -27,7 +27,7 @@ class EnvCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Env::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/env');
-        CRUD::setEntityNameStrings('env', 'envs');
+        CRUD::setEntityNameStrings('env', 'Environnements');
     }
 
     /**

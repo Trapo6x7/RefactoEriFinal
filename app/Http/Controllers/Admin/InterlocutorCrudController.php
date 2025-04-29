@@ -27,7 +27,7 @@ class InterlocutorCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Interlocutor::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/interlocutor');
-        CRUD::setEntityNameStrings('interlocutor', 'interlocutors');
+        CRUD::setEntityNameStrings('interlocutor', 'Interlocuteurs');
     }
 
     /**

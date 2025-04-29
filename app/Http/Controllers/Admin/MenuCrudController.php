@@ -19,7 +19,7 @@ class MenuCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Menu::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/menu');
-        CRUD::setEntityNameStrings('menu', 'menus');
+        CRUD::setEntityNameStrings('menu', 'Accès rapides');
     }
 
     protected function setupListOperation()

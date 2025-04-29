@@ -27,7 +27,7 @@ class ToolCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Tool::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/tool');
-        CRUD::setEntityNameStrings('tool', 'tools');
+        CRUD::setEntityNameStrings('tool', 'Outils');
     }
 
     /**
