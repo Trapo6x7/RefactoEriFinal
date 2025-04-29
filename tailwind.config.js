@@ -18,7 +18,7 @@ export default {
         colors: {
             "primary-grey" : "#0F2033",
             "secondary-grey" : "#F5F5F5",
-            "off-white" : "#E5EDFF",
+            "off-white" : "#F9FBFF",
             "blue-accent" : "#678BD8",
             "red-accent" : "#DB7171",
         }

@@ -5,16 +5,16 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
 
-class Problem extends Model
+class Menu extends Model
 {
     use CrudTrait;
-    protected $table = 'problems';
-
+    protected $table = 'menus';
+    
     protected $fillable = [
         'title',
-        'env',
-        'tool',
-        'societe',
-        'description',
+        'icon',
+        'link',
+        'order',
+        'role', // optionnel : pour restreindre à certains rôles
     ];
 }
