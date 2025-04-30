@@ -12,7 +12,7 @@
     </a>
     <ul class="dropdown-menu" aria-labelledby="internDropdown">
         <li>
-            <x-backpack::menu-item title="Users" :link="backpack_url('user')" class="dropdown-item" />
+            <x-backpack::menu-item title="Utilisateurs" :link="backpack_url('user')" class="dropdown-item" />
         </li>
         <li>
             <x-backpack::menu-item title="Techniciens" :link="backpack_url('tech')" class="dropdown-item" />

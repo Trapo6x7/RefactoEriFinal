@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             <!-- Logo -->
-            <div class="flex w-1/4 justify-center items-center">
+            <div class="flex w-1/5 justify-center items-center">
                 <a href="{{ route('dashboard') }}">
                     <img src="{{ asset('imgs/logoligne.png') }}" alt="logo" class="lg:w-1/2 md:w-auto sm:w-auto">
                 </a>
@@ -14,26 +14,52 @@
                     class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-accent' : '' }}">
                     ACCUEIL
                 </a>
-                <a href="#"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('societes*') ? 'border-b-2 border-blue-accent' : '' }}">
-                    SOCIETES
-                </a>
-                <a href="#"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('interlocuteurs*') ? 'border-b-2 border-blue-accent' : '' }}">
-                    INTERLOCUTEURS
-                </a>
-                <a href="#"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('environnements*') ? 'border-b-2 border-blue-accent' : '' }}">
-                    ENVIRONNEMENTS
-                </a>
-                <a href="#"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('outils*') ? 'border-b-2 border-blue-accent' : '' }}">
-                    OUTILS
-                </a>
-                <a href="#"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->is('problemes*') ? 'border-b-2 border-blue-accent' : '' }}">
-                    PROBLEMES
-                </a>
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open"
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('societes*') || request()->is('interlocuteurs*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        CLIENTS
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute left-0 mt-2 w-40 bg-white rounded shadow-lg z-50 py-1"
+                        x-transition>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('societes*') ? 'font-bold text-blue-accent' : '' }}">
+                            SOCIETES
+                        </a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('interlocuteurs*') ? 'font-bold text-blue-accent' : '' }}">
+                            INTERLOCUTEURS
+                        </a>
+                    </div>
+                </div>
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open"
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('environnements*') || request()->is('outils*') || request()->is('problemes*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        MAINTENANCE
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-50 py-1"
+                        x-transition>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('environnements*') ? 'font-bold text-blue-accent' : '' }}">
+                            ENVIRONNEMENTS
+                        </a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('outils*') ? 'font-bold text-blue-accent' : '' }}">
+                            OUTILS
+                        </a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('problemes*') ? 'font-bold text-blue-accent' : '' }}">
+                            PROBLEMES
+                        </a>
+                    </div>
+                </div>
             </nav>
 
             <!-- User Dropdown -->
