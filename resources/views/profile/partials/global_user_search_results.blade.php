@@ -1,5 +1,5 @@
-<article class="w-[80%] h-56 overflow-y-auto py-2 flex justify-center">
-    <div class="flex gap-x-6 w-full">
+<article class="w-[80%] h-56 overflow-y-auto flex justify-center">
+    <div class="flex gap-2 w-full">
         @if($societies->count())
             <div class="bg-white rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
