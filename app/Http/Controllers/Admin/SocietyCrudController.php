@@ -38,6 +38,7 @@ class SocietyCrudController extends CrudController
      */
     protected function setupListOperation()
     {
+        
         CRUD::column('name');
 
         /**
