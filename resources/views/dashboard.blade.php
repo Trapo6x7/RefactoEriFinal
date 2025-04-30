@@ -12,6 +12,11 @@
                     <input type="text" id="user-search-input" name="q" autocomplete="off"
                         placeholder="Recherche..."
                         class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
+                    <button type="button" id="reset-search-input"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xl hidden"
+                        aria-label="Effacer">
+                        &times;
+                    </button>
                     <div id="autocomplete-results"
                         class="absolute left-0 top-full mt-1 w-full bg-white rounded-md shadow-lg z-50 flex flex-col">
                         <!-- Suggestions injectées ici -->
@@ -47,9 +52,11 @@
             const input = document.getElementById('user-search-input');
             const tableSelect = document.getElementById('user-search-table');
             const suggestionBox = document.getElementById('autocomplete-results');
+            const resetBtn = document.getElementById('reset-search-input');
 
             // Autocomplétion
             input.addEventListener('input', function() {
+                resetBtn.classList.toggle('hidden', !this.value.length);
                 const q = this.value.trim();
                 const table = tableSelect.value;
                 if (q.length < 2) {
@@ -81,6 +88,15 @@
                             suggestionBox.classList.add('hidden');
                         }
                     });
+            });
+
+            // Bouton reset
+            resetBtn.addEventListener('click', function() {
+                input.value = '';
+                input.focus();
+                resetBtn.classList.add('hidden');
+                suggestionBox.innerHTML = '';
+                suggestionBox.classList.add('hidden');
             });
 
             // Fermer l'autocomplétion si clic à l'extérieur
