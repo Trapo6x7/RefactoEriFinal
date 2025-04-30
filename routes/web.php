@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\ContextualSearchController;
+use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserSearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -25,4 +27,8 @@ Route::get('/global-suggestions', [GlobalSearchController::class, 'suggestions']
 Route::get('/contextual-search', [ContextualSearchController::class, 'index'])->name('contextual-search');
 Route::get('/contextual-suggestions', [ContextualSearchController::class, 'suggestions'])->name('contextual-suggestions');
 
+Route::get('/user-search', [UserSearchController::class, 'index'])->name('user-search');
+Route::post('/user-search', [UserSearchController::class, 'search'])->name('user-search.post');
+
+Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('global-suggestions');
 require __DIR__ . '/auth.php';

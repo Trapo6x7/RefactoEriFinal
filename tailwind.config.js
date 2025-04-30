@@ -20,7 +20,9 @@ export default {
             "secondary-grey" : "#F5F5F5",
             "off-white" : "#F9FBFF",
             "blue-accent" : "#678BD8",
+            "blue-hover" : "#5c7dc4",
             "red-accent" : "#DB7171",
+            "red-hover" : "#bf6363",
         }
     },
 
