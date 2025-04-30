@@ -31,4 +31,14 @@ Route::get('/user-search', [UserSearchController::class, 'index'])->name('user-s
 Route::post('/user-search', [UserSearchController::class, 'search'])->name('user-search.post');
 
 Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('global-suggestions');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/model/{model}', [\App\Http\Controllers\ModelController::class, 'index'])
+        ->name('model.index');
+    Route::get('/model/{model}/{action}/{id?}', [\App\Http\Controllers\ModelController::class, 'form'])
+        ->name('model.form');
+    Route::post('/model/{model}/{action}/{id?}', [\App\Http\Controllers\ModelController::class, 'submit'])
+        ->name('model.submit');
+});
+
 require __DIR__ . '/auth.php';
