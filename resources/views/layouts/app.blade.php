@@ -35,7 +35,7 @@
         <main class="flex-1">
             {{ $slot }}
         </main>
-        @include('layouts.footer')
+        {{-- @include('layouts.footer') --}}
     </div>
 </body>
 

@@ -78,17 +78,17 @@
             </article>
         </section>
 
-        <section class="flex flex-col h-auto md:flex-row md:items-start md:justify-between gap-4 mt-8 px-0 md:px-8">
+        <section class="flex flex-col h-auto md:flex-row md:items-start md:justify-between gap-4 mt-10 px-0 md:px-8">
             <article id="saved-card-1"
-                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-72 overflow-y-auto mb-4 md:mb-0">
+            class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
             </article>
         
             <article id="saved-card-2"
-                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-72 overflow-y-auto mb-4 md:mb-0">
+            class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
             </article>
         
             <article id="saved-card-3"
-                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-72 overflow-y-auto">
+            class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto">
             </article>
         </section>
     </section>
