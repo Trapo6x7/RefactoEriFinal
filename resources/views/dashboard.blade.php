@@ -80,15 +80,15 @@
 
         <section class="flex flex-col h-auto md:flex-row md:items-start md:justify-between gap-4 mt-10 px-0 md:px-8">
             <article id="saved-card-1"
-            class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
+                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
             </article>
-        
+
             <article id="saved-card-2"
-            class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
+                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
             </article>
-        
+
             <article id="saved-card-3"
-            class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto">
+                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto">
             </article>
         </section>
     </section>
@@ -103,7 +103,7 @@
                 const model = this.value;
                 link.href = `/model/${model}/create`;
             });
-        
+
             // Autocomplétion recherche utilisateur
             const form = document.getElementById('user-search-form');
             const results = document.getElementById('user-search-results');
@@ -111,7 +111,7 @@
             const tableSelect = document.getElementById('user-search-table');
             const suggestionBox = document.getElementById('autocomplete-results');
             const resetBtn = document.getElementById('reset-search-input');
-        
+
             input.addEventListener('input', function() {
                 resetBtn.classList.toggle('hidden', !this.value.length);
                 const q = this.value.trim();
@@ -130,7 +130,8 @@
                             suggestions.forEach(suggestion => {
                                 let item = document.createElement('button');
                                 item.type = 'button';
-                                item.className = 'text-left px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer';
+                                item.className =
+                                    'text-left px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer';
                                 item.textContent = suggestion.label ?? suggestion;
                                 item.onclick = function() {
                                     input.value = suggestion.label ?? suggestion;
@@ -145,7 +146,7 @@
                         }
                     });
             });
-        
+
             resetBtn.addEventListener('click', function() {
                 input.value = '';
                 input.focus();
@@ -153,14 +154,14 @@
                 suggestionBox.innerHTML = '';
                 suggestionBox.classList.add('hidden');
             });
-        
+
             document.addEventListener('click', function(e) {
                 if (!input.contains(e.target) && !suggestionBox.contains(e.target)) {
                     suggestionBox.innerHTML = '';
                     suggestionBox.classList.add('hidden');
                 }
             });
-        
+
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(form);
@@ -186,14 +187,15 @@
                         };
                     })
                     .catch(() => {
-                        results.innerHTML = '<div class="text-red-500 p-4">Erreur lors de la recherche.</div>';
+                        results.innerHTML =
+                            '<div class="text-red-500 p-4">Erreur lors de la recherche.</div>';
                     });
             });
         });
-        
+
         // Gestion des cards dashboard
         let savedResults = [null, null, null];
-        
+
         function updateCards() {
             for (let i = 0; i < 3; i++) {
                 const card = document.getElementById('saved-card-' + (i + 1));
@@ -215,16 +217,16 @@
                                 .filter(([key]) => !['id', 'created_at', 'updated_at'].includes(key))
                                 .map(([key, value]) =>
                                     `<li class="border-b border-gray-200 py-2 w-full">
-                                        <div class="font-semibold text-blue-700 text-xs uppercase tracking-wide mb-1 w-full">${key}</div>
-                                        <div class="text-gray-700 break-words text-base text-right w-full editable-value"
-                                            contenteditable="true"
-                                            data-key="${key}"
-                                            data-index="${i}"
-                                            data-model="${savedResults[i].details.model ?? ''}"
-                                            data-id="${savedResults[i].details.id ?? ''}">
-                                            ${value ?? ''}
-                                        </div>
-                                    </li>`
+                                            <div class="font-semibold text-blue-700 text-xs uppercase tracking-wide mb-1 w-full">${key}</div>
+                                            <div class="text-gray-700 break-words text-base text-right w-full editable-value"
+                                                contenteditable="true"
+                                                data-key="${key}"
+                                                data-index="${i}"
+                                                data-model="${savedResults[i].details.model ?? ''}"
+                                                data-id="${savedResults[i].details.id ?? ''}">
+                                                ${value ?? ''}
+                                            </div>
+                                        </li>`
                                 ).join('')
                             : ''
                     }
@@ -240,7 +242,7 @@
                 }
             }
         }
-        
+
         // Délégation pour le bouton "Retirer"
         document.addEventListener('click', function(e) {
             if (e.target.matches('.remove-saved-result-btn')) {
@@ -248,13 +250,13 @@
                 removeSavedResult(index);
             }
         });
-        
+
         // Fonction pour retirer une card
         function removeSavedResult(index) {
             savedResults[index] = null;
             updateCards();
         }
-        
+
         // Ajout d'un résultat dans la première card vide
         document.addEventListener('click', function(e) {
             if (e.target.matches('.search-result-link')) {
@@ -264,7 +266,7 @@
                 const url = e.target.href;
                 const model = e.target.dataset.model;
                 const id = e.target.dataset.id;
-        
+
                 fetch(`/api/model/${model}/${id}`)
                     .then(res => res.json())
                     .then(data => {
@@ -275,7 +277,10 @@
                                 title,
                                 description,
                                 url,
-                                details: { ...data, model }
+                                details: {
+                                    ...data,
+                                    model
+                                }
                             };
                             updateCards();
                         } else {
@@ -284,7 +289,7 @@
                     });
             }
         });
-        
+
         // Délégation pour la sauvegarde à la sortie du champ éditable
         document.addEventListener('blur', function(e) {
             if (e.target.matches('.editable-value')) {
@@ -293,31 +298,33 @@
                 const index = e.target.dataset.index;
                 const model = e.target.dataset.model;
                 const id = e.target.dataset.id;
-        
+
                 // Met à jour en mémoire
                 if (savedResults[index] && savedResults[index].details) {
                     savedResults[index].details[key] = newValue;
                 }
-        
+
                 // Envoi AJAX pour sauvegarder en BDD
                 fetch(`/api/model/${model}/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ [key]: newValue })
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Erreur lors de la sauvegarde');
-                    e.target.classList.add('bg-green-100');
-                    setTimeout(() => e.target.classList.remove('bg-green-100'), 1000);
-                })
-                .catch(() => {
-                    e.target.classList.add('bg-red-100');
-                    setTimeout(() => e.target.classList.remove('bg-red-100'), 1000);
-                });
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            [key]: newValue
+                        })
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Erreur lors de la sauvegarde');
+                        e.target.classList.add('bg-green-100');
+                        setTimeout(() => e.target.classList.remove('bg-green-100'), 1000);
+                    })
+                    .catch(() => {
+                        e.target.classList.add('bg-red-100');
+                        setTimeout(() => e.target.classList.remove('bg-red-100'), 1000);
+                    });
             }
         }, true); // useCapture pour blur
-        </script>
+    </script>
 </x-app-layout>
