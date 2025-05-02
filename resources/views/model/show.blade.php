@@ -14,7 +14,7 @@
                             <span
                                 class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition
                                     cursor-text outline-none text-right
-                                    focus:border-blue-accent border border-transparent
+                                    focus:border-blue-accent border border-off-white
                                     group-hover:border-blue-hover"
                                 contenteditable="true" data-field="{{ $key }}" data-id="{{ $item->id }}"
                                 data-model="{{ $model }}" tabindex="0">{{ $value }}</span>
