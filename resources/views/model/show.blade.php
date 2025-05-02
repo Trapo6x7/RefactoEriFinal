@@ -9,13 +9,15 @@
             <ul class="divide-y divide-primary-grey" id="details-list">
                 @foreach ($item->getAttributes() as $key => $value)
                     @if ($key !== 'id')
-                        <li class="p-3 flex items-center justify-between h-auto">
-                            <span class="font-semibold text-gray-700 w-40 mr-20">{{ $key }}</span>
-                            <span class="text-gray-600 max-w-[55rem] editable" contenteditable="true"
-                                data-field="{{ $key }}" data-id="{{ $item->id }}"
-                                data-model="{{ $model }}">
-                                {{ $value }}
-                            </span>
+                        <li class="p-3 flex items-center justify-between h-auto group">
+                            <span class="font-semibold text-blue-accent w-40 mr-20">{{ $key }}</span>
+                            <span
+                                class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition
+                                    cursor-text outline-none text-right
+                                    focus:border-blue-accent border border-transparent
+                                    group-hover:border-blue-hover"
+                                contenteditable="true" data-field="{{ $key }}" data-id="{{ $item->id }}"
+                                data-model="{{ $model }}" tabindex="0">{{ $value }}</span>
                         </li>
                     @endif
                 @endforeach
