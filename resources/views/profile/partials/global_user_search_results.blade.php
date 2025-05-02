@@ -3,14 +3,14 @@
         @if ($societies->count())
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
-                    <span class="text-blue-600 mr-2"><i class="la la-building"></i></span>
+                    <span class="mr-2"><i class="la la-building"></i></span>
                     <h3 class="font-bold text-lg text-primary-grey">Sociétés</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @foreach ($societies as $society)
                         <li>
                             <a href="{{ route('model.show', ['model' => 'société', 'id' => $society->id]) }}"
-                                class="search-result-link text-blue-700 hover:underline"
+                                class="search-result-link text-blue-700 hover:text-blue-accent"
                                 data-title="{{ $society->name }}" data-description="Société" data-model="société"
                                 data-id="{{ $society->id }}">
                                 {{ $society->name }}
@@ -24,14 +24,14 @@
         @if ($problems->count())
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
-                    <span class="text-red-600 mr-2"><i class="la la-exclamation-circle"></i></span>
+                    <span class="mr-2"><i class="la la-exclamation-circle"></i></span>
                     <h3 class="font-bold text-lg text-primary-grey">Problèmes</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @foreach ($problems as $problem)
                         <li>
                             <a href="{{ route('model.show', ['model' => 'problème', 'id' => $problem->id]) }}"
-                                class="search-result-link text-red-700 hover:underline"
+                                class="search-result-link text-red-700 hover:text-blue-accent"
                                 data-title="{{ $problem->title }}" data-description="Problème" data-model="problème"
                                 data-id="{{ $problem->id }}">
                                 {{ $problem->title }}
@@ -45,14 +45,14 @@
         @if ($problemStatuses->count())
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
-                    <span class="text-green-600 mr-2"><i class="la la-flag"></i></span>
+                    <span class="mr-2"><i class="la la-flag"></i></span>
                     <h3 class="font-bold text-lg text-primary-grey">Statuts</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @foreach ($problemStatuses as $status)
                         <li>
                             <a href="{{ route('model.show', ['model' => 'problemStatus', 'id' => $status->id]) }}"
-                                class="search-result-link text-green-700 hover:underline"
+                                class="search-result-link text-green-700 hover:text-blue-accent"
                                 data-title="{{ $status->name }}" data-description="Statut" data-model="problemStatus"
                                 data-id="{{ $status->id }}">
                                 {{ $status->name }}
@@ -66,14 +66,14 @@
         @if ($interlocutors->count())
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
-                    <span class="text-yellow-600 mr-2"><i class="la la-user"></i></span>
+                    <span class="mr-2"><i class="la la-user"></i></span>
                     <h3 class="font-bold text-lg text-primary-grey">Interlocuteurs</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @foreach ($interlocutors as $interlocutor)
                         <li>
                             <a href="{{ route('model.show', ['model' => 'interlocuteur', 'id' => $interlocutor->id]) }}"
-                                class="search-result-link text-yellow-700 hover:underline"
+                                class="search-result-link text-primary-grey hover:text-blue-accent"
                                 data-title="{{ $interlocutor->fullname ?? $interlocutor->name }}"
                                 data-description="Interlocuteur" data-model="interlocuteur"
                                 data-id="{{ $interlocutor->id }}">
@@ -88,14 +88,14 @@
         @if ($envs->count())
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
-                    <span class="text-indigo-600 mr-2"><i class="la la-globe"></i></span>
+                    <span class="mr-2"><i class="la la-globe"></i></span>
                     <h3 class="font-bold text-lg text-primary-grey">Environnements</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @foreach ($envs as $env)
                         <li>
                             <a href="{{ route('model.show', ['model' => 'environnement', 'id' => $env->id]) }}"
-                                class="search-result-link text-indigo-700 hover:underline"
+                                class="search-result-link text-indigo-700 hover:text-blue-accent"
                                 data-title="{{ $env->name }}" data-description="Environnement"
                                 data-model="environnement" data-id="{{ $env->id }}">
                                 {{ $env->name }}
@@ -109,14 +109,14 @@
         @if ($tools->count())
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
-                    <span class="text-purple-600 mr-2"><i class="la la-wrench"></i></span>
+                    <span class="mr-2"><i class="la la-wrench"></i></span>
                     <h3 class="font-bold text-lg text-primary-grey">Outils</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @foreach ($tools as $tool)
                         <li>
                             <a href="{{ route('model.show', ['model' => 'outil', 'id' => $tool->id]) }}"
-                                class="search-result-link text-purple-700 hover:underline"
+                                class="search-result-link text-purple-700 hover:text-blue-accent"
                                 data-title="{{ $tool->name }}" data-description="Outil" data-model="outil"
                                 data-id="{{ $tool->id }}">
                                 {{ $tool->name }}
@@ -134,7 +134,7 @@
                 !$interlocutors->count() &&
                 !$envs->count() &&
                 !$tools->count())
-            <div class="text-primary-grey text-center py-8 min-w-[300px] flex-shrink-0">Aucun résultat trouvé.</div>
+            <div class="text-primary-grey text-center flex just py-8 min-w-[300px] flex-shrink-0"><p>Aucun résultat trouvé.</p> </div>
         @endif
     </div>
 </article>

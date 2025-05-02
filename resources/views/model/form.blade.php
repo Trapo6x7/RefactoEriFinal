@@ -15,7 +15,7 @@
                 </ul>
             </div>
         @endif
-        
+
         @if ($action === 'edit')
             @method('POST')
         @endif
@@ -41,4 +41,28 @@
             </button>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                let valid = true;
+                let firstInvalid = null;
+                // Sélectionne tous les champs requis (ajoute l'attribut required sur tes inputs Blade)
+                form.querySelectorAll('[required]').forEach(function(input) {
+                    if (!input.value.trim()) {
+                        valid = false;
+                        input.classList.add('border-red-500', 'ring-2', 'ring-red-300');
+                        if (!firstInvalid) firstInvalid = input;
+                    } else {
+                        input.classList.remove('border-red-500', 'ring-2', 'ring-red-300');
+                    }
+                });
+                if (!valid) {
+                    e.preventDefault();
+                    if (firstInvalid) firstInvalid.focus();
+                }
+            });
+        });
+    </script>
 </x-app-layout>

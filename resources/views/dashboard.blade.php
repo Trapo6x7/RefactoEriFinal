@@ -80,15 +80,24 @@
 
         <section class="flex flex-col h-auto md:flex-row md:items-start md:justify-between gap-4 mt-10 px-0 md:px-8">
             <article id="saved-card-1"
-                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
+                class=" rounded-lg  p-0 flex flex-col items-center justify-start border-secondary-grey border w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
+                <div class="flex flex-col items-center justify-center h-full">
+                    <span class="text-blue-accent">Aucun résultat enregistré</span>
+                </div>
             </article>
 
             <article id="saved-card-2"
-                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
+                class=" rounded-lg  p-0 flex flex-col items-center justify-start border-secondary-grey border w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto mb-4 md:mb-0">
+                <div class="flex flex-col items-center justify-center h-full">
+                    <span class="text-blue-accent">Aucun résultat enregistré</span>
+                </div>
             </article>
 
             <article id="saved-card-3"
-                class=" rounded-lg shadow-md p-0 flex flex-col items-center justify-start w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto">
+                class=" rounded-lg  p-0 flex flex-col items-center justify-start border-secondary-grey border w-full md:w-1/3 max-w-full md:max-w-lg flex-grow h-96 overflow-y-auto">
+                <div class="flex flex-col items-center justify-center h-full">
+                    <span class="text-blue-accent">Aucun résultat enregistré</span>
+                </div>
             </article>
         </section>
     </section>
@@ -201,32 +210,31 @@
                 const card = document.getElementById('saved-card-' + (i + 1));
                 if (savedResults[i]) {
                     card.innerHTML = `
-            <div class="flex items-center justify-between w-full mb-2">
+            <div class="flex items-center justify-between w-full my-8 px-8">
                 <h3 class="text-lg font-semibold text-blue-accent flex-1">${savedResults[i].title}</h3>
+                <a href="${savedResults[i].url}" class="ml-4 text-primary-grey hover:text-blue-accent text-sm" title="Voir +">Voir +</a>
                 <button type="button"
-                    class="ml-2 text-xl text-red-500 hover:text-red-700 font-bold remove-saved-result-btn"
+                    class="ml-2 text-xl text-red-accent hover:text-red-hover font-bold remove-saved-result-btn"
                     data-index="${i}" title="Retirer">&times;</button>
-                <a href="${savedResults[i].url}" class="ml-4 text-blue-600 hover:underline text-sm" title="Voir la fiche">Voir</a>
             </div>
-            <p class="text-gray-600 text-center mb-2">${savedResults[i].description ?? ''}</p>
-            <div class="bg-secondary-grey p-3 mb-2 w-full">
-                <ul class="space-y-2 w-full">
+
+            <div class="bg-off-white p-8 mb-2 w-full rounded-lg">
+                <ul class="space-y-5 w-full">
                     ${
                         savedResults[i].details
                             ? Object.entries(savedResults[i].details)
-                                .filter(([key]) => !['id', 'created_at', 'updated_at'].includes(key))
+                                .filter(([key]) => !['id', 'created_at', 'updated_at', 'model'].includes(key))
                                 .map(([key, value]) =>
-                                    `<li class="border-b border-gray-200 py-2 w-full">
-                                            <div class="font-semibold text-blue-700 text-xs uppercase tracking-wide mb-1 w-full">${key}</div>
-                                            <div class="text-gray-700 break-words text-base text-right w-full editable-value"
-                                                contenteditable="true"
-                                                data-key="${key}"
-                                                data-index="${i}"
-                                                data-model="${savedResults[i].details.model ?? ''}"
-                                                data-id="${savedResults[i].details.id ?? ''}">
-                                                ${value ?? ''}
-                                            </div>
-                                        </li>`
+                                    `<li class="border-b border-primary-grey py-2 w-full">
+                                                <div class="font-semibold text-blue-accent text-xs uppercase tracking-wide mb-4 w-full">${key}</div>
+                                                <div class="text-primary-grey break-words text-base text-right w-full mb-4 editable-value focus:rounded-lg focus:ring-2 focus:ring-blue-accent focus:outline-none"
+                                                    contenteditable="true"
+                                                    data-key="${key}"
+                                                    data-index="${i}"
+                                                    data-id="${savedResults[i].details.id ?? ''}">
+                                                    ${value ?? ''}
+                                                </div>
+                                            </li>`
                                 ).join('')
                             : ''
                     }
@@ -236,7 +244,7 @@
                 } else {
                     card.innerHTML = `
                         <div class="flex flex-col items-center justify-center h-full">
-                            <span class="text-gray-400">Aucun résultat enregistré</span>
+                            <span class="text-blue-accent">Aucun résultat enregistré</span>
                         </div>
                     `;
                 }
