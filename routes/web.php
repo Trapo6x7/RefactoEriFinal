@@ -3,6 +3,8 @@
 use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\ContextualSearchController;
 use App\Http\Controllers\DatabaseController;
+use App\Http\Controllers\ModelController;
+use App\Http\Controllers\ModelSearchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserSearchController;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +32,11 @@ Route::get('/contextual-suggestions', [ContextualSearchController::class, 'sugge
 Route::get('/user-search', [UserSearchController::class, 'index'])->name('user-search');
 Route::post('/user-search', [UserSearchController::class, 'search'])->name('user-search.post');
 
-Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('global-suggestions');
+Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('user-suggestions');
+
+Route::get('/model/{model}/search', [ModelSearchController::class, 'search'])->name('model-suggestions');
+
+Route::get('/model/{model}/show/{id}', [\App\Http\Controllers\ModelController::class, 'show'])->name('model.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/model/{model}', [\App\Http\Controllers\ModelController::class, 'index'])
@@ -40,5 +46,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/model/{model}/{action}/{id?}', [\App\Http\Controllers\ModelController::class, 'submit'])
         ->name('model.submit');
 });
+
 
 require __DIR__ . '/auth.php';

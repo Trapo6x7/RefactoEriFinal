@@ -15,44 +15,44 @@
                 </a>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/society*') || request()->is('model/interlocuteur*') ? 'border-b-2 border-blue-accent' : '' }}">
-                        CLIENTS
+                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/société*') || request()->is('model/interlocuteur*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        EXTERNE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
                     <div x-show="open" @click.away="open = false"
-                        class="absolute left-0 mt-2 w-40 bg-white rounded shadow-lg z-50 py-1" x-transition>
-                        <a href="{{ route('model.index', ['model' => 'society']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('model/society*') ? 'font-bold text-blue-accent' : '' }}">
+                        class="absolute left-0 mt-2 w-40 bg-secondary-grey rounded-lg shadow-lg z-50 py-1" x-transition>
+                        <a href="{{ route('model.index', ['model' => 'société']) }}"
+                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/society*') ? 'font-bold text-blue-accent' : '' }}">
                             SOCIETES
                         </a>
                         <a href="{{ route('model.index', ['model' => 'interlocuteur']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
                             INTERLOCUTEURS
                         </a>
                     </div>
                 </div>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/environnement*') || request()->is('model/tool*') || request()->is('model/problem*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/problème*') ? 'border-b-2 border-blue-accent' : '' }}">
                         MAINTENANCE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
                     <div x-show="open" @click.away="open = false"
-                        class="absolute left-0 mt-2 w-48 bg-white rounded shadow-lg z-50 py-1" x-transition>
+                        class="absolute left-0 mt-2 w-48 bg-secondary-grey rounded-lg shadow-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
                             ENVIRONNEMENTS
                         </a>
-                        <a href="{{ route('model.index', ['model' => 'tool']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('model/tool*') ? 'font-bold text-blue-accent' : '' }}">
+                        <a href="{{ route('model.index', ['model' => 'outil']) }}"
+                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/tool*') ? 'font-bold text-blue-accent' : '' }}">
                             OUTILS
                         </a>
-                        <a href="{{ route('model.index', ['model' => 'problem']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey hover:bg-secondary-grey hover:text-blue-accent {{ request()->is('model/problem*') ? 'font-bold text-blue-accent' : '' }}">
+                        <a href="{{ route('model.index', ['model' => 'problème']) }}"
+                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/problem*') ? 'font-bold text-blue-accent' : '' }}">
                             PROBLEMES
                         </a>
                     </div>

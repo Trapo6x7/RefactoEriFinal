@@ -1,4 +1,4 @@
-<article class="w-[80%] h-96 overflow-y-auto flex justify-center">
+<article class="w-[80%] max-h-[600px] overflow-y-auto flex justify-center">
     <div class="flex gap-2 w-full">
         @if($societies->count())
             <div class="bg-white rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">

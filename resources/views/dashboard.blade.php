@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-4 bg-secondary-grey min-h-screen">
+    <div class="py-4 mx-12 bg-off-white rounded-lg max-h-screen">
         <div class="max-w-4xl mx-auto">
             <form id="user-search-form" class="flex flex-col md:flex-row items-center gap-4 relative">
                 <div class="w-full md:w-1/2 relative">

@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 class ModelController extends Controller
 {
     protected $models = [
-        'society'       => \App\Models\Society::class,
+        'société'       => \App\Models\Society::class,
         'interlocuteur' => \App\Models\Interlocutor::class,
         'environnement' => \App\Models\Env::class,
-        'problem'       => \App\Models\Problem::class,
-        'tool'          => \App\Models\Tool::class,
+        'problème'       => \App\Models\Problem::class,
+        'outil'          => \App\Models\Tool::class,
     ];
 
     public function index($model)
@@ -40,7 +40,7 @@ class ModelController extends Controller
         $class = $this->models[$model];
 
         $rules = [
-            'society' => [
+            'société' => [
                 'id_main'                           => 'nullable|integer',
                 'name'                              => 'required|string|max:255',
                 'status_client'                     => 'nullable|string|max:255',
@@ -98,14 +98,14 @@ class ModelController extends Controller
             'environnement' => [
                 'name' => 'required|string|max:255',
             ],
-            'problem' => [
+            'problème' => [
                 'title'       => 'required|string|max:255',
                 'env'         => 'nullable|string|max:255',
                 'tool'        => 'nullable|string|max:255',
                 'societe'     => 'nullable|string|max:255',
                 'description' => 'nullable|string',
             ],
-            'tool' => [
+            'outil' => [
                 'name' => 'required|string|max:255',
             ],
         ];
@@ -122,5 +122,15 @@ class ModelController extends Controller
         }
 
         return redirect()->route('dashboard')->with('status', 'Opération réussie !');
+    }
+
+    public function show($model, $id)
+    {
+        if (!isset($this->models[$model])) {
+            abort(404);
+        }
+        $modelClass = $this->models[$model];
+        $item = $modelClass::findOrFail($id);
+        return view('model.show', compact('item', 'model'));
     }
 }

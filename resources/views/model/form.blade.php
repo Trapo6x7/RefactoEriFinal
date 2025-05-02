@@ -8,15 +8,15 @@
             @method('POST')
         @endif
     
-        @if ($model === 'society')
+        @if ($model === 'société')
             @include('model.partials._society_field')
         @elseif($model === 'interlocuteur')
             @include('model.partials._interlocutor_field')
         @elseif($model === 'environnement')
             @include('model.partials._env_field')
-        @elseif($model === 'problem')
+        @elseif($model === 'problème')
             @include('model.partials._problem_field')
-        @elseif($model === 'tool')
+        @elseif($model === 'outil')
             @include('model.partials._tool_field')
         @endif
     
