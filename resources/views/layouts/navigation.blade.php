@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-secondary-grey">
+<nav x-data="{ open: false }" class="bg-off-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             <!-- Logo -->
@@ -22,7 +22,7 @@
                         </svg>
                     </button>
                     <div x-show="open" @click.away="open = false"
-                        class="absolute left-0 mt-2 w-40 bg-secondary-grey rounded-lg shadow-lg z-50 py-1" x-transition>
+                        class="absolute left-0 mt-2 w-40 bg-off-white rounded-lg shadow-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'société']) }}"
                             class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/society*') ? 'font-bold text-blue-accent' : '' }}">
                             SOCIETES
@@ -42,7 +42,7 @@
                         </svg>
                     </button>
                     <div x-show="open" @click.away="open = false"
-                        class="absolute left-0 mt-2 w-48 bg-secondary-grey rounded-lg shadow-lg z-50 py-1" x-transition>
+                        class="absolute left-0 mt-2 w-48 bg-off-white rounded-lg shadow-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
                             class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
                             ENVIRONNEMENTS
@@ -64,7 +64,7 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
-                            class="uppercase hidden lg:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-grey bg-secondary-grey hover:text-blue-accent focus:outline-none transition ease-in-out duration-150">
+                            class="uppercase hidden lg:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-150">
                             <div>{{ Auth::user()->name }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +110,7 @@
 
     <!-- Responsive Navigation Menu -->
     <nav x-show="open" @click.away="open = false"
-        class="absolute top-20 left-0 w-full bg-secondary-grey flex flex-col items-center gap-4 py-4 lg:hidden z-50">
+        class="absolute top-20 left-0 w-full bg-off-white flex flex-col items-center gap-4 py-4 lg:hidden z-50">
         <a href="{{ route('dashboard') }}"
             class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
             ACCUEIL

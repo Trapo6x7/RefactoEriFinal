@@ -1,6 +1,6 @@
 <x-app-layout>
     <h1 class="text-3xl text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}</h1>
-    <div class="bg-off-white rounded-lg shadow p-6 max-w-[80%] mx-auto">
+    <div class="bg-off-white rounded-lg p-6 max-w-[80%] mx-auto">
         <div class="mb-4 flex justify-center">
             <input type="text" id="detail-search" placeholder="Rechercher un champ ou une valeur..."
                 class="border rounded px-4 py-2 w-1/2">

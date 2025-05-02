@@ -3,7 +3,7 @@
         CRÉER {{ ucfirst($model) }}
     </h2>
     <form method="POST" action="{{ route('model.submit', [$model, $action, $instance->id ?? null]) }}"
-        class="max-w-4xl mx-auto bg-off-white p-8 rounded-lg shadow space-y-8 flex flex-col">
+        class="max-w-4xl mx-auto bg-off-white p-8 rounded-lg shadow space-y-8 flex flex-col gap-4">
         @csrf
 
         @if ($errors->any())
@@ -20,7 +20,7 @@
             @method('POST')
         @endif
 
-        <div class="overflow-y-auto max-h-[60vh] px-2">
+        <div class="overflow-y-auto max-h-[60vh] px-2 flex flex-col gap-4">
             @if ($model === 'société')
                 @include('model.partials._society_field')
             @elseif($model === 'interlocuteur')
@@ -36,7 +36,7 @@
 
         <div class="flex justify-end">
             <button type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded shadow uppercase tracking-wider transition">
+                class="bg-blue-accent hover:bg-blue-hover text-off-white font-bold py-2 px-8 rounded uppercase tracking-wider transition">
                 {{ $action === 'create' ? 'Créer' : 'Mettre à jour' }}
             </button>
         </div>

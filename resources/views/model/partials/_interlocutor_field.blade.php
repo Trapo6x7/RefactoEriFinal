@@ -4,7 +4,7 @@
         <select
             id="societe"
             name="societe"
-            class="w-full px-4 py-2 border border-secondary-grey rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+            class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
             required
         >
             <option value="">Sélectionner une société</option>
@@ -22,7 +22,7 @@
             name="{{ $field['name'] }}"
             value="{{ old($field['name'], $instance->{$field['name']} ?? '') }}"
             placeholder="{{ $field['placeholder'] }}"
-            class="w-full px-4 py-2 border border-secondary-grey rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+            class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
             @if(in_array($field['name'], ['service_connect','service_cloody','service_comptes','service_mail'])) required @endif
         >
     @endif
