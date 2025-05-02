@@ -261,4 +261,19 @@ class ModelController extends Controller
         }
         return $fields;
     }
+
+    public function apiShow($model, $id)
+    {
+        if (!isset($this->models[$model])) abort(404);
+        $item = $this->models[$model]::findOrFail($id);
+        return response()->json($item);
+    }
+
+    public function apiUpdate(Request $request, $model, $id)
+    {
+        if (!isset($this->models[$model])) abort(404);
+        $item = $this->models[$model]::findOrFail($id);
+        $item->update($request->only(array_keys($request->all())));
+        return response()->json(['success' => true]);
+    }
 }
