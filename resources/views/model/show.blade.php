@@ -8,14 +8,16 @@
         <div class="px-8" style="max-height:600px; overflow-y: auto;">
             <ul class="divide-y divide-primary-grey" id="details-list">
                 @foreach ($item->getAttributes() as $key => $value)
-                    <li class="p-3 flex items-center justify-between h-auto">
-                        <span class="font-semibold text-gray-700 w-40 mr-20">{{ $key }}</span>
-                        <span class="text-gray-600 max-w-[55rem] editable" contenteditable="true"
-                            data-field="{{ $key }}" data-id="{{ $item->id }}"
-                            data-model="{{ $model }}">
-                            {{ $value }}
-                        </span>
-                    </li>
+                    @if ($key !== 'id')
+                        <li class="p-3 flex items-center justify-between h-auto">
+                            <span class="font-semibold text-gray-700 w-40 mr-20">{{ $key }}</span>
+                            <span class="text-gray-600 max-w-[55rem] editable" contenteditable="true"
+                                data-field="{{ $key }}" data-id="{{ $item->id }}"
+                                data-model="{{ $model }}">
+                                {{ $value }}
+                            </span>
+                        </li>
+                    @endif
                 @endforeach
             </ul>
         </div>

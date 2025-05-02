@@ -40,6 +40,11 @@ class ModelSearchController extends Controller
             })
             ->get();
 
-        return view('model.partials.table_body', compact('items'))->render();
+        return view('model.partials.table_body', [
+            'items' => $items,
+            'model' => $model
+        ])->render();
     }
+
+  
 }

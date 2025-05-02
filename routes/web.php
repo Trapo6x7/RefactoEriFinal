@@ -38,6 +38,8 @@ Route::get('/model/{model}/search', [ModelSearchController::class, 'search'])->n
 
 Route::get('/model/{model}/show/{id}', [\App\Http\Controllers\ModelController::class, 'show'])->name('model.show');
 
+Route::post('/model/{model}/update-field/{id}', [\App\Http\Controllers\ModelController::class, 'updateField'])->name('model.updateField');
+
 Route::middleware('auth')->group(function () {
     Route::get('/model/{model}', [\App\Http\Controllers\ModelController::class, 'index'])
         ->name('model.index');

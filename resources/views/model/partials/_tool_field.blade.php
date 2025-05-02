@@ -1,4 +1,4 @@
-<label for="name">Nom de l'outil</label>
+<label class="uppercase" for="name">Nom de l'outil</label>
 <input
     type="text"
     id="name"

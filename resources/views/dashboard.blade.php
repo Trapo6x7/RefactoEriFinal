@@ -5,7 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-4 mx-12 bg-off-white rounded-lg max-h-screen">
+    <div class="py-4 mx-12 bg-off-white rounded-lg h-auto h-[80%])">
+
         <div class="max-w-4xl mx-auto">
             <form id="user-search-form" class="flex flex-col md:flex-row items-center gap-4 relative">
                 <div class="w-full md:w-1/2 relative">
@@ -18,10 +19,11 @@
                         &times;
                     </button>
                     <div id="autocomplete-results"
-                        class="absolute left-0 top-full mt-1 w-full bg-white rounded-md shadow-lg z-50 flex flex-col">
+                        class="absolute left-0 top-full mt-1 w-full bg-off-white rounded-md shadow-lg z-50 flex flex-col">
                         <!-- Suggestions injectées ici -->
                     </div>
                 </div>
+
                 <div class="w-full md:w-1/4">
                     <select id="user-search-table" name="table"
                         class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
@@ -40,12 +42,51 @@
                 </button>
             </form>
         </div>
+
         <div class="mx-auto">
             <div id="user-search-results" class="mt-8 flex justify-center items-center"></div>
+        </div>
+
+        @php
+            $models = [
+                'société' => 'Société',
+                'problème' => 'Problème',
+                'problemStatus' => 'Statut',
+                'interlocuteur' => 'Interlocuteur',
+                'environnement' => 'Environnement',
+                'outil' => 'Outil',
+            ];
+        @endphp
+
+        <div class="w-full flex justify-center mt-6">
+            <div class="bg-white rounded-lg px-8 py-6 flex flex-col items-center max-w-sm w-full">
+                <div class="text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
+                <div class="flex gap-2 w-full">
+                    <select id="add-model-select" class="border rounded px-4 py-2 flex-1">
+                        @foreach ($models as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <a id="add-model-link"
+                        href="{{ route('model.form', ['model' => array_key_first($models), 'action' => 'create']) }}"
+                        class="px-4 py-2 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition flex-shrink-0">
+                        +
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('add-model-select');
+            const link = document.getElementById('add-model-link');
+            select.addEventListener('change', function() {
+                const model = this.value;
+                link.href = `/model/${model}/create`;
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('user-search-form');
             const results = document.getElementById('user-search-results');
@@ -54,7 +95,6 @@
             const suggestionBox = document.getElementById('autocomplete-results');
             const resetBtn = document.getElementById('reset-search-input');
 
-            // Autocomplétion
             input.addEventListener('input', function() {
                 resetBtn.classList.toggle('hidden', !this.value.length);
                 const q = this.value.trim();

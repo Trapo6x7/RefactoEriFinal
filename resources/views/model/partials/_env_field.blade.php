@@ -1,4 +1,4 @@
-<label for="name">Nom de l'environnement</label>
+<label class="uppercase" for="name">Nom de l'environnement</label>
 <input
     type="text"
     id="name"

@@ -18,8 +18,10 @@
                     @foreach ($items as $item)
                         <tr class="border-b">
                             <td class="py-2 px-4 text-center bg-off-white hover:text-blue-accent">
-                                {{ $item->name ?? ($item->title ?? '-') }}
-                                <a href="{{ route('model.show', ['model' => $model, 'id' => $item->id]) }}" class="ml-4 text-blue-500 hover:underline">◉</a>
+
+                                <a href="{{ route('model.show', ['model' => $model, 'id' => $item->id]) }}"
+                                    class="ml-4 text-blue-500 hover:underline">
+                                    {{ $item->name ?? ($item->title ?? '-') }}</a>
                         </tr>
                     @endforeach
                 </tbody>
@@ -31,14 +33,14 @@
         document.getElementById('search').addEventListener('input', function() {
             let query = this.value;
             fetch(`{{ route('model-suggestions', ['model' => $model]) }}?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('table-body').innerHTML = html;
-            });
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('table-body').innerHTML = html;
+                });
         });
     </script>
 </x-app-layout>
