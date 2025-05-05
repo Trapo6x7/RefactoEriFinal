@@ -1,0 +1,287 @@
+/* === Ambiance froide : bleu, violet, gris, blanc === */
+
+/* Fond général sombre */
+body {
+    background-color: #0f2033 !important; /* primary-grey */
+    color: #678bd8 !important; /* blue-accent */
+}
+
+/* Cards */
+.card,
+.rounded-lg {
+    background-color: #f9fbff !important; /* off-white */
+    border: 1px solid #f5f5f5 !important; /* secondary-grey */
+    color: #0f2033 !important; /* primary-grey */
+    border-radius: 1rem !important;
+    box-shadow: 0 2px 8px #678bd822;
+}
+
+/* Titres */
+h1,
+.fw-bold {
+    color: #f9fbff; /* off-white */
+    font-weight: 700 !important;
+}
+
+h2,
+h3 {
+    color: #678bd8 !important; /* blue-accent */
+    font-weight: 700 !important;
+}
+
+/* Boutons principaux */
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #678bd8 !important; /* blue-accent */
+    border-color: #678bd8 !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+.btn-primary:hover {
+    background-color: #5c7dc4 !important; /* blue-hover */
+    border-color: #5c7dc4 !important;
+}
+
+/* Boutons danger */
+.btn-danger,
+.btn-danger:focus,
+.btn-danger:active {
+    background-color: #db7171 !important; /* red-accent */
+    border-color: #db7171 !important;
+    color: #fff !important;
+}
+.btn-danger:hover {
+    background-color: #bf6363 !important; /* red-hover */
+    border-color: #bf6363 !important;
+}
+
+/* Textes secondaires */
+.text-muted,
+.small,
+.card .small {
+    color: #b0b0b0 !important;
+}
+
+/* Sidebar et header */
+aside,
+header,
+.navbar,
+.navbar-nav {
+    background-color: #0f2033 !important; /* primary-grey */
+    color: #f5f5f5 !important; /* secondary-grey */
+    border: none !important;
+}
+
+/* Liens actifs dans la nav */
+aside a.nav-link.active,
+aside a.nav-link.active:hover {
+    background-color: #678bd8 !important; /* blue-accent */
+    color: #fff !important;
+}
+
+/* Liens nav au hover */
+aside a.nav-link:hover {
+    color: #678bd8 !important;
+    background-color: #f5f5f5 !important; /* secondary-grey */
+}
+
+/* Tableaux */
+.table {
+    background-color: #f9fbff !important; /* off-white */
+    color: #0f2033 !important; /* primary-grey */
+}
+.table thead th {
+    background-color: #678bd8 !important; /* blue-accent */
+    color: #fff !important;
+}
+
+td span {
+    color: #f9fbff !important; /* blue-accent */
+}
+
+td a {
+    color: #678bd8 !important; /* blue-accent */
+    text-decoration: none !important;
+}
+
+/* Inputs et selects */
+.form-control,
+.form-select {
+    background-color: #f5f5f5 !important; /* secondary-grey */
+    color: #0f2033 !important; /* primary-grey */
+    border-color: #678bd8 !important;
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: #678bd8 !important;
+    box-shadow: 0 0 0 0.25rem #678bd833 !important;
+}
+.form-control::placeholder {
+    color: #b0b0b0 !important;
+    opacity: 1;
+}
+
+/* Checkbox et radio */
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: #678bd8 !important;
+    background: #f5f5f5 !important;
+    border: 1px solid #678bd8 !important;
+}
+
+/* Alertes */
+.alert,
+.alert-warning,
+.alert-danger,
+.alert-info,
+.alert-success {
+    background-color: #f9fbff !important; /* off-white */
+    color: #678bd8 !important; /* blue-accent */
+    border: none !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    color: #f5f5f5 !important; /* secondary-grey */
+    background-color: #0f2033 !important; /* primary-grey */
+    border: none !important;
+}
+
+/* Modals */
+.modal-content {
+    color: #f9fbff !important; /* off-white */
+    background-color: #0f2033 !important; /* primary-grey */
+    border: none !important;
+}
+
+/* Pagination */
+ul.pagination li.paginate_button.page-item.active a {
+    color: #fff !important;
+    background-color: #678bd8 !important;
+    border-color: #678bd8 !important;
+}
+ul.pagination li.paginate_button.page-item a {
+    color: #678bd8 !important;
+    background: transparent !important;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    background: transparent !important;
+    color: #b0b0b0 !important;
+}
+.breadcrumb .active {
+    color: #678bd8 !important;
+}
+
+/* Cards body */
+.card-body,
+.bg-off-white {
+    background-color: #f9fbff !important; /* off-white */
+    color: #0f2033 !important; /* primary-grey */
+    text-align: center;
+    padding: 2rem 1rem;
+    border-radius: 1rem;
+}
+
+#crudTable_wrapper {
+    background: #0f2033 !important;
+    border-radius: 1rem;
+    margin: 3rem 0;
+    transition: background 0.2s, box-shadow 0.2s;
+    width: 100% !important;
+    max-width: 1320px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    overflow: visible;
+}
+#crudTable_wrapper,
+#crudTable_wrapper .table-content,
+#crudTable_wrapper .table-footer,
+.header-operation.container-fluid.animated.fadeIn,
+.container-fluid.animated.fadeIn {
+    max-width: 100%;
+    text-align: center;
+    margin: 1rem 0;
+}
+#global-search-form{   
+    margin: 0 auto;
+    max-width: 100%;
+    text-align: center;
+    background-color: #0F2033 !important; /* primary-grey */
+}
+.d-lg-block {
+    display: block !important;
+    margin: 3rem 0;
+}
+.col-md-12>.row {
+    --tblr-gutter-x: var(--tblr-page-padding);
+    --tblr-gutter-y: 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+tfoot {
+    background-color: #678bd8 !important; /* secondary-grey */
+    color: #678bd8 !important; /* primary-grey */
+    border-radius: 1rem;
+    padding: 2rem 1rem;
+}
+div.dtr-modal div.dtr-modal-content {
+    position: relative;
+    padding: 1em;
+    background-color: #5c7dc4;
+}
+.table {
+    background-color: #5c7dc4 !important;
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--tblr-table-color);
+    vertical-align: top;
+    border-color: var(--tblr-table-border-color);
+}
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+    border-color: inherit;
+    border-style: solid;
+    border-width: 0;
+    color: #f9fbff;
+}
+
+/* Utilisation des couleurs tailwind personnalisées */
+.text-blue-accent {
+    color: #678bd8 !important;
+}
+.text-primary-grey {
+    color: #0f2033 !important;
+}
+.text-secondary-grey {
+    color: #f5f5f5 !important;
+}
+.bg-blue-accent {
+    background-color: #678bd8 !important;
+}
+.bg-primary-grey {
+    background-color: #0f2033 !important;
+}
+.bg-secondary-grey {
+    background-color: #f5f5f5 !important;
+}
+.bg-off-white {
+    background-color: #f9fbff !important;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    h1.display-4.fw-bold.text-primary {
+        font-size: 2rem;
+        word-break: break-word;
+    }
+}
