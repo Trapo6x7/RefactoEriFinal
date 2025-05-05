@@ -28,4 +28,9 @@ class Interlocutor extends Model
         'infos_comptes',
         'infos_mail',
     ];
+
+    public function society()
+    {
+        return $this->belongsTo(Society::class, 'societe');
+    }
 }

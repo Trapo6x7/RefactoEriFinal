@@ -205,17 +205,19 @@ ul.pagination li.paginate_button.page-item a {
     text-align: center;
     margin: 1rem 0;
 }
-#global-search-form{   
+
+#global-search-form {
     margin: 0 auto;
     max-width: 100%;
     text-align: center;
-    background-color: #0F2033 !important; /* primary-grey */
+    background-color: #0f2033 !important; /* primary-grey */
 }
+
 .d-lg-block {
     display: block !important;
     margin: 3rem 0;
 }
-.col-md-12>.row {
+.col-md-12 > .row {
     --tblr-gutter-x: var(--tblr-page-padding);
     --tblr-gutter-y: 0;
     display: flex;

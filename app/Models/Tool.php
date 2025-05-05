@@ -13,4 +13,9 @@ class Tool extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function problems()
+    {
+        return $this->hasMany(Problem::class, 'tool');
+    }
 }

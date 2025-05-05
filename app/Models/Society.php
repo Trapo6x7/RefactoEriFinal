@@ -46,4 +46,23 @@ class Society extends Model
         'address',
         'status',
     ];
+
+    public function main()
+    {
+        return $this->belongsTo(Society::class, 'id_main');
+    }
+
+    public function subsidiaries()
+    {
+        return $this->hasMany(Society::class, 'id_main');
+    }
+
+    public function interlocutors()
+    {
+        return $this->hasMany(Interlocutor::class, 'societe');
+    }
+    public function problems()
+    {
+        return $this->hasMany(Problem::class, 'societe');
+    }
 }
