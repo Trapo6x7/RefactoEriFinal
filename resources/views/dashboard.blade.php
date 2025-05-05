@@ -1,8 +1,33 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="px-8 font-semibold text-xl text-center text-primary-grey leading-tight">
-            BIENVENUE {{ strtoupper(Auth::user()->name) }}
-        </h2>
+        @php
+            $models = [
+                'société' => 'Société',
+                'problème' => 'Problème',
+                'problemStatus' => 'Statut',
+                'interlocuteur' => 'Interlocuteur',
+                'environnement' => 'Environnement',
+                'outil' => 'Outil',
+            ];
+        @endphp
+
+        <article class="w-full flex justify-center">
+            <div class=" rounded-lg px-4 md:px-8 py-2 flex flex-col items-center max-w-full md:max-w-sm w-full">
+                <div class="text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
+                <div class="flex gap-2 w-full">
+                    <select id="add-model-select" class="border rounded px-4 py-2 flex-1">
+                        @foreach ($models as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <a id="add-model-link"
+                        href="{{ route('model.form', ['model' => array_key_first($models), 'action' => 'create']) }}"
+                        class="px-4 py-2 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition flex-shrink-0 text-center">
+                        +
+                    </a>
+                </div>
+            </div>
+        </article>
     </x-slot>
 
     <section class="px-4 md:px-8">
@@ -37,7 +62,7 @@
                             <option value="tools">Outils</option>
                         </select>
                     </div>
-                    <button type="submit"
+                    <button type="submit" id="submit"
                         class="px-6 py-2 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition">
                         Rechercher
                     </button>
@@ -48,34 +73,7 @@
                 <div id="user-search-results" class="mt-8 flex justify-center items-center"></div>
             </div>
 
-            @php
-                $models = [
-                    'société' => 'Société',
-                    'problème' => 'Problème',
-                    'problemStatus' => 'Statut',
-                    'interlocuteur' => 'Interlocuteur',
-                    'environnement' => 'Environnement',
-                    'outil' => 'Outil',
-                ];
-            @endphp
 
-            <article class="w-full flex justify-center mt-6">
-                <div class=" rounded-lg px-4 md:px-8 py-6 flex flex-col items-center max-w-full md:max-w-sm w-full">
-                    <div class="text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
-                    <div class="flex gap-2 w-full">
-                        <select id="add-model-select" class="border rounded px-4 py-2 flex-1">
-                            @foreach ($models as $key => $label)
-                                <option value="{{ $key }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        <a id="add-model-link"
-                            href="{{ route('model.form', ['model' => array_key_first($models), 'action' => 'create']) }}"
-                            class="px-4 py-2 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition flex-shrink-0 text-center">
-                            +
-                        </a>
-                    </div>
-                </div>
-            </article>
         </section>
 
         <section class="flex flex-col h-auto md:flex-row md:items-start md:justify-between gap-4 mt-10 px-0 md:px-8">
@@ -84,6 +82,7 @@
                 <div class="flex flex-col items-center justify-center h-full">
                     <span class="text-blue-accent">Aucun résultat enregistré</span>
                 </div>
+                <div class="mb-4 flex justify-center">
             </article>
 
             <article id="saved-card-2"
@@ -102,6 +101,9 @@
         </section>
     </section>
 
+    <script>
+        window.translatedFields = @json(__('fields'));
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -208,45 +210,60 @@
         function updateCards() {
             for (let i = 0; i < 3; i++) {
                 const card = document.getElementById('saved-card-' + (i + 1));
+                console.log('TEST', window.translatedFields['name']); // Devrait afficher "Nom"
                 if (savedResults[i]) {
                     card.innerHTML = `
-            <div class="flex items-center justify-between w-full my-8 px-8">
-                <h3 class="text-lg font-semibold text-blue-accent flex-1">${savedResults[i].title}</h3>
-                <a href="${savedResults[i].url}" class="ml-4 text-primary-grey hover:text-blue-accent text-sm" title="Voir +">Voir +</a>
-                <button type="button"
-                    class="ml-2 text-xl text-red-accent hover:text-red-hover font-bold remove-saved-result-btn"
-                    data-index="${i}" title="Retirer">&times;</button>
-            </div>
-
-            <div class="bg-off-white p-8 mb-2 w-full rounded-lg">
-                <ul class="space-y-5 w-full">
-                    ${
-                        savedResults[i].details
-                            ? Object.entries(savedResults[i].details)
-                                .filter(([key]) => !['id', 'created_at', 'updated_at', 'model'].includes(key))
-                                .map(([key, value]) =>
-                                    `<li class="border-b border-primary-grey py-2 w-full">
-                                                <div class="font-semibold text-blue-accent text-xs uppercase tracking-wide mb-4 w-full">${key}</div>
-                                                <div class="text-primary-grey break-words text-base text-right w-full mb-4 editable-value focus:rounded-lg focus:ring-2 focus:ring-blue-accent focus:outline-none"
-                                                    contenteditable="true"
-                                                    data-key="${key}"
-                                                    data-index="${i}"
-                                                    data-id="${savedResults[i].details.id ?? ''}">
-                                                    ${value ?? ''}
-                                                </div>
+                <div class="flex items-center justify-between w-full my-8 px-8">
+                    <h3 class="text-lg font-semibold text-blue-accent flex-1">${savedResults[i].title}</h3>
+                    <a href="${savedResults[i].url}" class="ml-4 text-primary-grey hover:text-blue-accent text-sm" title="Voir +">Voir +</a>
+                    <button type="button"
+                        class="ml-2 text-xl text-red-accent hover:text-red-hover font-bold remove-saved-result-btn"
+                        data-index="${i}" title="Retirer">&times;</button>
+                </div>
+                <input type="text" id="filter-card-${i}" placeholder="Filtrer les champs..." class="border rounded px-4 py-2 w-full mb-4" />
+                <div class="bg-off-white p-8 mb-2 w-full rounded-lg">
+                    <ul class="space-y-5 w-full" id="details-list-card-${i}">
+                        ${
+                            savedResults[i].details
+                                ? Object.entries(savedResults[i].details)
+                                    .filter(([key]) => !['id', 'created_at', 'updated_at', 'model'].includes(key))
+                                    .map(([key, value]) =>
+                                        `<li class="border-b border-primary-grey py-2 w-full">
+                                               <div class="font-semibold text-blue-accent text-xs uppercase tracking-wide mb-4 w-full">${
+        window.translatedFields && window.translatedFields[key] ? window.translatedFields[key] : key
+    }</div>
+                                          <div class="text-primary-grey break-words text-base text-right w-full mb-4 editable-value focus:rounded-lg focus:ring-2 focus:ring-blue-accent focus:outline-none"
+        contenteditable="true"
+        data-key="${key}"
+        data-index="${i}"
+        data-id="${savedResults[i].details.id ?? ''}"
+        data-model="${savedResults[i].details.model ?? ''}">
+        ${value ?? ''}
+    </div>
                                             </li>`
-                                ).join('')
-                            : ''
+                                    ).join('')
+                                : ''
+                        }
+                    </ul>
+                </div>
+            `;
+                    // Ajoute le filtre dynamique
+                    const filterInput = document.getElementById(`filter-card-${i}`);
+                    const detailsList = document.getElementById(`details-list-card-${i}`);
+                    if (filterInput && detailsList) {
+                        filterInput.addEventListener('input', function() {
+                            const query = this.value.toLowerCase();
+                            detailsList.querySelectorAll('li').forEach(function(li) {
+                                li.style.display = li.innerText.toLowerCase().includes(query) ? '' : 'none';
+                            });
+                        });
                     }
-                </ul>
-            </div>
-        `;
                 } else {
                     card.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-full">
-                            <span class="text-blue-accent">Aucun résultat enregistré</span>
-                        </div>
-                    `;
+                <div class="flex flex-col items-center justify-center h-full">
+                    <span class="text-blue-accent">Aucun résultat enregistré</span>
+                </div>
+            `;
                 }
             }
         }
