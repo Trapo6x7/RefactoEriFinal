@@ -1,6 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        @php
+<h1 class="text-2xl font-semibold text-blue-accent leading-tight uppercase text-center">
+        {{ __('Dashboard') }}
+    </h1>
+    </x-slot>
+
+    <section class="px-4 md:px-8">
+        <section class="mx-0 md:mx-8 bg-off-white rounded-lg h-auto md:h-[80%]">
+            @php
             $models = [
                 'société' => 'Société',
                 'problème' => 'Problème',
@@ -28,11 +35,6 @@
                 </div>
             </div>
         </article>
-    </x-slot>
-
-    <section class="px-4 md:px-8">
-        <section class="mx-0 md:mx-8 bg-off-white rounded-lg h-auto md:h-[80%]">
-
             <article class="max-w-4xl pt-4 mx-auto">
                 <form id="user-search-form" class="flex flex-col md:flex-row items-center gap-4 relative">
                     <div class="w-full md:w-1/2 relative">
