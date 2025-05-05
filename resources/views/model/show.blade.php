@@ -1,4 +1,7 @@
 <x-app-layout>
+    @php
+    $fields = __('fields');
+@endphp
     <h1 class="text-3xl text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}</h1>
     <div class="bg-off-white rounded-lg p-6 max-w-[80%] mx-auto">
         <div class="mb-4 flex justify-center">
@@ -10,7 +13,9 @@
                 @foreach ($item->getAttributes() as $key => $value)
                     @if ($key !== 'id')
                         <li class="p-3 flex items-center justify-between h-auto group">
-                            <span class="font-semibold text-blue-accent w-40 mr-20">{{ $key }}</span>
+                            <span class="font-semibold text-blue-accent w-40 mr-20">
+                                {{ $fields[$key] ?? $key }}
+                            </span>
                             <span
                                 class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition
                                     cursor-text outline-none text-right
