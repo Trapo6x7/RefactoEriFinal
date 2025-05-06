@@ -14,7 +14,10 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        window.translatedFields = @json(trans('fields'));
+    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/dashboard.js'])
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 

@@ -8,15 +8,21 @@
                 </div>
                 <ul class="text-primary-grey">
                     @php
-                        $allowedKeys = ['name', 'adress', 'boss_name', 'boss_phone', 'recep_phone'];
+                        $allowedKeys = ['name', 'adress', 'boss_name', 'boss_phone', 'recep_phone', 'main'];
                     @endphp
 
                     @foreach ($societies as $society)
                         <li>
                             <a href="..." class="search-result-link" data-model="société"
+                                data-id="{{ $society->id }}"
                                 @foreach (\Illuminate\Support\Arr::only($society->getAttributes(), $allowedKeys) as $key => $value)
-            data-{{ $key }}="{{ $value }}" @endforeach>
+                                data-{{ $key }}="{{ $value }}" @endforeach
+                                @if ($society->main) data-main_name="{{ $society->main->name }}" @endif>
                                 {{ $society->name }}
+                                @if ($society->main)
+                                    <span
+                                        class="ml-2 text-xs text-blue-hover font-semibold">({{ $society->main->name }})</span>
+                                @endif
                             </a>
                         </li>
                     @endforeach
@@ -32,22 +38,29 @@
                 </div>
                 <ul class="text-primary-grey">
                     @php
-                    $allowedKeys = ['fullname', 'email', 'phone_fix', 'phone_mobile', 'id_teamviewer'];
-                @endphp
-                
-                @foreach ($interlocutors as $interlocutor)
-                    <li>
-                        <a href="{{ route('model.show', ['model' => 'interlocuteur', 'id' => $interlocutor->id]) }}"
-                           class="search-result-link text-primary-grey hover:text-blue-accent"
-                           data-model="interlocuteur"
-                           @foreach (\Illuminate\Support\Arr::only($interlocutor->getAttributes(), $allowedKeys) as $key => $value)
-                               data-{{ $key }}="{{ $value }}"
-                           @endforeach
-                           data-id="{{ $interlocutor->id }}">
-                            {{ $interlocutor->fullname ?? $interlocutor->name }}
-                        </a>
-                    </li>
-                @endforeach
+                        $allowedKeys = [
+                            'fullname',
+                            'lastname',
+                            'name',
+                            'email',
+                            'phone_fix',
+                            'phone_mobile',
+                            'id_teamviewer',
+                        ];
+                    @endphp
+
+                    @foreach ($interlocutors as $interlocutor)
+                        <li>
+                            <a href="{{ route('model.show', ['model' => 'interlocuteur', 'id' => $interlocutor->id]) }}"
+                                class="search-result-link text-primary-grey hover:text-blue-accent"
+                                data-model="interlocuteur"
+                                @foreach (\Illuminate\Support\Arr::only($interlocutor->getAttributes(), $allowedKeys) as $key => $value)
+            data-{{ $key }}="{{ $value }}" @endforeach
+                                data-id="{{ $interlocutor->id }}" data-society_id="{{ $interlocutor->societe }}">
+                                {{ $interlocutor->fullname ?? $interlocutor->name }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
         @endif

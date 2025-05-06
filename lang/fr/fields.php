@@ -38,9 +38,11 @@ return [
     'updated_at' => 'Mis à jour le',
     'status' => 'Statut',
     'title' => 'Titre',
-    'lastname' => 'Nom de famille',
-    'firstname' => 'Prénom',
+    'lastname' => 'Prénom',
     'phone_fix' => 'Téléphone fixe',
     'env' => "Environnement",
     'tool' => 'Outil',
+    'society_id' => 'Société',
+    'fullname' => 'Nom complet',
+    'main_name' => 'Société principale',
 ];

@@ -211,6 +211,9 @@ class ModelController extends Controller
         }
         $modelClass = $this->models[$model];
         $item = $modelClass::findOrFail($id);
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json($item);
+        }
         return view('model.show', compact('item', 'model'));
     }
 
