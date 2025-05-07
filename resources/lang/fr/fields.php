@@ -43,4 +43,5 @@ return [
     'env' => "Environnement",
     'tool' => 'Outil',
     'email' => 'Email',
+    'id_teamviewer' => 'TeamViewer',
 ];

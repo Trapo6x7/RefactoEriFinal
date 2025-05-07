@@ -1,11 +1,19 @@
 const allowedKeys = {
-    interlocuteur: ["lastname", "name", "societe", "email", "phone"],
+
+    interlocuteur: [
+        "lastname", 
+        "name", 
+        "email", 
+        "phone_fix", 
+        "phone_mobile", 
+        'id_teamviewer'
+    ],
+
     société: [
-        "name",
-        "adress",
         "boss_name",
         "boss_phone",
         "recep_phone",
+        "address",
         "main_name",
     ],
 };
@@ -223,6 +231,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         entity.active_services = data.active_services;
                     if (data.societe) entity.societe = data.societe;
                     if (data.main_obj) entity.main_obj = data.main_obj;
+                    if (data.phone_fix)
+                        entity.phone_fix = data.phone_fix;
+                    if (data.phone_mobile)
+                        entity.phone_mobile = data.phone_mobile;
+                    if (data.id_teamviewer)
+                        entity.id_teamviewer = data.id_teamviewer;
+                    if (data.address)
+                        entity.address = data.address;
                     addEntityToSelection(entity);
                 });
                 const results = document.getElementById("user-search-results");
@@ -244,6 +260,7 @@ function showSelectedEntitiesCard(entities) {
 
     // Affiche la première entité (société ou interlocuteur)
     const ent1 = entities[0];
+    console.log(ent1);
     if (ent1) {
         let coordonneesHtml = "";
         (allowedKeys[ent1.model] || []).forEach((key) => {
@@ -290,6 +307,8 @@ function showSelectedEntitiesCard(entities) {
                 ${coordonneesHtml}
             </div>
         `;
+        document.getElementById("card-1").setAttribute("data-societe", ent1.societe || ent1.name || "");
+
 
         // Ajout du select interlocuteur si ent1 est une société
         if (ent1.model === "société") {
@@ -348,6 +367,12 @@ function showSelectedEntitiesCard(entities) {
                                                 data.active_services;
                                         if (data.societe)
                                             entity.societe = data.societe;
+                                        if (data.phone_fix)
+                                            entity.phone_fix = data.phone_fix;
+                                        if (data.phone_mobile)
+                                            entity.phone_mobile = data.phone_mobile;
+                                        if (data.id_teamviewer)
+                                            entity.id_teamviewer = data.id_teamviewer;
                                         addEntityToSelection(entity);
                                     });
                             }
@@ -462,6 +487,7 @@ function showSelectedEntitiesCard(entities) {
                 ${coordonneesHtml}
             </div>
         `;
+        document.getElementById("card-3").setAttribute("data-societe", ent2.societe || ent2.name || "");
 
         // Ajout du select interlocuteur si ent2 est une société
         if (ent2.model === "société") {

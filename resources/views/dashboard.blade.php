@@ -12,7 +12,7 @@
         @endphp
 
         <article class="w-full flex justify-center">
-            <div class="rounded-lg px-4 md:px-8 py-2 flex flex-col items-center max-w-full md:max-w-sm w-full">
+            <div class="rounded-lg px-4 md:px-8 flex flex-col items-center max-w-full md:max-w-sm w-full">
                 <div class="text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
                 <div class="flex gap-2 w-full">
                     <select id="add-model-select" class="border rounded px-4 py-2 flex-1">
@@ -72,21 +72,22 @@
 
         <section id="selected-entity-card" class="flex flex-wrap gap-4 w-full min-w-0 p-8">
             <article id="card-1"
-                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll relative">
+                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg p-6 flex flex-col h-64 overflow-hidden overflow-y-scroll relative">
             </article>
             <article id="card-2"
-                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll">
+                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg p-6 flex flex-col h-64 overflow-hidden overflow-y-scroll">
             </article>
             <article id="card-3"
-                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll relative">
+                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg p-6 flex flex-col h-64 overflow-hidden overflow-y-scroll relative">
             </article>
             <article id="card-4"
-                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll">
+                class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg p-6 flex flex-col h-64 overflow-hidden overflow-y-scroll">
             </article>
         </section>
 
-        <section class="mx-8 bg-off-white rounded-lg h-auto md:h-[80%]">
-            <article id="problemes-list" class="p-6"></article>
+        <section id='bandeau-problem' class="mx-8 h-64 overflow-y-auto bg-blue-accent rounded-lg mt-4">
+            <article id="problemes-list" class="min-h-full p-6"></article>
+        </section>
         </section>
     </section>
 </x-app-layout>
