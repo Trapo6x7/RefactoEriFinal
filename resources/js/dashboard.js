@@ -246,65 +246,98 @@ function showSelectedEntitiesCard(entities) {
         (allowedKeys[ent1.model] || []).forEach((key) => {
             if (ent1[key]) {
                 coordonneesHtml += `
-                <div class="mb-2 pr-2 w-full break-words flex flex-col">
-                <p class="font-semibold text-blue-accent">${window.translatedFields[key]} :</p>
-                <p class=""> ${ent1[key]}</p>
-                </div>`;
+                    <div class="mb-2 pr-2 w-full break-words flex flex-col">
+                        <p class="font-semibold text-blue-accent">${window.translatedFields[key]} :</p>
+                        <span 
+                            class="editable-field" 
+                            data-model="${ent1.model}" 
+                            data-id="${ent1.id}" 
+                            data-key="${key}" 
+                            contenteditable="true"
+                            style="border-bottom:1px dashed #ccc;min-height:1.5em">${ent1[key]}</span>
+                    </div>`;
             }
         });
-        console.log("ent1", ent1);
+
         document.getElementById("card-1").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-            <h2 class="font-bold text-blue-accent text-lg mb-2">${
-                ent1.model === "société"
-                ? ent1.name
-                : ent1.model === "interlocuteur"
-                ? ent1.fullname
-                : ""
-            }</h2>
-            ${coordonneesHtml}
+                <h2 class="font-bold text-blue-accent text-lg mb-2">
+                    ${
+                        ent1.model === "société"
+                            ? ent1.name
+                            : ent1.model === "interlocuteur"
+                            ? ent1.fullname
+                            : ""
+                    }
+                </h2>
+                ${coordonneesHtml}
             </div>
         `;
 
         // Ajout du select interlocuteur si ent1 est une société
         if (ent1.model === "société") {
-            fetch(`/societe/${ent1.id}/interlocuteurs`, { headers: { Accept: "application/json" } })
-                .then(res => res.json())
-                .then(interlocutors => {
-                    console.log("Interlocuteurs reçus pour société", ent1.id, interlocutors);
-                    if (true) {
-                        const selectHtml = `
-                            <label class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
-                            <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
-                                <option value="">-- Choisir --</option>
-                                ${interlocutors.map(i => `<option value="${i.id}">${i.fullname || i.name}</option>`).join("")}
-                            </select>
-                        `;
-                        document.getElementById("card-1").insertAdjacentHTML("beforeend", selectHtml);
+            fetch(`/societe/${ent1.id}/interlocuteurs`, {
+                headers: { Accept: "application/json" },
+            })
+                .then((res) => res.json())
+                .then((interlocutors) => {
+                    const selectHtml = `
+                        <label class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
+                        <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
+                            <option value="">-- Choisir --</option>
+                            ${interlocutors
+                                .map(
+                                    (i) =>
+                                        `<option value="${i.id}">${
+                                            i.fullname || i.name
+                                        }</option>`
+                                )
+                                .join("")}
+                        </select>
+                    `;
+                    document
+                        .getElementById("card-1")
+                        .insertAdjacentHTML("beforeend", selectHtml);
 
-                        document.getElementById("interlocutor-select-1").addEventListener("change", function () {
+                    document
+                        .getElementById("interlocutor-select-1")
+                        .addEventListener("change", function () {
                             const interlocutorId = this.value;
                             if (interlocutorId) {
-                                fetch(`/model/interlocuteur/show/${interlocutorId}`, { headers: { Accept: "application/json" } })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        const allowed = allowedKeys["interlocuteur"];
-                                        const entity = { model: "interlocuteur" };
-                                        allowed.forEach(key => {
-                                            if (data[key] !== undefined) entity[key] = data[key];
+                                fetch(
+                                    `/model/interlocuteur/show/${interlocutorId}`,
+                                    {
+                                        headers: {
+                                            Accept: "application/json",
+                                        },
+                                    }
+                                )
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        const allowed =
+                                            allowedKeys["interlocuteur"];
+                                        const entity = {
+                                            model: "interlocuteur",
+                                        };
+                                        allowed.forEach((key) => {
+                                            if (data[key] !== undefined)
+                                                entity[key] = data[key];
                                         });
                                         entity.id = data.id;
-                                        if (data.fullname) entity.fullname = data.fullname;
-                                        if (data.active_services) entity.active_services = data.active_services;
+                                        if (data.fullname)
+                                            entity.fullname = data.fullname;
+                                        if (data.active_services)
+                                            entity.active_services =
+                                                data.active_services;
                                         addEntityToSelection(entity);
                                     });
                             }
                         });
-                    }
                 });
         }
 
+        // Services activés avec recherche et édition inline
         if (ent1.active_services) {
             let services = Object.values(ent1.active_services);
             const searchInputId = "services-search-1";
@@ -312,12 +345,24 @@ function showSelectedEntitiesCard(entities) {
                 <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." 
                     class="mb-4 p-2 border rounded w-full" />
                 <div id="services-list-1">
-                    ${services.map(service => `
+                    ${services
+                        .map(
+                            (service) => `
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
                             <p class="font-semibold text-blue-accent">${service.label} :</p>
-                            <p>${service.info ?? "Oui"}</p>
+                            <span 
+                                class="editable-service-field"
+                                data-model="${ent1.model}"
+                                data-id="${ent1.id}"
+                                data-service-key="${service.label}"
+                                contenteditable="true"
+                                style="border-bottom:1px dashed #ccc;min-height:1.5em">
+                                ${service.info ?? "Oui"}
+                            </span>
                         </div>
-                    `).join("")}
+                    `
+                        )
+                        .join("")}
                 </div>
             `;
             document.getElementById("card-2").innerHTML = `
@@ -332,9 +377,15 @@ function showSelectedEntitiesCard(entities) {
                 if (input && list) {
                     input.addEventListener("input", function () {
                         const q = this.value.toLowerCase();
-                        list.querySelectorAll(".service-item").forEach(div => {
-                            div.style.display = div.textContent.toLowerCase().includes(q) ? "" : "none";
-                        });
+                        list.querySelectorAll(".service-item").forEach(
+                            (div) => {
+                                div.style.display = div.textContent
+                                    .toLowerCase()
+                                    .includes(q)
+                                    ? ""
+                                    : "none";
+                            }
+                        );
                     });
                 }
             }, 0);
@@ -348,76 +399,124 @@ function showSelectedEntitiesCard(entities) {
         (allowedKeys[ent2.model] || []).forEach((key) => {
             if (ent2[key]) {
                 coordonneesHtml += `
-                <div class="mb-2 pr-2 w-full break-words flex flex-col">
-                <p class="font-semibold text-blue-accent">${window.translatedFields[key]} :</p>
-                <p class=""> ${ent2[key]}</p>
-                </div>`;
+                    <div class="mb-2 pr-2 w-full break-words flex flex-col">
+                        <p class="font-semibold text-blue-accent">${window.translatedFields[key]} :</p>
+                        <span 
+                            class="editable-field" 
+                            data-model="${ent2.model}" 
+                            data-id="${ent2.id}" 
+                            data-key="${key}" 
+                            contenteditable="true"
+                            style="border-bottom:1px dashed #ccc;min-height:1.5em">${ent2[key]}</span>
+                    </div>`;
             }
         });
         document.getElementById("card-3").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-            <h2 class="font-bold text-blue-accent text-lg mb-2">${
-                ent2.model === "société"
-                ? ent2.name
-                : ent2.model === "interlocuteur"
-                ? ent2.fullname
-                : ""
-            }</h2>
+                <h2 class="font-bold text-blue-accent text-lg mb-2">
+                    ${
+                        ent2.model === "société"
+                            ? ent2.name
+                            : ent2.model === "interlocuteur"
+                            ? ent2.fullname
+                            : ""
+                    }
+                </h2>
                 ${coordonneesHtml}
             </div>
         `;
 
         // Ajout du select interlocuteur si ent2 est une société
         if (ent2.model === "société") {
-            fetch(`/societe/${ent2.id}/interlocuteurs`, { headers: { Accept: "application/json" } })
-                .then(res => res.json())
-                .then(interlocutors => {
+            fetch(`/societe/${ent2.id}/interlocuteurs`, {
+                headers: { Accept: "application/json" },
+            })
+                .then((res) => res.json())
+                .then((interlocutors) => {
                     if (interlocutors.length) {
                         const selectHtml = `
                             <label class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
                             <select id="interlocutor-select-2" class="mt-1 p-2 border rounded w-full">
                                 <option value="">-- Choisir --</option>
-                                ${interlocutors.map(i => `<option value="${i.id}">${i.fullname || i.name}</option>`).join("")}
+                                ${interlocutors
+                                    .map(
+                                        (i) =>
+                                            `<option value="${i.id}">${
+                                                i.fullname || i.name
+                                            }</option>`
+                                    )
+                                    .join("")}
                             </select>
                         `;
-                        document.getElementById("card-3").insertAdjacentHTML("beforeend", selectHtml);
+                        document
+                            .getElementById("card-3")
+                            .insertAdjacentHTML("beforeend", selectHtml);
 
-                        document.getElementById("interlocutor-select-2").addEventListener("change", function () {
-                            const interlocutorId = this.value;
-                            if (interlocutorId) {
-                                fetch(`/model/interlocuteur/show/${interlocutorId}`, { headers: { Accept: "application/json" } })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        const allowed = allowedKeys["interlocuteur"];
-                                        const entity = { model: "interlocuteur" };
-                                        allowed.forEach(key => {
-                                            if (data[key] !== undefined) entity[key] = data[key];
+                        document
+                            .getElementById("interlocutor-select-2")
+                            .addEventListener("change", function () {
+                                const interlocutorId = this.value;
+                                if (interlocutorId) {
+                                    fetch(
+                                        `/model/interlocuteur/show/${interlocutorId}`,
+                                        {
+                                            headers: {
+                                                Accept: "application/json",
+                                            },
+                                        }
+                                    )
+                                        .then((res) => res.json())
+                                        .then((data) => {
+                                            const allowed =
+                                                allowedKeys["interlocuteur"];
+                                            const entity = {
+                                                model: "interlocuteur",
+                                            };
+                                            allowed.forEach((key) => {
+                                                if (data[key] !== undefined)
+                                                    entity[key] = data[key];
+                                            });
+                                            entity.id = data.id;
+                                            if (data.fullname)
+                                                entity.fullname = data.fullname;
+                                            if (data.active_services)
+                                                entity.active_services =
+                                                    data.active_services;
+                                            addEntityToSelection(entity);
                                         });
-                                        entity.id = data.id;
-                                        if (data.fullname) entity.fullname = data.fullname;
-                                        if (data.active_services) entity.active_services = data.active_services;
-                                        addEntityToSelection(entity);
-                                    });
-                            }
-                        });
+                                }
+                            });
                     }
                 });
         }
 
-        if (ent2 && ent2.active_services) {
+        // Services activés avec recherche et édition inline pour ent2
+        if (ent2.active_services) {
             let services = Object.values(ent2.active_services);
             const searchInputId = "services-search-2";
             let servicesHtml = `
                 <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." 
-                    class="mb-4 p-2 border rounded w-1/2" />
+                    class="mb-4 p-2 border rounded w-full" />
                 <div id="services-list-2">
-                    ${services.map(service => `
+                    ${services
+                        .map(
+                            (service) => `
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
                             <p class="font-semibold text-blue-accent">${service.label} :</p>
-                            <p>${service.info ?? "Oui"}</p>
+                            <span 
+                                class="editable-service-field"
+                                data-model="${ent2.model}"
+                                data-id="${ent2.id}"
+                                data-service-key="${service.label}"
+                                contenteditable="true"
+                                style="border-bottom:1px dashed #ccc;min-height:1.5em">
+                                ${service.info ?? "Oui"}
+                            </span>
                         </div>
-                    `).join("")}
+                    `
+                        )
+                        .join("")}
                 </div>
             `;
             document.getElementById("card-4").innerHTML = `
@@ -432,14 +531,88 @@ function showSelectedEntitiesCard(entities) {
                 if (input && list) {
                     input.addEventListener("input", function () {
                         const q = this.value.toLowerCase();
-                        list.querySelectorAll(".service-item").forEach(div => {
-                            div.style.display = div.textContent.toLowerCase().includes(q) ? "" : "none";
-                        });
+                        list.querySelectorAll(".service-item").forEach(
+                            (div) => {
+                                div.style.display = div.textContent
+                                    .toLowerCase()
+                                    .includes(q)
+                                    ? ""
+                                    : "none";
+                            }
+                        );
                     });
                 }
             }, 0);
         }
     }
+
+    // Edition inline des coordonnées (cards 1 et 3)
+    setTimeout(() => {
+        document.querySelectorAll("#card-1 .editable-field, #card-3 .editable-field").forEach((span) => {
+            span.addEventListener("blur", function () {
+                const model = this.dataset.model;
+                const id = this.dataset.id;
+                const key = this.dataset.key;
+                const value = this.textContent.trim();
+
+                fetch(`/model/${model}/update-field/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({ field: key, value }),
+                })
+                    .then((res) => res.json())
+                    .then(() => {
+                        this.style.background = "#e0ffe0";
+                        setTimeout(() => (this.style.background = ""), 500);
+                    })
+                    .catch(() => {
+                        this.style.background = "#ffe0e0";
+                        setTimeout(() => (this.style.background = ""), 1000);
+                    });
+            });
+        });
+
+        // Edition inline des services activés (cards 2 et 4)
+        document.querySelectorAll("#card-2 .editable-service-field, #card-4 .editable-service-field").forEach((span) => {
+            span.addEventListener("blur", function () {
+                const model = this.dataset.model;
+                const id = this.dataset.id;
+                const serviceLabel = this.dataset.serviceKey;
+                const value = this.textContent.trim();
+                // Génère la clé du champ infos_XYZ
+                const field =
+                    "infos_" +
+                    serviceLabel
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .replace(/ /g, "_");
+
+                fetch(`/model/${model}/update-field/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify({ field, value }),
+                })
+                    .then((res) => res.json())
+                    .then(() => {
+                        this.style.background = "#e0ffe0";
+                        setTimeout(() => (this.style.background = ""), 500);
+                    })
+                    .catch(() => {
+                        this.style.background = "#ffe0e0";
+                        setTimeout(() => (this.style.background = ""), 1000);
+                    });
+            });
+        });
+    }, 0);
 
     // Gestion de la suppression via la croix
     document.querySelectorAll(".remove-entity-btn").forEach((btn) => {

@@ -232,7 +232,7 @@ class ModelController extends Controller
         $modelClass = $this->models[$model];
         $item = $modelClass::findOrFail($id);
 
-        $field = $request->input('field');
+        $field = $request->input('key');
         $value = $request->input('value');
 
         // Sécurise les champs éditables

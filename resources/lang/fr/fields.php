@@ -42,4 +42,5 @@ return [
     'phone_fix' => 'Téléphone fixe',
     'env' => "Environnement",
     'tool' => 'Outil',
+    'email' => 'Email',
 ];
