@@ -1,3 +1,7 @@
+import { addEntityToSelection } from './entities.js';
+import { addCoordEditListeners } from './ui.js';
+import { addServiceEditListeners } from './services.js';
+
 const allowedKeys = {
     interlocuteur: ["lastname", "name", "society_id", "email", "phone"],
     société: [
@@ -19,64 +23,6 @@ function getEntityFromDataset(dataset) {
     const entity = {};
     for (const key in dataset) entity[key] = dataset[key];
     return entity;
-}
-
-function addEntityToSelection(entity) {
-    let selectedEntities = JSON.parse(
-        localStorage.getItem("selectedEntities") || "[]"
-    );
-
-    // Si déjà présente, ne rien faire
-    if (
-        selectedEntities.some(
-            (item) => item.id === entity.id && item.model === entity.model
-        )
-    ) {
-        showSelectedEntitiesCard(selectedEntities);
-        return;
-    }
-
-    // Si on ajoute un interlocuteur et qu'il y a déjà une société + un interlocuteur
-    if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 2 &&
-        selectedEntities[0].model === "société" &&
-        selectedEntities[1].model === "interlocuteur"
-    ) {
-        // Remplace l'interlocuteur (position 1)
-        selectedEntities[1] = entity;
-    } else if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 2 &&
-        selectedEntities[1].model === "société" &&
-        selectedEntities[0].model === "interlocuteur"
-    ) {
-        // Remplace l'interlocuteur (position 0)
-        selectedEntities[0] = entity;
-    } else if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 1 &&
-        selectedEntities[0].model === "société"
-    ) {
-        // Ajoute l'interlocuteur après la société
-        selectedEntities.push(entity);
-    } else if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 1 &&
-        selectedEntities[0].model === "interlocuteur"
-    ) {
-        // Remplace l'interlocuteur unique
-        selectedEntities[0] = entity;
-    } else {
-        // Cas standard : si déjà 2 entités, retire la première
-        if (selectedEntities.length >= 2) {
-            selectedEntities.shift();
-        }
-        selectedEntities.push(entity);
-    }
-
-    localStorage.setItem("selectedEntities", JSON.stringify(selectedEntities));
-    showSelectedEntitiesCard(selectedEntities);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -222,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.active_services) {
                         entity.active_services = data.active_services;
                     }
-                    addEntityToSelection(entity);
+                    addEntityToSelection(entity, allowedKeys, showSelectedEntitiesCard);
                 });
         }
     });
@@ -330,7 +276,7 @@ function showSelectedEntitiesCard(entities) {
                                         if (data.active_services)
                                             entity.active_services =
                                                 data.active_services;
-                                        addEntityToSelection(entity);
+                                        addEntityToSelection(entity, allowedKeys, showSelectedEntitiesCard);
                                     });
                             }
                         });
@@ -349,9 +295,7 @@ function showSelectedEntitiesCard(entities) {
                         .map(
                             (service) => `
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <p class="font-semibold text-blue-accent">${
-                                service.label
-                            } :</p>
+                            <p class="font-semibold text-blue-accent">${service.label} :</p>
                             <span 
                                 class="editable-service-field"
                                 data-model="${ent1.model}"
@@ -485,7 +429,7 @@ function showSelectedEntitiesCard(entities) {
                                             if (data.active_services)
                                                 entity.active_services =
                                                     data.active_services;
-                                            addEntityToSelection(entity);
+                                            addEntityToSelection(entity, allowedKeys, showSelectedEntitiesCard);
                                         });
                                 }
                             });
@@ -505,9 +449,7 @@ function showSelectedEntitiesCard(entities) {
                         .map(
                             (service) => `
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <p class="font-semibold text-blue-accent">${
-                                service.label
-                            } :</p>
+                            <p class="font-semibold text-blue-accent">${service.label} :</p>
                             <span 
                                 class="editable-service-field"
                                 data-model="${ent2.model}"
@@ -552,85 +494,8 @@ function showSelectedEntitiesCard(entities) {
 
     // Edition inline des coordonnées (cards 1 et 3)
     setTimeout(() => {
-        document
-            .querySelectorAll(
-                "#card-1 .editable-field, #card-3 .editable-field"
-            )
-            .forEach((span) => {
-                span.addEventListener("blur", function () {
-                    const model = this.dataset.model;
-                    const id = this.dataset.id;
-                    const key = this.dataset.key;
-                    const value = this.textContent.trim();
-          
-                    fetch(`/model/${model}/update-field/${id}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            Accept: "application/json",
-                        },
-                        body: JSON.stringify({ key, value }),
-                    })
-                        .then((res) => res.json())
-                        .then(() => {
-                            this.style.background = "#678BD8";
-                            setTimeout(() => (this.style.background = ""), 500);
-                        })
-                        .catch(() => {
-                            this.style.background = "#DB7171";
-                            setTimeout(
-                                () => (this.style.background = ""),
-                                1000
-                            );
-                        });
-                });
-            });
-
-        // Edition inline des services activés (cards 2 et 4)
-        document
-            .querySelectorAll(
-                "#card-2 .editable-service-field, #card-4 .editable-service-field"
-            )
-            .forEach((span) => {
-                span.addEventListener("blur", function () {
-                    const model = this.dataset.model;
-                    const id = this.dataset.id;
-                    const serviceLabel = this.dataset.serviceKey;
-                    const value = this.textContent.trim();
-                    // Génère la clé du champ infos_XYZ
-                    const key =
-                        "infos_" +
-                        serviceLabel
-                            .toLowerCase()
-                            .normalize("NFD")
-                            .replace(/[\u0300-\u036f]/g, "")
-                            .replace(/ /g, "_");
-
-     
-                    fetch(`/model/${model}/update-field/${id}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            Accept: "application/json",
-                        },
-                        body: JSON.stringify({ key, value }),
-                    })
-                        .then((res) => res.json())
-                        .then(() => {
-                            this.style.background = "#678BD8";
-                            setTimeout(() => (this.style.background = ""), 500);
-                        })
-                        .catch(() => {
-                            this.style.background = "#DB7171";
-                            setTimeout(
-                                () => (this.style.background = ""),
-                                1000
-                            );
-                        });
-                });
-            });
+        addCoordEditListeners(csrfToken);
+        addServiceEditListeners(csrfToken);
     }, 0);
 
     // Gestion de la suppression via la croix
