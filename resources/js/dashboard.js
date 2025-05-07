@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 input.value = suggestion.label ?? suggestion;
                                 suggestionBox.innerHTML = "";
                                 suggestionBox.classList.add("hidden");
+
                                 // Ajoute ceci pour charger et afficher la card directement
                                 const model = suggestion.model || tableSelect.value;
                                 const id = suggestion.id;
