@@ -218,6 +218,9 @@ class ModelController extends Controller
             if (method_exists($item, 'activeServicesWithInfos')) {
                 $data['active_services'] = $item->activeServicesWithInfos();
             }
+            if ($model === 'société' && $item->main) {
+                $data['main_obj'] = $item->main->toArray();
+            }
             return response()->json($data);
         }
     
