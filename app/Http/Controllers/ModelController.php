@@ -211,9 +211,16 @@ class ModelController extends Controller
         }
         $modelClass = $this->models[$model];
         $item = $modelClass::findOrFail($id);
+    
         if (request()->wantsJson() || request()->ajax()) {
-            return response()->json($item);
+            $data = $item->toArray();
+            // Ajoute les services actifs si la méthode existe
+            if (method_exists($item, 'activeServicesWithInfos')) {
+                $data['active_services'] = $item->activeServicesWithInfos();
+            }
+            return response()->json($data);
         }
+    
         return view('model.show', compact('item', 'model'));
     }
 

@@ -33,4 +33,19 @@ class Interlocutor extends Model
     {
         return $this->belongsTo(Society::class, 'societe');
     }
+
+    public function activeServicesWithInfos()
+    {
+        $result = [];
+        foreach ($this->getAttributes() as $key => $value) {
+            if (str_starts_with($key, 'service_') && $value) {
+                $infoKey = 'infos_' . substr($key, 8);
+                $result[$key] = [
+                    'label' => ucfirst(str_replace('_', ' ', substr($key, 8))),
+                    'info' => $this->$infoKey ?? null,
+                ];
+            }
+        }
+        return $result;
+    }
 }

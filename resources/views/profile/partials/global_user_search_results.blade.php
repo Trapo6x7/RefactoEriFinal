@@ -13,17 +13,27 @@
 
                     @foreach ($societies as $society)
                         <li>
-                            <a href="..." class="search-result-link" data-model="société"
-                                data-id="{{ $society->id }}"
-                                @foreach (\Illuminate\Support\Arr::only($society->getAttributes(), $allowedKeys) as $key => $value)
-                                data-{{ $key }}="{{ $value }}" @endforeach
-                                @if ($society->main) data-main_name="{{ $society->main->name }}" @endif>
-                                {{ $society->name }}
-                                @if ($society->main)
+                            @if ($society->main)
+                                <a href="{{ route('model.show', ['model' => 'société', 'id' => $society->main->id]) }}"
+                                    class="search-result-link text-primary-grey hover:text-blue-accent"
+                                    data-model="société"
+                                    @foreach (\Illuminate\Support\Arr::only($society->getAttributes(), $allowedKeys) as $key => $value)
+                                    data-{{ $key }}="{{ $value }}" @endforeach
+                                    data-id="{{ $society->id }}" data-main_name="{{ $society->main->name }}">
+                                    {{ $society->name }}
                                     <span
                                         class="ml-2 text-xs text-blue-hover font-semibold">({{ $society->main->name }})</span>
-                                @endif
-                            </a>
+                                </a>
+                            @else
+                                <a href="{{ route('model.show', ['model' => 'société', 'id' => $society->id]) }}"
+                                    class="search-result-link text-primary-grey hover:text-blue-accent"
+                                    data-model="société"
+                                    @foreach (\Illuminate\Support\Arr::only($society->getAttributes(), $allowedKeys) as $key => $value)
+                                    data-{{ $key }}="{{ $value }}" @endforeach
+                                    data-id="{{ $society->id }}">
+                                    {{ $society->name }}
+                                </a>
+                            @endif
                         </li>
                     @endforeach
                 </ul>

@@ -25,6 +25,13 @@ export default {
             "red-hover" : "#bf6363",
         }
     },
+    safelist: [
+        'absolute',
+        'top-2',
+        'right-2',
+        'top-4',
+        'right-4',
+      ],
 
     plugins: [forms],
 };

@@ -1,4 +1,3 @@
-
 <x-app-layout>
     <x-slot name="header">
         <h1 class="text-2xl font-semibold text-blue-accent leading-tight uppercase text-center">
@@ -72,10 +71,11 @@
             </article>
         </section>
 
-
-
-        <section class="flex flex-col h-auto md:flex-row md:items-start md:justify-between gap-4 mt-10 px-0 md:px-8">
-            <div id="selected-entity-card" class="hidden"> </div>
+        <section id="selected-entity-card" class="flex flex-wrap gap-4 w-full min-w-0 p-8">
+            <article id="card-1" class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll relative"></article>
+            <article id="card-2" class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll"></article>
+            <article id="card-3" class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll relative"></article>
+            <article id="card-4" class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll"></article>
         </section>
     </section>
 </x-app-layout>

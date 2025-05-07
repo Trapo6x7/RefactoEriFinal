@@ -34,6 +34,8 @@ Route::post('/user-search', [UserSearchController::class, 'search'])->name('user
 
 Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('user-suggestions');
 
+Route::get('/model-suggestions', [\App\Http\Controllers\ModelController::class, 'suggestions'])->name('model-suggestions');
+
 Route::get('/model/{model}/show/{id}', [\App\Http\Controllers\ModelController::class, 'show'])->name('model.show');
 
 Route::post('/model/{model}/update-field/{id}', [\App\Http\Controllers\ModelController::class, 'updateField'])->name('model.updateField');

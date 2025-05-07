@@ -16,7 +16,6 @@ class ModelSearchController extends Controller
 
     public function search(Request $request, $model)
     {
-
         if (!isset($this->models[$model])) {
             abort(404);
         }
@@ -31,20 +30,19 @@ class ModelSearchController extends Controller
         };
 
         $items = $modelClass::query()
-            ->when($search, function ($query) use ($search, $fields) {
-                $query->where(function ($q) use ($search, $fields) {
-                    foreach ($fields as $field) {
-                        $q->orWhere($field, 'like', "%{$search}%");
-                    }
-                });
-            })
-            ->get();
+        ->when($search, function ($query) use ($search, $fields) {
+            $query->where(function ($q) use ($search, $fields) {
+                foreach ($fields as $field) {
+                    $q->orWhere($field, 'like', "%{$search}%");
+                }
+            });
+        })
+        ->orderBy('name', 'asc')
+        ->get();
 
         return view('model.partials.table_body', [
             'items' => $items,
             'model' => $model
         ])->render();
     }
-
-  
 }
