@@ -15,7 +15,7 @@
 
     <!-- Scripts -->
 
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/dashboard.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/dashboard.js', 'resources/js/dashboardProblem.js'])
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 

@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             let item = document.createElement("button");
                             item.type = "button";
                             item.className =
-                                "text-left px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer";
+                                "text-left text-primary-grey px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer";
                             item.textContent = suggestion.label ?? suggestion;
                             item.onclick = function () {
                                 input.value = suggestion.label ?? suggestion;

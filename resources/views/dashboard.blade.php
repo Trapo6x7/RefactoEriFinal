@@ -84,5 +84,9 @@
                 class="flex-1 min-w-1/4 max-w-1/4 bg-white rounded-lg shadow p-6 flex flex-col  h-80 overflow-hidden overflow-y-scroll">
             </article>
         </section>
+
+        <section class="mx-8 bg-off-white rounded-lg h-auto md:h-[80%]">
+            <article id="problemes-list" class="p-6"></article>
+        </section>
     </section>
 </x-app-layout>
