@@ -57,6 +57,13 @@
                         </a>
                     </div>
                 </div>
+                @if (request()->routeIs('dashboard'))
+                    <button type="button"
+                        onclick="document.getElementById('dashboard-header')?.classList.toggle('hidden')"
+                        class="ml-4 px-3 py-1 rounded bg-blue-accent text-off-white hover:bg-blue-hover transition">
+                        +
+                    </button>
+                @endif
             </nav>
 
             <!-- User Dropdown -->
