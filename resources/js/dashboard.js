@@ -1,15 +1,15 @@
 const allowedKeys = {
-
     interlocuteur: [
-        "lastname", 
-        "name", 
-        "email", 
-        "phone_fix", 
-        "phone_mobile", 
-        'id_teamviewer'
+        "lastname",
+        "name",
+        "email",
+        "phone_fix",
+        "phone_mobile",
+        "id_teamviewer",
     ],
 
     société: [
+        "name",
         "boss_name",
         "boss_phone",
         "recep_phone",
@@ -231,18 +231,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         entity.active_services = data.active_services;
                     if (data.societe) entity.societe = data.societe;
                     if (data.main_obj) entity.main_obj = data.main_obj;
-                    if (data.phone_fix)
-                        entity.phone_fix = data.phone_fix;
+                    if (data.phone_fix) entity.phone_fix = data.phone_fix;
                     if (data.phone_mobile)
                         entity.phone_mobile = data.phone_mobile;
                     if (data.id_teamviewer)
                         entity.id_teamviewer = data.id_teamviewer;
-                    if (data.address)
-                        entity.address = data.address;
+                    if (data.address) entity.address = data.address;
                     addEntityToSelection(entity);
                 });
-                const results = document.getElementById("user-search-results");
-                if (results) results.innerHTML = "";
+            const results = document.getElementById("user-search-results");
+            if (results) results.innerHTML = "";
         }
     });
 
@@ -260,7 +258,7 @@ function showSelectedEntitiesCard(entities) {
 
     // Affiche la première entité (société ou interlocuteur)
     const ent1 = entities[0];
-    console.log(ent1);
+
     if (ent1) {
         let coordonneesHtml = "";
         (allowedKeys[ent1.model] || []).forEach((key) => {
@@ -280,7 +278,7 @@ function showSelectedEntitiesCard(entities) {
         });
         const maisonMereHtml =
             ent1.model === "société" && ent1.main_obj
-                ? `<p class="text-xs text-blue-hover mb-2">Filiale de ${ent1.main_obj.name}</p>`
+                ? `<a href="#" class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent1.main_obj.id}">Filiale de ${ent1.main_obj.name}</a>`
                 : "";
         document.getElementById("card-1").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
@@ -307,8 +305,9 @@ function showSelectedEntitiesCard(entities) {
                 ${coordonneesHtml}
             </div>
         `;
-        document.getElementById("card-1").setAttribute("data-societe", ent1.societe || ent1.name || "");
-
+        document
+            .getElementById("card-1")
+            .setAttribute("data-societe", ent1.societe || ent1.name || "");
 
         // Ajout du select interlocuteur si ent1 est une société
         if (ent1.model === "société") {
@@ -370,9 +369,11 @@ function showSelectedEntitiesCard(entities) {
                                         if (data.phone_fix)
                                             entity.phone_fix = data.phone_fix;
                                         if (data.phone_mobile)
-                                            entity.phone_mobile = data.phone_mobile;
+                                            entity.phone_mobile =
+                                                data.phone_mobile;
                                         if (data.id_teamviewer)
-                                            entity.id_teamviewer = data.id_teamviewer;
+                                            entity.id_teamviewer =
+                                                data.id_teamviewer;
                                         addEntityToSelection(entity);
                                     });
                             }
@@ -459,7 +460,7 @@ function showSelectedEntitiesCard(entities) {
 
         const maisonMereHtml2 =
             ent2.model === "société" && ent2.main_obj
-                ? `<p class="text-xs text-blue-hover mb-2">Filiale de ${ent2.main_obj.name}</p>`
+                ? `<a href="#" class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent2.main_obj.id}">Filiale de ${ent2.main_obj.name}</a>`
                 : "";
 
         document.getElementById("card-3").innerHTML = `
@@ -487,7 +488,9 @@ function showSelectedEntitiesCard(entities) {
                 ${coordonneesHtml}
             </div>
         `;
-        document.getElementById("card-3").setAttribute("data-societe", ent2.societe || ent2.name || "");
+        document
+            .getElementById("card-3")
+            .setAttribute("data-societe", ent2.societe || ent2.name || "");
 
         // Ajout du select interlocuteur si ent2 est une société
         if (ent2.model === "société") {
@@ -613,28 +616,67 @@ function showSelectedEntitiesCard(entities) {
     }
 
     // Ajoute le comportement "Voir la société" sur les deux cards
-    document.querySelectorAll('.voir-societe-link').forEach(link => {
-        link.addEventListener('click', function(e) {
+    document.querySelectorAll(".voir-societe-link").forEach((link) => {
+        link.addEventListener("click", function (e) {
             e.preventDefault();
             const societeId = this.dataset.societeId;
             fetch(`/model/société/show/${societeId}`, {
-                headers: { Accept: "application/json" }
+                headers: { Accept: "application/json" },
             })
-            .then(res => res.json())
-            .then(data => {
-                const allowed = allowedKeys["société"] || [];
-                const entity = { model: "société" };
-                allowed.forEach((key) => {
-                    if (data[key] !== undefined) entity[key] = data[key];
+                .then((res) => res.json())
+                .then((data) => {
+                    const allowed = allowedKeys["société"] || [];
+                    const entity = { model: "société" };
+                    allowed.forEach((key) => {
+                        if (data[key] !== undefined) entity[key] = data[key];
+                    });
+                    entity.id = data.id;
+                    if (data.active_services)
+                        entity.active_services = data.active_services;
+                    if (data.main_obj) entity.main_obj = data.main_obj;
+                    addEntityToSelection(entity);
                 });
-                entity.id = data.id;
-                if (data.active_services) entity.active_services = data.active_services;
-                if (data.main_obj) entity.main_obj = data.main_obj;
-                addEntityToSelection(entity);
-            });
         });
     });
 
+    document.querySelectorAll(".maison-mere-link").forEach((link) => {
+        link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const mainId = this.dataset.mainId;
+            fetch(`/model/société/show/${mainId}`, {
+                headers: { Accept: "application/json" },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    const allowed = allowedKeys["société"] || [];
+                    const entity = { model: "société" };
+                    allowed.forEach((key) => {
+                        if (data[key] !== undefined) entity[key] = data[key];
+                    });
+                    entity.id = data.id;
+                    if (data.active_services)
+                        entity.active_services = data.active_services;
+                    if (data.main_obj) entity.main_obj = data.main_obj;
+
+                    // Ajoute la maison mère en deuxième entité (card-3)
+                    let selectedEntities = JSON.parse(
+                        localStorage.getItem("selectedEntities") || "[]"
+                    );
+                    if (selectedEntities.length === 0) {
+                        selectedEntities.push(entity);
+                    } else if (selectedEntities.length === 1) {
+                        selectedEntities.push(entity);
+                    } else {
+                        selectedEntities[1] = entity;
+                    }
+                    localStorage.setItem(
+                        "selectedEntities",
+                        JSON.stringify(selectedEntities)
+                    );
+                    showSelectedEntitiesCard(selectedEntities);
+                });
+        });
+    });
     // Edition inline des coordonnées (cards 1 et 3)
     setTimeout(() => {
         document
