@@ -225,6 +225,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.main_obj) entity.main_obj = data.main_obj;
                     addEntityToSelection(entity);
                 });
+                const results = document.getElementById("user-search-results");
+                if (results) results.innerHTML = "";
         }
     });
 
