@@ -30,8 +30,8 @@
         </article>
     </x-slot>
 
-    <section class="px-2 sm:px-4 md:px-8">
-        <section class="mx-0 md:mx-8 bg-off-white rounded-lg h-auto md:h-[80%]">
+    <section>
+        <section class="mx-0 bg-off-white rounded-lg h-auto md:h-[80%]">
 
             <article class="max-w-4xl pt-4 mx-auto">
                 <form id="user-search-form" class="flex flex-col md:flex-row items-center gap-4 relative">
@@ -71,20 +71,20 @@
 
         <section id="selected-entity-card" class="flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8">
             <article id="card-1"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
+                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
             <article id="card-2"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
+                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll text-sm">
             </article>
             <article id="card-3"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
+                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
             <article id="card-4"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
+                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll text-sm">
             </article>
         </section>
 
-        <section id='bandeau-problem' class="mx-12 h-64 overflow-y-auto bg-off-white rounded-lg mt-4">
+        <section id='bandeau-problem' class="overflow-y-auto h-72 bg-off-white rounded-lg mt-4">
             <article id="problemes-list" class="min-h-full p-4 md:p-6"></article>
         </section>
         </section>
