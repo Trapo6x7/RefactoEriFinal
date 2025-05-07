@@ -41,10 +41,7 @@
 </body>
 <script>
     window.translatedFields = @json(__('fields'));
-
     window.currentUserRole = "{{ Auth::user()->role }}";
-    console.log(window.currentUserRole);
-    
 </script>
 
 </html>

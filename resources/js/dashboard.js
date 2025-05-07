@@ -135,6 +135,33 @@ document.addEventListener("DOMContentLoaded", function () {
                                 input.value = suggestion.label ?? suggestion;
                                 suggestionBox.innerHTML = "";
                                 suggestionBox.classList.add("hidden");
+                                // Ajoute ceci pour charger et afficher la card directement
+                                const model = suggestion.model || tableSelect.value;
+                                const id = suggestion.id;
+                                if (model && id) {
+                                    fetch(`/model/${model}/show/${id}`, {
+                                        headers: { Accept: "application/json" },
+                                    })
+                                        .then((res) => res.json())
+                                        .then((data) => {
+                                            const allowed = allowedKeys[model] || [];
+                                            const entity = { model };
+                                            allowed.forEach((key) => {
+                                                if (data[key] !== undefined) entity[key] = data[key];
+                                            });
+                                            entity.id = data.id;
+                                            if (data.fullname) entity.fullname = data.fullname;
+                                            if (data.active_services) entity.active_services = data.active_services;
+                                            if (data.societe) entity.societe = data.societe;
+                                            if (data.main_obj) entity.main_obj = data.main_obj;
+                                            if (data.phone_fix) entity.phone_fix = data.phone_fix;
+                                            if (data.phone_mobile) entity.phone_mobile = data.phone_mobile;
+                                            if (data.id_teamviewer) entity.id_teamviewer = data.id_teamviewer;
+                                            if (data.address) entity.address = data.address;
+                                            addEntityToSelection(entity);
+                                        });
+                                    if (results) results.innerHTML = "";
+                                }
                             };
                             suggestionBox.appendChild(item);
                         });
