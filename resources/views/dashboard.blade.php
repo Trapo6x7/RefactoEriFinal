@@ -13,7 +13,7 @@
 
         <article class="w-full flex justify-center">
             <div class="rounded-lg px-4 md:px-8 flex flex-col items-center max-w-full md:max-w-sm w-full">
-                <div class="text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
+                <div class="text-sm font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
                 <div class="flex gap-2 w-full">
                     <select id="add-model-select" class="border rounded px-4 py-2 flex-1">
                         @foreach ($models as $key => $label)
