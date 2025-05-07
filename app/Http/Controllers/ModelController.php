@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Problem;
 use Illuminate\Http\Request;
 
 class ModelController extends Controller
@@ -211,7 +212,7 @@ class ModelController extends Controller
         }
         $modelClass = $this->models[$model];
         $item = $modelClass::findOrFail($id);
-    
+
         if (request()->wantsJson() || request()->ajax()) {
             $data = $item->toArray();
             // Ajoute les services actifs si la méthode existe
@@ -223,7 +224,7 @@ class ModelController extends Controller
             }
             return response()->json($data);
         }
-    
+
         return view('model.show', compact('item', 'model'));
     }
 
@@ -288,5 +289,18 @@ class ModelController extends Controller
         $item = $this->models[$model]::findOrFail($id);
         $item->update($request->only(array_keys($request->all())));
         return response()->json(['success' => true]);
+    }
+
+    public function listProblemes()
+    {
+        $problemes = Problem::with('societe')->get();
+        $data = $problemes->map(function ($item) {
+            $arr = $item->toArray();
+            if ($item->societe) {
+                $arr['societe_obj'] = $item->societe->toArray();
+            }
+            return $arr;
+        });
+        return response()->json($data);
     }
 }

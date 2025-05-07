@@ -40,6 +40,8 @@ Route::get('/model/{model}/show/{id}', [\App\Http\Controllers\ModelController::c
 
 Route::post('/model/{model}/update-field/{id}', [\App\Http\Controllers\ModelController::class, 'updateField'])->name('model.updateField');
 
+Route::get('/model/problème/list', [ModelController::class, 'listProblemes']);
+
 Route::get('/societe/{id}/interlocuteurs', function($id) {
     return \App\Models\Interlocutor::where('societe', $id)->get();
 });

@@ -251,12 +251,21 @@ document.addEventListener("DOMContentLoaded", function () {
     showSelectedEntitiesCard(selectedEntities);
 });
 
+function highlightText(text, query) {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return text.replace(
+        new RegExp(escaped, "gi"),
+        (match) =>
+            `<mark style="background:#ffe066;color:#222;">${match}</mark>`
+    );
+}
+
 function showSelectedEntitiesCard(entities) {
     for (let i = 1; i <= 4; i++) {
         document.getElementById(`card-${i}`).innerHTML = "";
     }
 
-    // Affiche la première entité (société ou interlocuteur)
     const ent1 = entities[0];
 
     if (ent1) {
@@ -265,14 +274,25 @@ function showSelectedEntitiesCard(entities) {
             if (ent1[key]) {
                 coordonneesHtml += `
                     <div class="my-4 pr-2 w-full break-words flex flex-col">
-                        <p class="font-semibold text-blue-accent">${window.translatedFields[key]} :</p>
+                        <p class="font-semibold text-blue-accent">${
+                            window.translatedFields[key]
+                        } :</p>
                         <span 
                             class="editable-field" 
                             data-model="${ent1.model}" 
                             data-id="${ent1.id}" 
                             data-key="${key}" 
-                            contenteditable="true"
-                            style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${ent1[key]}</span>
+                           contenteditable="${
+                               window.currentUserRole &&
+                               ["admin", "superadmin"].includes(
+                                   window.currentUserRole.toLowerCase()
+                               )
+                                   ? "true"
+                                   : "false"
+                           }"
+                            style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
+                                ent1[key]
+                            }</span>
                     </div>`;
             }
         });
@@ -381,7 +401,7 @@ function showSelectedEntitiesCard(entities) {
                 });
         }
 
-        // Services activés avec recherche et édition inline
+        // Services activés avec recherche, surbrillance et édition inline
         if (ent1.active_services) {
             let services = Object.values(ent1.active_services);
             const searchInputId = "services-search-1";
@@ -393,15 +413,22 @@ function showSelectedEntitiesCard(entities) {
                         .map(
                             (service) => `
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <p class="font-semibold text-blue-accent">${
-                                service.label
-                            } :</p>
+                            <p class="font-semibold text-blue-accent">
+                                ${service.label} :
+                            </p>
                             <span 
                                 class="editable-service-field"
                                 data-model="${ent1.model}"
                                 data-id="${ent1.id}"
                                 data-service-key="${service.label}"
-                                contenteditable="true"
+                  contenteditable="${
+                      window.currentUserRole &&
+                      ["admin", "superadmin"].includes(
+                          window.currentUserRole.toLowerCase()
+                      )
+                          ? "true"
+                          : "false"
+                  }"
                                 style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">
                                 ${service.info ?? "Oui"}
                             </span>
@@ -425,11 +452,28 @@ function showSelectedEntitiesCard(entities) {
                         const q = this.value.toLowerCase();
                         list.querySelectorAll(".service-item").forEach(
                             (div) => {
-                                div.style.display = div.textContent
-                                    .toLowerCase()
-                                    .includes(q)
-                                    ? ""
-                                    : "none";
+                                const labelElem = div.querySelector("p");
+                                const valueElem = div.querySelector("span");
+                                const label = labelElem?.textContent || "";
+                                const value = valueElem?.textContent || "";
+                                const match =
+                                    label.toLowerCase().includes(q) ||
+                                    value.toLowerCase().includes(q);
+                                div.style.display = match ? "" : "none";
+                                // Surligne le texte recherché
+                                if (match && q) {
+                                    labelElem.innerHTML = highlightText(
+                                        label,
+                                        q
+                                    );
+                                    valueElem.innerHTML = highlightText(
+                                        value,
+                                        q
+                                    );
+                                } else {
+                                    labelElem.innerHTML = label;
+                                    valueElem.innerHTML = value;
+                                }
                             }
                         );
                     });
@@ -446,14 +490,25 @@ function showSelectedEntitiesCard(entities) {
             if (ent2[key]) {
                 coordonneesHtml += `
                     <div class="my-4 pr-2 w-full break-words flex flex-col">
-                        <p class="font-semibold text-blue-accent">${window.translatedFields[key]} :</p>
+                        <p class="font-semibold text-blue-accent">${
+                            window.translatedFields[key]
+                        } :</p>
                         <span 
                             class="editable-field" 
                             data-model="${ent2.model}" 
                             data-id="${ent2.id}" 
                             data-key="${key}" 
-                            contenteditable="true"
-                            style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${ent2[key]}</span>
+                          contenteditable="${
+                              window.currentUserRole &&
+                              ["admin", "superadmin"].includes(
+                                  window.currentUserRole.toLowerCase()
+                              )
+                                  ? "true"
+                                  : "false"
+                          }"
+                            style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
+                                ent2[key]
+                            }</span>
                     </div>`;
             }
         });
@@ -558,7 +613,7 @@ function showSelectedEntitiesCard(entities) {
                 });
         }
 
-        // Services activés avec recherche et édition inline pour ent2
+        // Services activés avec recherche, surbrillance et édition inline pour ent2
         if (ent2.active_services) {
             let services = Object.values(ent2.active_services);
             const searchInputId = "services-search-2";
@@ -570,15 +625,22 @@ function showSelectedEntitiesCard(entities) {
                         .map(
                             (service) => `
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <p class="font-semibold text-blue-accent">${
-                                service.label
-                            } :</p>
+                            <p class="font-semibold text-blue-accent">
+                                ${service.label} :
+                            </p>
                             <span 
                                 class="editable-service-field"
                                 data-model="${ent2.model}"
                                 data-id="${ent2.id}"
                                 data-service-key="${service.label}"
-                                contenteditable="true"
+                      contenteditable="${
+                          window.currentUserRole &&
+                          ["admin", "superadmin"].includes(
+                              window.currentUserRole.toLowerCase()
+                          )
+                              ? "true"
+                              : "false"
+                      }"
                                 style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">
                                 ${service.info ?? "Oui"}
                             </span>
@@ -602,11 +664,28 @@ function showSelectedEntitiesCard(entities) {
                         const q = this.value.toLowerCase();
                         list.querySelectorAll(".service-item").forEach(
                             (div) => {
-                                div.style.display = div.textContent
-                                    .toLowerCase()
-                                    .includes(q)
-                                    ? ""
-                                    : "none";
+                                const labelElem = div.querySelector("p");
+                                const valueElem = div.querySelector("span");
+                                const label = labelElem?.textContent || "";
+                                const value = valueElem?.textContent || "";
+                                const match =
+                                    label.toLowerCase().includes(q) ||
+                                    value.toLowerCase().includes(q);
+                                div.style.display = match ? "" : "none";
+                                // Surligne le texte recherché
+                                if (match && q) {
+                                    labelElem.innerHTML = highlightText(
+                                        label,
+                                        q
+                                    );
+                                    valueElem.innerHTML = highlightText(
+                                        value,
+                                        q
+                                    );
+                                } else {
+                                    labelElem.innerHTML = label;
+                                    valueElem.innerHTML = value;
+                                }
                             }
                         );
                     });
@@ -677,86 +756,106 @@ function showSelectedEntitiesCard(entities) {
                 });
         });
     });
+
     // Edition inline des coordonnées (cards 1 et 3)
     setTimeout(() => {
-        document
-            .querySelectorAll(
-                "#card-1 .editable-field, #card-3 .editable-field"
+        if (
+            window.currentUserRole &&
+            ["admin", "superadmin"].includes(
+                window.currentUserRole.toLowerCase()
             )
-            .forEach((span) => {
-                span.addEventListener("blur", function () {
-                    const model = this.dataset.model;
-                    const id = this.dataset.id;
-                    const key = this.dataset.key;
-                    const value = this.textContent.trim();
+        ) {
+            document
+                .querySelectorAll(
+                    "#card-1 .editable-field, #card-3 .editable-field"
+                )
+                .forEach((span) => {
+                    span.addEventListener("blur", function () {
+                        const model = this.dataset.model;
+                        const id = this.dataset.id;
+                        const key = this.dataset.key;
+                        const value = this.textContent.trim();
 
-                    fetch(`/model/${model}/update-field/${id}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            Accept: "application/json",
-                        },
-                        body: JSON.stringify({ key, value }),
-                    })
-                        .then((res) => res.json())
-                        .then(() => {
-                            this.style.background = "#678BD8";
-                            setTimeout(() => (this.style.background = ""), 500);
+                        fetch(`/model/${model}/update-field/${id}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken,
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify({ key, value }),
                         })
-                        .catch(() => {
-                            this.style.background = "#DB7171";
-                            setTimeout(
-                                () => (this.style.background = ""),
-                                1000
-                            );
-                        });
+                            .then((res) => res.json())
+                            .then(() => {
+                                this.style.background = "#678BD8";
+                                setTimeout(
+                                    () => (this.style.background = ""),
+                                    500
+                                );
+                            })
+                            .catch(() => {
+                                this.style.background = "#DB7171";
+                                setTimeout(
+                                    () => (this.style.background = ""),
+                                    1000
+                                );
+                            });
+                    });
                 });
-            });
 
-        // Edition inline des services activés (cards 2 et 4)
-        document
-            .querySelectorAll(
-                "#card-2 .editable-service-field, #card-4 .editable-service-field"
-            )
-            .forEach((span) => {
-                span.addEventListener("blur", function () {
-                    const model = this.dataset.model;
-                    const id = this.dataset.id;
-                    const serviceLabel = this.dataset.serviceKey;
-                    const value = this.textContent.trim();
-                    // Génère la clé du champ infos_XYZ
-                    const key =
-                        "infos_" +
-                        serviceLabel
-                            .toLowerCase()
-                            .normalize("NFD")
-                            .replace(/[\u0300-\u036f]/g, "")
-                            .replace(/ /g, "_");
+            // Edition inline des services activés (cards 2 et 4)
+            document
+                .querySelectorAll(
+                    "#card-2 .editable-service-field, #card-4 .editable-service-field"
+                )
+                .forEach((span) => {
+                    span.addEventListener("blur", function () {
+                        const model = this.dataset.model;
+                        const id = this.dataset.id;
+                        const serviceLabel = this.dataset.serviceKey;
+                        const value = this.textContent.trim();
+                        const key =
+                            "infos_" +
+                            serviceLabel
+                                .toLowerCase()
+                                .normalize("NFD")
+                                .replace(/[\u0300-\u036f]/g, "")
+                                .replace(/ /g, "_");
 
-                    fetch(`/model/${model}/update-field/${id}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            Accept: "application/json",
-                        },
-                        body: JSON.stringify({ key, value }),
-                    })
-                        .then((res) => res.json())
-                        .then(() => {
-                            this.style.background = "#678BD8";
-                            setTimeout(() => (this.style.background = ""), 500);
+                        fetch(`/model/${model}/update-field/${id}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken,
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify({ key, value }),
                         })
-                        .catch(() => {
-                            this.style.background = "#DB7171";
-                            setTimeout(
-                                () => (this.style.background = ""),
-                                1000
-                            );
-                        });
+                            .then((res) => res.json())
+                            .then(() => {
+                                this.style.background = "#678BD8";
+                                setTimeout(
+                                    () => (this.style.background = ""),
+                                    500
+                                );
+                            })
+                            .catch(() => {
+                                this.style.background = "#DB7171";
+                                setTimeout(
+                                    () => (this.style.background = ""),
+                                    1000
+                                );
+                            });
+                    });
                 });
-            });
+        } else {
+            // Si pas admin, rendre les champs non éditables
+            document
+                .querySelectorAll(".editable-field, .editable-service-field")
+                .forEach((span) => {
+                    span.setAttribute("contenteditable", "false");
+                });
+        }
     }, 0);
 
     // Gestion de la suppression via la croix

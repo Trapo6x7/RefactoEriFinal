@@ -20,14 +20,14 @@ class Problem extends Model
 
     public function env()
     {
-        return $this->belongsToMany(Env::class, 'env');
+        return $this->belongsTo(Env::class, 'env');
     }
     public function tool()
     {
-        return $this->belongsToMany(Tool::class, 'env');
+        return $this->belongsTo(Tool::class, 'outils');
     }
     public function society()
     {
-        return $this->belongsToMany(Society::class, 'env');
+        return $this->belongsTo(Society::class, 'societe');
     }
 }

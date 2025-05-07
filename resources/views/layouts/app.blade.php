@@ -39,7 +39,12 @@
         {{-- @include('layouts.footer') --}}
     </div>
 </body>
-<script >
+<script>
     window.translatedFields = @json(__('fields'));
-  </script>
+
+    window.currentUserRole = "{{ Auth::user()->role }}";
+    console.log(window.currentUserRole);
+    
+</script>
+
 </html>
