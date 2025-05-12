@@ -1,6 +1,6 @@
 <nav x-data="{ open: false }" class="bg-off-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-20 items-center">
+        <div class="flex justify-between h-auto py-2 items-center">
             <!-- Logo -->
             <div class="flex w-1/5 justify-center items-center">
                 <a href="{{ route('dashboard') }}">

@@ -40,6 +40,7 @@ return [
     'title' => 'Titre',
     'lastname' => 'Prénom',
     'phone_fix' => 'Téléphone fixe',
+    'phone_mobile' => 'Téléphone portable',
     'env' => "Environnement",
     'tool' => 'Outil',
     'society_id' => 'Société',

@@ -15,14 +15,14 @@
             <div class="rounded-lg px-4 md:px-8 flex flex-col items-center max-w-full md:max-w-sm w-full">
                 <div class="text-sm font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
                 <div class="flex gap-2 w-full">
-                    <select id="add-model-select" class="border rounded px-4 py-2 flex-1">
+                    <select id="add-model-select" class="border rounded px-4 py-1 flex-1">
                         @foreach ($models as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
                         @endforeach
                     </select>
                     <a id="add-model-link"
                         href="{{ route('model.form', ['model' => array_key_first($models), 'action' => 'create']) }}"
-                        class="px-4 py-2 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition flex-shrink-0 text-center">
+                        class="px-4 py-1 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition flex-shrink-0 text-center">
                         +
                     </a>
                 </div>
@@ -83,12 +83,13 @@
             </article>
         </section>
 
-        <section id='bandeau-problem' class="overflow-y-auto h-72 bg-off-white rounded-lg mt-4">
-            <article class="min-h-full w-full flex p-4 md:p-6">
-                <div id="problemes-list-1" class="w-1/2 border-r border-secondary-grey"></div>
-                <div id="problemes-list-2" class="w-1/2"></div>
+        <section id='bandeau-problem' class=" h-80 flex bg-off-white rounded-lg mt-4 px-8">
+            <article  id="problemes-list1" class="w-1/2 px-8 py-4 border-r overflow-y-auto overflow-hidden border-secondary-grey">
+            </article>
+            <article  id="problemes-list2" class="w-1/2 px-8 py-4 overflow-y-auto overflow-hidden">
             </article>
         </section>
     </section>
     </section>
+    @vite('resources/js/dashboard.js')
 </x-app-layout>

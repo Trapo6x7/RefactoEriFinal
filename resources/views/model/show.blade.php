@@ -30,42 +30,46 @@
         </div>
     </div>
 
-    @canany(['admin', 'superadmin'])
-        <script>
-            document.getElementById('detail-search').addEventListener('input', function() {
-                let query = this.value.toLowerCase();
-                document.querySelectorAll('#details-list li').forEach(function(li) {
-                    let text = li.innerText.toLowerCase();
-                    li.style.display = text.includes(query) ? '' : 'none';
-                });
-            });
-
-            document.querySelectorAll('.editable').forEach(function(span) {
-                span.addEventListener('blur', function() {
-                    const value = this.innerText;
-                    const field = this.dataset.field;
-                    const id = this.dataset.id;
-                    const model = this.dataset.model;
-
-                    fetch(`/model/${model}/update-field/${id}`, {
-                        method: 'POST',
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifie le rôle JS (à adapter selon comment tu exposes le rôle)
+            if (
+                window.currentUserRole &&
+                ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase())
+            ) {
+                document.querySelectorAll('.editable').forEach(function(span) {
+                    span.addEventListener('blur', function() {
+                        const value = this.innerText;
+                        const field = this.dataset.field;
+                        const id = this.dataset.id;
+                        const model = this.dataset.model;
+        
+                        fetch(`/model/${model}/update-field/${id}`, {
+                            method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || '{{ csrf_token() }}',
+                                Accept: 'application/json'
                             },
-                            body: JSON.stringify({
-                                field,
-                                value
-                            })
+                            body: JSON.stringify({ field, value }),
                         })
                         .then(res => res.json())
                         .then(data => {
                             if (!data.success) {
                                 alert('Erreur lors de la mise à jour');
+                            } else {
+                                span.style.background = "#678BD8";
+                                setTimeout(() => span.style.background = "", 500);
                             }
+                        })
+                        .catch(() => {
+                            span.style.background = "#DB7171";
+                            setTimeout(() => span.style.background = "", 1000);
                         });
+                    });
                 });
-            });
+            }
+        });
         </script>
-    @endcanany
+
 </x-app-layout>

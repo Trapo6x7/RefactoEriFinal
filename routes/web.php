@@ -47,6 +47,32 @@ Route::get('/societe/{id}/interlocuteurs', function($id) {
 
 Route::get('/societe/{id}/problemes', [SocietyController::class, 'problemes']);
 
+Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
+    $q = $request->input('q');
+    $tool = $request->input('tool');
+    $env = $request->input('env');
+
+    $problems = \App\Models\Problem::select('id', 'title', 'description', 'tool', 'env')
+        ->when($q, function ($query, $q) {
+            $query->where('title', 'like', "%$q%")
+                  ->orWhere('description', 'like', "%$q%");
+        })
+        ->when($tool, function ($query, $tool) {
+            $query->where('tool', $tool);
+        })
+        ->when($env, function ($query, $env) {
+            $query->where('env', $env);
+        })
+        ->limit(50)
+        ->get();
+
+    return [
+        'problems' => $problems,
+        'tools' => \App\Models\Tool::select('id', 'name')->get(),
+        'envs' => \App\Models\Env::select('id', 'name')->get(),
+    ];
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/model/{model}', [ModelController::class, 'index'])
         ->name('model.index');

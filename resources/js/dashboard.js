@@ -7,7 +7,6 @@ const allowedKeys = {
         "phone_mobile",
         "id_teamviewer",
     ],
-
     société: [
         "name",
         "boss_name",
@@ -17,6 +16,11 @@ const allowedKeys = {
         "main_name",
     ],
 };
+
+let selectedEntities = JSON.parse(
+    localStorage.getItem("selectedEntities") || "[]"
+);
+selectedEntities = normalizeSelectedEntities(selectedEntities);
 
 const csrfToken =
     document
@@ -29,10 +33,17 @@ function getEntityFromDataset(dataset) {
     return entity;
 }
 
+// Fonction pour garantir l'ordre société/interlocuteur
+function normalizeSelectedEntities(entities) {
+    let societe = entities.find(e => e.model === "société");
+    let interlocuteur = entities.find(e => e.model === "interlocuteur");
+    let result = [];
+    if (societe) result.push(societe);
+    if (interlocuteur) result.push(interlocuteur);
+    return result;
+}
+
 function addEntityToSelection(entity) {
-    let selectedEntities = JSON.parse(
-        localStorage.getItem("selectedEntities") || "[]"
-    );
 
     // Si déjà présente, ne rien faire
     if (
@@ -40,51 +51,139 @@ function addEntityToSelection(entity) {
             (item) => item.id === entity.id && item.model === entity.model
         )
     ) {
+        selectedEntities = normalizeSelectedEntities(selectedEntities);
         showSelectedEntitiesCard(selectedEntities);
         return;
     }
 
-    // Si on ajoute un interlocuteur et qu'il y a déjà une société + un interlocuteur
-    if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 2 &&
-        selectedEntities[0].model === "société" &&
-        selectedEntities[1].model === "interlocuteur"
-    ) {
-        // Remplace l'interlocuteur (position 1)
-        selectedEntities[1] = entity;
-    } else if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 2 &&
-        selectedEntities[1].model === "société" &&
-        selectedEntities[0].model === "interlocuteur"
-    ) {
-        // Remplace l'interlocuteur (position 0)
-        selectedEntities[0] = entity;
-    } else if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 1 &&
-        selectedEntities[0].model === "société"
-    ) {
-        // Ajoute l'interlocuteur après la société
-        selectedEntities.push(entity);
-    } else if (
-        entity.model === "interlocuteur" &&
-        selectedEntities.length === 1 &&
-        selectedEntities[0].model === "interlocuteur"
-    ) {
-        // Remplace l'interlocuteur unique
-        selectedEntities[0] = entity;
-    } else {
-        // Cas standard : si déjà 2 entités, retire la première
-        if (selectedEntities.length >= 2) {
-            selectedEntities.shift();
+    // Ajout ou remplacement selon le type
+    if (entity.model === "société") {
+        // Remplace la société si déjà présente
+        selectedEntities = selectedEntities.filter(e => e.model !== "société");
+        selectedEntities.unshift(entity);
+    } else if (entity.model === "interlocuteur") {
+        // Remplace l'interlocuteur si déjà présent
+        selectedEntities = selectedEntities.filter(e => e.model !== "interlocuteur");
+        // Si une société existe déjà, interlocuteur en 2e
+        if (selectedEntities.length && selectedEntities[0].model === "société") {
+            selectedEntities.push(entity);
+        } else {
+            // Sinon, interlocuteur en premier
+            selectedEntities = [entity];
         }
-        selectedEntities.push(entity);
     }
 
+    selectedEntities = normalizeSelectedEntities(selectedEntities);
     localStorage.setItem("selectedEntities", JSON.stringify(selectedEntities));
     showSelectedEntitiesCard(selectedEntities);
+}
+
+function afficherRechercheProblemeGlobaleAjax(containerId) {
+    const liste = document.getElementById(containerId);
+    if (!liste) return;
+    liste.innerHTML = `
+        <div class="flex justify-center gap-2 mb-4">
+            <input type="text" id="search-problemes-global" placeholder="Rechercher un problème global..." 
+                class="p-2 border text-sm rounded w-full max-w-xs" />
+            <select id="filter-tool" class="p-2 text-sm border rounded">
+                <option value="">Tous les outils</option>
+            </select>
+            <select id="filter-env" class="p-2 border text-sm rounded">
+                <option value="">Tous les env...</option>
+            </select>
+        </div>
+        <div id="problemes-list-inner-global"></div>
+    `;
+
+    const renderProblemes = (problemes) => {
+        document.getElementById("problemes-list-inner-global").innerHTML = `
+            <div class="flex flex-col items-start w-full">
+            ${problemes.length
+                ? problemes
+                    .map(
+                        (p, i) =>
+                            `<div class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
+                                <button 
+                                class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover accordion-title flex items-center gap-2"
+                                data-idx="${i}">
+                                <span class="accordion-arrow transition-transform">&#x25BE;</span>
+                                ${p.title || ""}
+                                </button>
+                                <div class="accordion-content mt-2 hidden text-left w-full" id="problem-details-global-${i}">
+                                <div class="text-sm text-primary-grey">${p.description || ""}</div>
+                                </div>
+                            </div>`
+                    )
+                    .join("")
+                : '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème trouvé.</div>'
+            }
+            </div>
+        `;
+
+        // Accordion behavior
+        document
+            .getElementById("problemes-list-inner-global")
+            .querySelectorAll(".accordion-title")
+            .forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    const idx = this.dataset.idx;
+                    const content = document.getElementById(
+                        `problem-details-global-${idx}`
+                    );
+                    const arrow = this.querySelector(".accordion-arrow");
+                    if (content) {
+                        content.classList.toggle("hidden");
+                        if (arrow) {
+                            if (!content.classList.contains("hidden")) {
+                                arrow.style.transform = "rotate(180deg)";
+                            } else {
+                                arrow.style.transform = "rotate(0deg)";
+                            }
+                        }
+                    }
+                });
+            });
+    };
+
+    // Fonction pour charger les problèmes avec filtres
+    function fetchAndRenderProblems() {
+        const q = document.getElementById("search-problemes-global").value.trim();
+        const tool = document.getElementById("filter-tool").value;
+        const env = document.getElementById("filter-env").value;
+        const params = new URLSearchParams();
+        if (q) params.append('q', q);
+        if (tool) params.append('tool', tool);
+        if (env) params.append('env', env);
+
+        fetch('/problemes/search?' + params.toString())
+            .then(res => res.json())
+            .then(data => {
+                renderProblemes(data.problems);
+                // Remplir les filtres au premier chargement
+                if (!document.getElementById("filter-tool").dataset.loaded) {
+                    const toolSelect = document.getElementById("filter-tool");
+                    data.tools.forEach(t => {
+                        toolSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+                    });
+                    toolSelect.dataset.loaded = "1";
+                }
+                if (!document.getElementById("filter-env").dataset.loaded) {
+                    const envSelect = document.getElementById("filter-env");
+                    data.envs.forEach(e => {
+                        envSelect.innerHTML += `<option value="${e.id}">${e.name}</option>`;
+                    });
+                    envSelect.dataset.loaded = "1";
+                }
+            });
+    }
+
+    // Initial fetch
+    fetchAndRenderProblems();
+
+    // Recherche dynamique
+    document.getElementById("search-problemes-global").addEventListener("input", fetchAndRenderProblems);
+    document.getElementById("filter-tool").addEventListener("change", fetchAndRenderProblems);
+    document.getElementById("filter-env").addEventListener("change", fetchAndRenderProblems);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -288,10 +387,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Affiche la sélection au chargement si elle existe
-    const selectedEntities = JSON.parse(
+    let selectedEntities = JSON.parse(
         localStorage.getItem("selectedEntities") || "[]"
     );
+    selectedEntities = normalizeSelectedEntities(selectedEntities);
     showSelectedEntitiesCard(selectedEntities);
+
+    afficherRechercheProblemeGlobaleAjax("problemes-list2");
 });
 
 function highlightText(text, query) {
@@ -305,11 +407,15 @@ function highlightText(text, query) {
 }
 
 function showSelectedEntitiesCard(entities) {
+    
+    entities = normalizeSelectedEntities(entities);
+
     for (let i = 1; i <= 4; i++) {
         document.getElementById(`card-${i}`).innerHTML = "";
     }
 
-    const ent1 = entities[0];
+    const ent1 = entities[0]; // société
+    const ent2 = entities[1]; // interlocuteur
 
     if (ent1) {
         let coordonneesHtml = "";
@@ -341,7 +447,7 @@ function showSelectedEntitiesCard(entities) {
         });
         const maisonMereHtml =
             ent1.model === "société" && ent1.main_obj
-                ? `<a href="#" class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent1.main_obj.id}">Filiale de ${ent1.main_obj.name}</a>`
+                ? `<p class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent1.main_obj.id}">Filiale de ${ent1.main_obj.name}</p>`
                 : "";
         document.getElementById("card-1").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
@@ -380,7 +486,7 @@ function showSelectedEntitiesCard(entities) {
                 .then((res) => res.json())
                 .then((interlocutors) => {
                     const selectHtml = `
-                        <label class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
+                        <label for="interlocutor-select-1" class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
                         <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
                             <option value="">-- Choisir --</option>
                             ${interlocutors
@@ -525,8 +631,6 @@ function showSelectedEntitiesCard(entities) {
         }
     }
 
-    // Affiche la deuxième entité (société ou interlocuteur)
-    const ent2 = entities[1];
     if (ent2) {
         let coordonneesHtml = "";
         (allowedKeys[ent2.model] || []).forEach((key) => {
@@ -826,7 +930,7 @@ function showSelectedEntitiesCard(entities) {
                                 "X-CSRF-TOKEN": csrfToken,
                                 Accept: "application/json",
                             },
-                            body: JSON.stringify({ key, value }),
+                            body: JSON.stringify({ field: key, value }),
                         })
                             .then((res) => res.json())
                             .then(() => {
@@ -918,91 +1022,102 @@ function showSelectedEntitiesCard(entities) {
     });
 
     if (ent1 && ent1.model === "société") {
-        afficherProblemesSociete(ent1.id, "problemes-list-1");
+        afficherProblemesSociete(ent1.id, "problemes-list1");
     } else {
-        document.getElementById("problemes-list-1").innerHTML = "";
-    }
-    if (ent2 && ent2.model === "société") {
-        afficherProblemesSociete(ent2.id, "problemes-list-2");
-    } else {
-        document.getElementById("problemes-list-2").innerHTML = "";
+        document.getElementById("problemes-list1").innerHTML = "";
     }
 
-    function afficherProblemesSociete(societeId, containerId) {
-        const liste = document.getElementById(containerId);
-        if (!liste) return;
-        liste.innerHTML =
-            '<div class="mb-2 px-8 py-1 text-sm text-blue-accent font-semibold">Chargement...</div>';
-        fetch(`/societe/${societeId}/problemes`)
-            .then((res) => res.json())
-            .then((problemes) => {
-                if (!problemes.length) {
-                    liste.innerHTML =
-                        '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème lié à cette société.</div>';
-                    return;
-                }
-                const isAdmin =
-                    window.currentUserRole &&
-                    ["admin", "superadmin"].includes(
-                        window.currentUserRole.toLowerCase()
-                    );
-                liste.innerHTML = `
-                <div class="flex flex-col items-start w-full">
-                    ${problemes
-                        .map(
-                            (p, i) =>
-                                `<div class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
-                            <button 
-                                class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover accordion-title flex items-center gap-2"
-                                data-idx="${i}">
-                                <span class="accordion-arrow transition-transform">&#x25BE;</span>
-                                ${p.title || ""}
-                            </button>
-                            <div class="accordion-content mt-2 hidden text-left w-full" id="problem-details-${containerId}-${i}">
-                                <p class="text-sm text-primary-grey w-full">
-                                    ${
-                                        isAdmin
-                                            ? `<span 
-                                            class="editable-probleme-field outline-none focus:outline-none" 
-                                            data-id="${p.id}" 
-                                            data-key="description" 
-                                            contenteditable="true" 
-                                            style="outline:none;box-shadow:none;">${
-                                                p.description || ""
-                                            }</span>`
-                                            : p.description || ""
-                                    }
-                                </p>
-                            </div>
-                        </div>`
-                        )
-                        .join("")}
-                </div>
+
+
+function afficherProblemesSociete(societeId, containerId) {
+    const liste = document.getElementById(containerId);
+    if (!liste) return;
+    liste.innerHTML =
+        '<div class="mb-2 px-8 py-1 text-sm text-blue-accent font-semibold">Chargement...</div>';
+    fetch(`/societe/${societeId}/problemes`)
+        .then((res) => res.json())
+        .then((problemes) => {
+            if (!problemes.length) {
+                liste.innerHTML =
+                    '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème lié à cette société.</div>';
+                return;
+            }
+            const isAdmin =
+                window.currentUserRole &&
+                ["admin", "superadmin"].includes(
+                    window.currentUserRole.toLowerCase()
+                );
+
+            // Ajoute le champ de recherche
+            liste.innerHTML = `
+                <input type="text" id="search-problemes-${containerId}" placeholder="Rechercher un problème de la société..." 
+                    class="mb-4 p-2 border rounded w-full max-w-2xl" />
+                <div id="problemes-list-inner-${containerId}"></div>
             `;
-                // Ajoute le comportement accordion avec triangle
-                liste.querySelectorAll(".accordion-title").forEach((btn) => {
-                    btn.addEventListener("click", function () {
-                        const idx = this.dataset.idx;
-                        const content = document.getElementById(
-                            `problem-details-${containerId}-${idx}`
-                        );
-                        const arrow = this.querySelector(".accordion-arrow");
-                        if (content) {
-                            content.classList.toggle("hidden");
-                            if (arrow) {
-                                if (!content.classList.contains("hidden")) {
-                                    arrow.style.transform = "rotate(180deg)";
-                                } else {
-                                    arrow.style.transform = "rotate(0deg)";
+
+            const renderProblemes = (filteredProblemes) => {
+                document.getElementById(`problemes-list-inner-${containerId}`).innerHTML = `
+                    <div class="flex flex-col items-start w-full">
+                        ${filteredProblemes
+                            .map(
+                                (p, i) =>
+                                    `<div class="mb-2 p-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
+                                <button 
+                                    class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover accordion-title flex items-center gap-2"
+                                    data-idx="${i}">
+                                    <span class="accordion-arrow transition-transform">&#x25BE;</span>
+                                    ${p.title || ""}
+                                </button>
+                                <div class="accordion-content mt-2 hidden text-left w-full" id="problem-details-${containerId}-${i}">
+                                    <p class="text-sm text-primary-grey w-full">
+                                        ${
+                                            isAdmin
+                                                ? `<span 
+                                                class="editable-probleme-field outline-none focus:outline-none" 
+                                                data-id="${p.id}" 
+                                                data-key="description" 
+                                                contenteditable="true" 
+                                                style="outline:none;box-shadow:none;">${
+                                                    p.description || ""
+                                                }</span>`
+                                                : p.description || ""
+                                        }
+                                    </p>
+                                </div>
+                            </div>`
+                            )
+                            .join("")}
+                    </div>
+                `;
+
+                // Accordion
+                document
+                    .getElementById(`problemes-list-inner-${containerId}`)
+                    .querySelectorAll(".accordion-title")
+                    .forEach((btn) => {
+                        btn.addEventListener("click", function () {
+                            const idx = this.dataset.idx;
+                            const content = document.getElementById(
+                                `problem-details-${containerId}-${idx}`
+                            );
+                            const arrow = this.querySelector(".accordion-arrow");
+                            if (content) {
+                                content.classList.toggle("hidden");
+                                if (arrow) {
+                                    if (!content.classList.contains("hidden")) {
+                                        arrow.style.transform = "rotate(180deg)";
+                                    } else {
+                                        arrow.style.transform = "rotate(0deg)";
+                                    }
                                 }
                             }
-                        }
+                        });
                     });
-                });
 
                 // Edition inline AJAX si admin/superadmin
                 if (isAdmin) {
-                    liste
+                    document
+                        .getElementById(`problemes-list-inner-${containerId}`)
                         .querySelectorAll(".editable-probleme-field")
                         .forEach((span) => {
                             span.addEventListener("blur", function () {
@@ -1036,10 +1151,29 @@ function showSelectedEntitiesCard(entities) {
                             });
                         });
                 }
-            })
-            .catch(() => {
-                liste.innerHTML =
-                    '<div class="text-red-accent text-sm text-left mb-2 px-8 py-1">Erreur lors du chargement des problèmes.</div>';
-            });
-    }
+            };
+
+            // Affiche tous les problèmes au départ
+            renderProblemes(problemes);
+
+            // Ajoute l'écouteur sur le champ de recherche
+            document
+                .getElementById(`search-problemes-${containerId}`)
+                .addEventListener("input", function () {
+                    const q = this.value.trim().toLowerCase();
+                    const filtered = problemes.filter(
+                        (p) =>
+                            (p.title && p.title.toLowerCase().includes(q)) ||
+                            (p.description && p.description.toLowerCase().includes(q))
+                    );
+                    renderProblemes(filtered);
+                });
+        })
+        .catch(() => {
+            liste.innerHTML =
+                '<div class="text-red-accent text-sm text-left mb-2 px-8 py-1">Erreur lors du chargement des problèmes.</div>';
+        });
+}
+
+
 }
