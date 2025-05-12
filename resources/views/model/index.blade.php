@@ -1,5 +1,5 @@
 <x-app-layout>
-    <h1 class="text-2xl font-bold my-8 text-center uppercase">Liste des {{ $model }}s</h1>
+    <h1 class="text-xl font-bold my-8 text-center uppercase">Liste des {{ $model }}s</h1>
     <div class="w-full mx-auto px-40">
 
         <div class="mb-4 flex justify-center">
@@ -8,7 +8,7 @@
         </div>
 
         <div class=" rounded-lg" style="max-height: 600px; overflow-y: auto;">
-            <table class="w-full">
+            <table class="w-full text-sm">
                 <thead>
                     <tr>
                         <th class="py-2 px-4 border-b text-center bg-blue-accent text-secondary-grey">NOM</th>

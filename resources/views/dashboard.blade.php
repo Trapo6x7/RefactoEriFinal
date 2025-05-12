@@ -74,6 +74,7 @@
             <article id="card-2"
                 class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll text-sm">
             </article>
+            <div class="border-r border-secondary-grey"></div>
             <article id="card-3"
                 class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll relative text-sm">
             </article>

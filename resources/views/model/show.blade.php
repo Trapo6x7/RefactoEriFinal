@@ -29,6 +29,7 @@
             </ul>
         </div>
     </div>
+
     <script>
         document.getElementById('detail-search').addEventListener('input', function() {
             let query = this.value.toLowerCase();
@@ -46,7 +47,7 @@
                 const model = this.dataset.model;
 
                 fetch(`/model/${model}/update-field/${id}`, {
-                        method: 'POST',
+                    method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'

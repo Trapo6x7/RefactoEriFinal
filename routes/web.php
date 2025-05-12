@@ -35,12 +35,11 @@ Route::post('/user-search', [UserSearchController::class, 'search'])->name('user
 
 Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('user-suggestions');
 
-Route::get('/model-suggestions', [\App\Http\Controllers\ModelController::class, 'suggestions'])->name('model-suggestions');
+Route::get('/model-suggestions', [ModelController::class, 'suggestions'])->name('model-suggestions');
 
-Route::get('/model/{model}/show/{id}', [\App\Http\Controllers\ModelController::class, 'show'])->name('model.show');
+Route::get('/model/{model}/show/{id}', [ModelController::class, 'show'])->name('model.show');
 
-Route::post('/model/{model}/update-field/{id}', [\App\Http\Controllers\ModelController::class, 'updateField'])->name('model.updateField');
-
+Route::post('/model/{model}/update-field/{id}', [ModelController::class, 'updateField'])->name('model.updateField');
 
 Route::get('/societe/{id}/interlocuteurs', function($id) {
     return \App\Models\Interlocutor::where('societe', $id)->get();
@@ -49,11 +48,11 @@ Route::get('/societe/{id}/interlocuteurs', function($id) {
 Route::get('/societe/{id}/problemes', [SocietyController::class, 'problemes']);
 
 Route::middleware('auth')->group(function () {
-    Route::get('/model/{model}', [\App\Http\Controllers\ModelController::class, 'index'])
+    Route::get('/model/{model}', [ModelController::class, 'index'])
         ->name('model.index');
-    Route::get('/model/{model}/{action}/{id?}', [\App\Http\Controllers\ModelController::class, 'form'])
+    Route::get('/model/{model}/{action}/{id?}', [ModelController::class, 'form'])
         ->name('model.form');
-    Route::post('/model/{model}/{action}/{id?}', [\App\Http\Controllers\ModelController::class, 'submit'])
+    Route::post('/model/{model}/{action}/{id?}', [ModelController::class, 'submit'])
         ->name('model.submit');
 });
 

@@ -20,7 +20,7 @@
             @method('POST')
         @endif
 
-        <div class="overflow-y-auto max-h-[60vh] px-2 flex flex-col gap-4">
+        <div class="overflow-y-auto max-h-[60vh] px-2 flex flex-col gap-4 text-sm">
             @if ($model === 'société')
                 @include('model.partials._society_field')
             @elseif($model === 'interlocuteur')
@@ -52,10 +52,10 @@
                 form.querySelectorAll('[required]').forEach(function(input) {
                     if (!input.value.trim()) {
                         valid = false;
-                        input.classList.add('border-red-500', 'ring-2', 'ring-red-300');
+                        input.classList.add('border-red-accent', 'ring-2', 'ring-red-300');
                         if (!firstInvalid) firstInvalid = input;
                     } else {
-                        input.classList.remove('border-red-500', 'ring-2', 'ring-red-300');
+                        input.classList.remove('border-red-accent', 'ring-2', 'ring-red-300');
                     }
                 });
                 if (!valid) {

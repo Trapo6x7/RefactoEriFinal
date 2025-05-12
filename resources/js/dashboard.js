@@ -137,7 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                 suggestionBox.classList.add("hidden");
 
                                 // Ajoute ceci pour charger et afficher la card directement
-                                const model = suggestion.model || tableSelect.value;
+                                const model =
+                                    suggestion.model || tableSelect.value;
                                 const id = suggestion.id;
                                 if (model && id) {
                                     fetch(`/model/${model}/show/${id}`, {
@@ -145,20 +146,34 @@ document.addEventListener("DOMContentLoaded", function () {
                                     })
                                         .then((res) => res.json())
                                         .then((data) => {
-                                            const allowed = allowedKeys[model] || [];
+                                            const allowed =
+                                                allowedKeys[model] || [];
                                             const entity = { model };
                                             allowed.forEach((key) => {
-                                                if (data[key] !== undefined) entity[key] = data[key];
+                                                if (data[key] !== undefined)
+                                                    entity[key] = data[key];
                                             });
                                             entity.id = data.id;
-                                            if (data.fullname) entity.fullname = data.fullname;
-                                            if (data.active_services) entity.active_services = data.active_services;
-                                            if (data.societe) entity.societe = data.societe;
-                                            if (data.main_obj) entity.main_obj = data.main_obj;
-                                            if (data.phone_fix) entity.phone_fix = data.phone_fix;
-                                            if (data.phone_mobile) entity.phone_mobile = data.phone_mobile;
-                                            if (data.id_teamviewer) entity.id_teamviewer = data.id_teamviewer;
-                                            if (data.address) entity.address = data.address;
+                                            if (data.fullname)
+                                                entity.fullname = data.fullname;
+                                            if (data.active_services)
+                                                entity.active_services =
+                                                    data.active_services;
+                                            if (data.societe)
+                                                entity.societe = data.societe;
+                                            if (data.main_obj)
+                                                entity.main_obj = data.main_obj;
+                                            if (data.phone_fix)
+                                                entity.phone_fix =
+                                                    data.phone_fix;
+                                            if (data.phone_mobile)
+                                                entity.phone_mobile =
+                                                    data.phone_mobile;
+                                            if (data.id_teamviewer)
+                                                entity.id_teamviewer =
+                                                    data.id_teamviewer;
+                                            if (data.address)
+                                                entity.address = data.address;
                                             addEntityToSelection(entity);
                                         });
                                     if (results) results.innerHTML = "";
@@ -903,104 +918,128 @@ function showSelectedEntitiesCard(entities) {
     });
 
     if (ent1 && ent1.model === "société") {
-        afficherProblemesSociete(ent1.id, 'problemes-list-1');
+        afficherProblemesSociete(ent1.id, "problemes-list-1");
     } else {
-        document.getElementById('problemes-list-1').innerHTML = "";
+        document.getElementById("problemes-list-1").innerHTML = "";
     }
     if (ent2 && ent2.model === "société") {
-        afficherProblemesSociete(ent2.id, 'problemes-list-2');
+        afficherProblemesSociete(ent2.id, "problemes-list-2");
     } else {
-        document.getElementById('problemes-list-2').innerHTML = "";
+        document.getElementById("problemes-list-2").innerHTML = "";
     }
 
-function afficherProblemesSociete(societeId, containerId) {
-    const liste = document.getElementById(containerId);
-    if (!liste) return;
-    liste.innerHTML = '<div class="mb-2 px-8 py-1 text-sm text-blue-accent font-semibold">Chargement...</div>';
-    fetch(`/societe/${societeId}/problemes`)
-        .then(res => res.json())
-        .then(problemes => {
-            if (!problemes.length) {
-                liste.innerHTML = '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème lié à cette société.</div>';
-                return;
-            }
-            const isAdmin = window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase());
-            liste.innerHTML = `
+    function afficherProblemesSociete(societeId, containerId) {
+        const liste = document.getElementById(containerId);
+        if (!liste) return;
+        liste.innerHTML =
+            '<div class="mb-2 px-8 py-1 text-sm text-blue-accent font-semibold">Chargement...</div>';
+        fetch(`/societe/${societeId}/problemes`)
+            .then((res) => res.json())
+            .then((problemes) => {
+                if (!problemes.length) {
+                    liste.innerHTML =
+                        '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème lié à cette société.</div>';
+                    return;
+                }
+                const isAdmin =
+                    window.currentUserRole &&
+                    ["admin", "superadmin"].includes(
+                        window.currentUserRole.toLowerCase()
+                    );
+                liste.innerHTML = `
                 <div class="flex flex-col items-start w-full">
-                    ${problemes.map((p, i) =>
-                        `<div class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
+                    ${problemes
+                        .map(
+                            (p, i) =>
+                                `<div class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
                             <button 
                                 class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover accordion-title flex items-center gap-2"
                                 data-idx="${i}">
                                 <span class="accordion-arrow transition-transform">&#x25BE;</span>
-                                ${p.title || ''}
+                                ${p.title || ""}
                             </button>
                             <div class="accordion-content mt-2 hidden text-left w-full" id="problem-details-${containerId}-${i}">
                                 <p class="text-sm text-primary-grey w-full">
-                                    ${isAdmin
-                                        ? `<span 
+                                    ${
+                                        isAdmin
+                                            ? `<span 
                                             class="editable-probleme-field outline-none focus:outline-none" 
                                             data-id="${p.id}" 
                                             data-key="description" 
                                             contenteditable="true" 
-                                            style="outline:none;box-shadow:none;">${p.description || ''}</span>`
-                                        : (p.description || '')}
+                                            style="outline:none;box-shadow:none;">${
+                                                p.description || ""
+                                            }</span>`
+                                            : p.description || ""
+                                    }
                                 </p>
                             </div>
                         </div>`
-                    ).join('')}
+                        )
+                        .join("")}
                 </div>
             `;
-            // Ajoute le comportement accordion avec triangle
-            liste.querySelectorAll('.accordion-title').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const idx = this.dataset.idx;
-                    const content = document.getElementById(`problem-details-${containerId}-${idx}`);
-                    const arrow = this.querySelector('.accordion-arrow');
-                    if (content) {
-                        content.classList.toggle('hidden');
-                        if (arrow) {
-                            if (!content.classList.contains('hidden')) {
-                                arrow.style.transform = 'rotate(180deg)';
-                            } else {
-                                arrow.style.transform = 'rotate(0deg)';
+                // Ajoute le comportement accordion avec triangle
+                liste.querySelectorAll(".accordion-title").forEach((btn) => {
+                    btn.addEventListener("click", function () {
+                        const idx = this.dataset.idx;
+                        const content = document.getElementById(
+                            `problem-details-${containerId}-${idx}`
+                        );
+                        const arrow = this.querySelector(".accordion-arrow");
+                        if (content) {
+                            content.classList.toggle("hidden");
+                            if (arrow) {
+                                if (!content.classList.contains("hidden")) {
+                                    arrow.style.transform = "rotate(180deg)";
+                                } else {
+                                    arrow.style.transform = "rotate(0deg)";
+                                }
                             }
                         }
-                    }
-                });
-            });
-
-            // Edition inline AJAX si admin/superadmin
-            if (isAdmin) {
-                liste.querySelectorAll('.editable-probleme-field').forEach(span => {
-                    span.addEventListener('blur', function () {
-                        const id = this.dataset.id;
-                        const key = this.dataset.key;
-                        const value = this.textContent.trim();
-                        fetch(`/probleme/update-field/${id}`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": csrfToken,
-                                Accept: "application/json",
-                            },
-                            body: JSON.stringify({ key, value }),
-                        })
-                        .then(res => res.json())
-                        .then(() => {
-                            this.style.background = "#678BD8";
-                            setTimeout(() => (this.style.background = ""), 500);
-                        })
-                        .catch(() => {
-                            this.style.background = "#DB7171";
-                            setTimeout(() => (this.style.background = ""), 1000);
-                        });
                     });
                 });
-            }
-        })
-        .catch(() => {
-            liste.innerHTML = '<div class="text-red-accent text-sm text-left mb-2 px-8 py-1">Erreur lors du chargement des problèmes.</div>';
-        });
-}
+
+                // Edition inline AJAX si admin/superadmin
+                if (isAdmin) {
+                    liste
+                        .querySelectorAll(".editable-probleme-field")
+                        .forEach((span) => {
+                            span.addEventListener("blur", function () {
+                                const id = this.dataset.id;
+                                const key = this.dataset.key;
+                                const value = this.textContent.trim();
+                                fetch(`/probleme/update-field/${id}`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRF-TOKEN": csrfToken,
+                                        Accept: "application/json",
+                                    },
+                                    body: JSON.stringify({ key, value }),
+                                })
+                                    .then((res) => res.json())
+                                    .then(() => {
+                                        this.style.background = "#678BD8";
+                                        setTimeout(
+                                            () => (this.style.background = ""),
+                                            500
+                                        );
+                                    })
+                                    .catch(() => {
+                                        this.style.background = "#DB7171";
+                                        setTimeout(
+                                            () => (this.style.background = ""),
+                                            1000
+                                        );
+                                    });
+                            });
+                        });
+                }
+            })
+            .catch(() => {
+                liste.innerHTML =
+                    '<div class="text-red-accent text-sm text-left mb-2 px-8 py-1">Erreur lors du chargement des problèmes.</div>';
+            });
+    }
 }

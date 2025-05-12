@@ -236,7 +236,7 @@ class ModelController extends Controller
         $modelClass = $this->models[$model];
         $item = $modelClass::findOrFail($id);
 
-        $field = $request->input('key');
+        $field = $request->input('field');
         $value = $request->input('value');
 
         // Sécurise les champs éditables
@@ -294,6 +294,7 @@ class ModelController extends Controller
     public function listProblemes()
     {
         $problemes = Problem::with('societe')->get();
+
         $data = $problemes->map(function ($item) {
             $arr = $item->toArray();
             if ($item->societe) {
