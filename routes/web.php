@@ -73,6 +73,8 @@ Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
     ];
 });
 
+Route::get('/problemes/list', [ModelController::class, 'problemsList']);
+
 Route::middleware('auth')->group(function () {
     Route::get('/model/{model}', [ModelController::class, 'index'])
         ->name('model.index');

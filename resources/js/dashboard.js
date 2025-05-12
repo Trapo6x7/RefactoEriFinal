@@ -102,17 +102,17 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                 ? problemes
                     .map(
                         (p, i) =>
-                            `<div class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
+                            `<article class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
                                 <button 
                                 class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover accordion-title flex items-center gap-2"
                                 data-idx="${i}">
                                 <span class="accordion-arrow transition-transform">&#x25BE;</span>
-                                ${p.title || ""}
+                                <h3 class="text-left">${p.title || ""}</h3>
                                 </button>
-                                <div class="accordion-content mt-2 hidden text-left w-full" id="problem-details-global-${i}">
-                                <div class="text-sm text-primary-grey">${p.description || ""}</div>
+                                <div class="accordion-content mt-2 hidden text-left" id="problem-details-global-${i}">
+                                <p class="text-sm text-primary-grey">${p.description || ""}</p>
                                 </div>
-                            </div>`
+                            </article>`
                     )
                     .join("")
                 : '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème trouvé.</div>'

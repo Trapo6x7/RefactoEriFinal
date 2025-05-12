@@ -4,14 +4,13 @@
             $models = [
                 'société' => 'Société',
                 'problème' => 'Problème',
-                'problemStatus' => 'Statut',
                 'interlocuteur' => 'Interlocuteur',
                 'environnement' => 'Environnement',
                 'outil' => 'Outil',
             ];
         @endphp
 
-        <article class="w-full flex justify-center">
+        <article class="w-full flex justify-center" id="header">
             <div class="rounded-lg px-4 md:px-8 flex flex-col items-center max-w-full md:max-w-sm w-full">
                 <div class="text-sm font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
                 <div class="flex gap-2 w-full">
@@ -20,17 +19,29 @@
                             <option value="{{ $key }}">{{ $label }}</option>
                         @endforeach
                     </select>
-                    <a id="add-model-link"
-                        href="{{ route('model.form', ['model' => array_key_first($models), 'action' => 'create']) }}"
+                    <button id="add-model-link" type="button"
                         class="px-4 py-1 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition flex-shrink-0 text-center">
                         +
-                    </a>
+                    </button>
                 </div>
             </div>
         </article>
-    </x-slot>
 
-    <section>
+
+    </x-slot>
+    <!-- Modale pour le formulaire -->
+    <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black hidden">
+        <div class="rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+            <button id="close-add-model-modal"
+                class="absolute top-2 right-2 text-red-accent hover:text-red-hover text-2xl">&times;</button>
+            <div id="add-model-modal-content">
+                <!-- Le formulaire sera chargé ici -->
+                <div class="flex justify-center items-center h-32 text-blue-accent">Chargement...</div>
+            </div>
+        </div>
+    </article>
+
+    <section id="main-content">
         <section class="mx-0 bg-off-white rounded-lg h-auto md:h-[80%]">
 
             <article class="max-w-4xl pt-4 mx-auto">
@@ -84,12 +95,85 @@
         </section>
 
         <section id='bandeau-problem' class=" h-80 flex bg-off-white rounded-lg mt-4 px-8">
-            <article  id="problemes-list1" class="w-1/2 px-8 py-4 border-r overflow-y-auto overflow-hidden border-secondary-grey">
+            <article id="problemes-list1"
+                class="w-1/2 px-8 py-4 border-r overflow-y-auto overflow-hidden border-secondary-grey">
             </article>
-            <article  id="problemes-list2" class="w-1/2 px-8 py-4 overflow-y-auto overflow-hidden">
+            <article id="problemes-list2" class="w-1/2 px-8 py-4 overflow-y-auto overflow-hidden">
             </article>
         </section>
     </section>
     </section>
+    <script>
+        const modal = document.getElementById('add-model-modal');
+        const mainContent = document.getElementById('main-content');
+        const header = document.getElementById('header');
+
+        document.getElementById('add-model-link').addEventListener('click', function() {
+            const model = document.getElementById('add-model-select').value;
+            const url = "{{ route('model.form', ['model' => ':model', 'action' => 'create']) }}".replace(':model',
+                model);
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            mainContent.classList.add('modal-blur');
+            header.classList.add('modal-blur');
+            document.getElementById('add-model-modal-content').innerHTML =
+                '<div class="flex justify-center items-center h-32 text-blue-accent">Chargement...</div>';
+
+            fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('add-model-modal-content').innerHTML = html;
+                });
+        });
+
+        document.getElementById('close-add-model-modal').addEventListener('click', function() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            mainContent.classList.remove('modal-blur');
+            header.classList.remove('modal-blur');
+        });
+
+        // Délégation d'événement pour intercepter tous les submit dans la modale
+        modal.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.id === 'add-model-form') {
+                e.preventDefault();
+
+                const url = form.action;
+                const formData = new FormData(form);
+
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+                        },
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('add-model-modal-content').innerHTML = html;
+                        if (html.includes('Succès')) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                            mainContent.classList.remove('modal-blur');
+                            header.classList.remove('modal-blur');
+
+                            // Rafraîchir la liste des problèmes (exemple pour #problemes-list1)
+                            fetch('/problemes/list') // <-- adapte l’URL à ta route qui retourne la liste HTML
+                                .then(resp => resp.text())
+                                .then(listHtml => {
+                                    document.getElementById('problemes-list2').innerHTML = listHtml;
+                                });
+                        }
+                    });
+            }
+        });
+    </script>
     @vite('resources/js/dashboard.js')
 </x-app-layout>

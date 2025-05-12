@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Problem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class ModelController extends Controller
 {
@@ -110,7 +112,7 @@ class ModelController extends Controller
         $societies = null;
         $tools = null;
         $envs = null;
-    
+
         if (in_array($model, ['interlocuteur', 'problème'])) {
             $societies = \App\Models\Society::all();
         }
@@ -118,10 +120,16 @@ class ModelController extends Controller
             $tools = \App\Models\Tool::all();
             $envs = \App\Models\Env::all();
         }
-    
-        return view('model.form', compact(
-            'model', 'action', 'instance', 'fields', 'societies', 'tools', 'envs'
-        ));
+
+        $viewData = compact('model', 'action', 'instance', 'fields', 'societies', 'tools', 'envs');
+
+        // Si la requête est AJAX (modale), retourne la vue modale
+        if (request()->ajax()) {
+            return view('model.form_modal', $viewData);
+        }
+
+        // Sinon, retourne la vue classique
+        return view('model.form', $viewData);
     }
 
     public function submit(Request $request, $model, $action, $id = null)
@@ -171,7 +179,7 @@ class ModelController extends Controller
                 'name'              => 'required|string|max:50',
                 'lastname'          => 'nullable|string|max:50',
                 'fullname'          => 'nullable|string|max:110',
-                'societe'           => 'required|integer', // correspond à l'id de la société
+                'societe'           => 'required|integer',
                 'phone_fix'         => 'nullable|string|max:50',
                 'phone_mobile'      => 'nullable|string|max:50',
                 'email'             => 'nullable|email|max:100',
@@ -204,11 +212,40 @@ class ModelController extends Controller
 
         if ($action === 'create') {
             $class::create($validated);
+            $instance = null;
         } elseif ($action === 'edit' && $id) {
             $instance = $class::findOrFail($id);
             $instance->update($validated);
         } else {
             abort(400);
+        }
+
+        // Prépare les listes pour les selects selon le modèle
+        $societies = null;
+        $tools = null;
+        $envs = null;
+
+        if (in_array($model, ['interlocuteur', 'problème'])) {
+            $societies = \App\Models\Society::all();
+        }
+        if ($model === 'problème') {
+            $tools = \App\Models\Tool::all();
+            $envs = \App\Models\Env::all();
+        }
+
+        $fields = self::getFieldsFromRules($rules[$model]);
+
+        if ($request->ajax()) {
+            return view('model.form_modal', [
+                'model' => $model,
+                'action' => $action,
+                'instance' => $instance,
+                'fields' => $fields,
+                'societies' => $societies,
+                'tools' => $tools,
+                'envs' => $envs,
+                'success' => true,
+            ]);
         }
 
         return redirect()->route('dashboard')->with('status', 'Opération réussie !');
@@ -312,5 +349,17 @@ class ModelController extends Controller
             return $arr;
         });
         return response()->json($data);
+    }
+
+    public function problemsList()
+    {
+        $filteredProblemes = \App\Models\Problem::all();
+        $user = Auth::user();
+    
+        return view('model.partials.problemes_list', [
+            'filteredProblemes' => $filteredProblemes,
+            'isAdmin' => $user ? ($user->is_admin ?? false) : false,
+            'containerId' => 'default',
+        ]);
     }
 }
