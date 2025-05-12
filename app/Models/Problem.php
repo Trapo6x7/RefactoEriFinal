@@ -24,7 +24,7 @@ class Problem extends Model
     }
     public function tool()
     {
-        return $this->belongsTo(Tool::class, 'outils');
+        return $this->belongsTo(Tool::class, 'tool');
     }
     public function society()
     {

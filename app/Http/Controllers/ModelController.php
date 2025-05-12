@@ -106,13 +106,22 @@ class ModelController extends Controller
 
         $fields = self::getFieldsFromRules($rules[$model]);
 
-        // Si on est sur le modèle interlocuteur, on passe la liste des sociétés
+        // Prépare les listes pour les selects selon le modèle
         $societies = null;
-        if ($model === 'interlocuteur') {
+        $tools = null;
+        $envs = null;
+    
+        if (in_array($model, ['interlocuteur', 'problème'])) {
             $societies = \App\Models\Society::all();
         }
-
-        return view('model.form', compact('model', 'action', 'instance', 'fields', 'societies'));
+        if ($model === 'problème') {
+            $tools = \App\Models\Tool::all();
+            $envs = \App\Models\Env::all();
+        }
+    
+        return view('model.form', compact(
+            'model', 'action', 'instance', 'fields', 'societies', 'tools', 'envs'
+        ));
     }
 
     public function submit(Request $request, $model, $action, $id = null)

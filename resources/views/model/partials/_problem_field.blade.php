@@ -10,34 +10,46 @@
 />
 
 <label class="uppercase" for="env">Environnement</label>
-<input
-    type="text"
+<select
     id="env"
     name="env"
-    value="{{ old('env', $instance->env ?? '') }}"
-    placeholder="Environnement"
-    class="w-full px-4 py-2 border border-secondary-grey rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
-/>
+    class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+>
+    <option value="">Sélectionner un environnement</option>
+    @foreach($envs as $env)
+        <option value="{{ $env->id }}" {{ old('env', $instance->env ?? '') == $env->id ? 'selected' : '' }}>
+            {{ $env->name }}
+        </option>
+    @endforeach
+</select>
 
 <label class="uppercase" for="tool">Outil</label>
-<input
-    type="text"
+<select
     id="tool"
     name="tool"
-    value="{{ old('tool', $instance->tool ?? '') }}"
-    placeholder="Outil"
-    class="w-full px-4 py-2 border border-secondary-grey rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
-/>
+    class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+>
+    <option value="">Sélectionner un outil</option>
+    @foreach($tools as $tool)
+        <option value="{{ $tool->id }}" {{ old('tool', $instance->tool ?? '') == $tool->id ? 'selected' : '' }}>
+            {{ $tool->name }}
+        </option>
+    @endforeach
+</select>
 
 <label class="uppercase" for="societe">Société</label>
-<input
-    type="text"
+<select
     id="societe"
     name="societe"
-    value="{{ old('societe', $instance->societe ?? '') }}"
-    placeholder="Société"
-    class="w-full px-4 py-2 border border-secondary-grey rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
-/>
+    class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+>
+    <option value="">Sélectionner une société</option>
+    @foreach($societies as $societe)
+        <option value="{{ $societe->id }}" {{ old('societe', $instance->societe ?? '') == $societe->id ? 'selected' : '' }}>
+            {{ $societe->name }}
+        </option>
+    @endforeach
+</select>
 
 <label class="uppercase" for="description">Description</label>
 <textarea

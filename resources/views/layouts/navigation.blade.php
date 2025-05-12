@@ -24,11 +24,11 @@
                     <div x-show="open" @click.away="open = false"
                         class="absolute left-0 mt-2 w-40 bg-off-white rounded-lg shadow-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'société']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/society*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/société*') ? 'font-bold text-blue-accent' : '' }}">
                             SOCIETES
                         </a>
                         <a href="{{ route('model.index', ['model' => 'interlocuteur']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
                             INTERLOCUTEURS
                         </a>
                     </div>
@@ -44,15 +44,15 @@
                     <div x-show="open" @click.away="open = false"
                         class="absolute left-0 mt-2 w-48 bg-off-white rounded-lg shadow-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
                             ENVIRONNEMENTS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'outil']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/tool*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
                             OUTILS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'problème']) }}"
-                            class="block px-4 py-2 text-sm text-primary-grey  hover:text-blue-accent {{ request()->is('model/problem*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/problème*') ? 'font-bold text-blue-accent' : '' }}">
                             PROBLEMES
                         </a>
                     </div>
