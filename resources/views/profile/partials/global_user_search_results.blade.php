@@ -4,7 +4,7 @@
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
                     <span class="mr-2"><i class="la la-building"></i></span>
-                    <h3 class="font-bold text-lg text-primary-grey">Sociétés</h3>
+                    <h3 class="font-bold text-sm text-primary-grey">Sociétés</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @php
@@ -44,7 +44,7 @@
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
                     <span class="mr-2"><i class="la la-user"></i></span>
-                    <h3 class="font-bold text-lg text-primary-grey">Interlocuteurs</h3>
+                    <h3 class="font-bold text-sm text-primary-grey">Interlocuteurs</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @php

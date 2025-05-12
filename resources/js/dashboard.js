@@ -331,7 +331,7 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById("card-1").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg uppercase">
+                <h2 class="font-bold text-blue-accent text-sm uppercase">
                     ${
                         ent1.model === "société"
                             ? ent1.name
@@ -468,7 +468,7 @@ function showSelectedEntitiesCard(entities) {
             `;
             document.getElementById("card-2").innerHTML = `
                 <div class="flex flex-col w-full h-full">
-                    <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+                    <h2 class="font-bold text-blue-accent text-sm mb-2 uppercase text-center">Services activés</h2>
                     ${servicesHtml}
                 </div>
             `;
@@ -549,7 +549,7 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById("card-3").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg uppercase">
+                <h2 class="font-bold text-blue-accent text-sm uppercase">
                     ${
                         ent2.model === "société"
                             ? ent2.name
@@ -680,7 +680,7 @@ function showSelectedEntitiesCard(entities) {
             `;
             document.getElementById("card-4").innerHTML = `
                 <div class="flex flex-col w-full h-full">
-                    <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+                    <h2 class="font-bold text-blue-accent text-sm mb-2 uppercase text-center">Services activés</h2>
                     ${servicesHtml}
                 </div>
             `;
@@ -903,37 +903,104 @@ function showSelectedEntitiesCard(entities) {
     });
 
     if (ent1 && ent1.model === "société") {
-        afficherProblemesSociete(ent1.id);
+        afficherProblemesSociete(ent1.id, 'problemes-list-1');
     } else {
-        document.getElementById('problemes-list').innerHTML = "";
+        document.getElementById('problemes-list-1').innerHTML = "";
     }
     if (ent2 && ent2.model === "société") {
-        afficherProblemesSociete(ent2.id);
+        afficherProblemesSociete(ent2.id, 'problemes-list-2');
     } else {
-        document.getElementById('problemes-list').innerHTML = "";
+        document.getElementById('problemes-list-2').innerHTML = "";
     }
-}
 
-function afficherProblemesSociete(societeId) {
-    const liste = document.getElementById('problemes-list');
+function afficherProblemesSociete(societeId, containerId) {
+    const liste = document.getElementById(containerId);
     if (!liste) return;
-    liste.innerHTML = '<div>Chargement...</div>';
+    liste.innerHTML = '<div class="mb-2 px-8 py-1 text-sm text-blue-accent font-semibold">Chargement...</div>';
     fetch(`/societe/${societeId}/problemes`)
         .then(res => res.json())
         .then(problemes => {
             if (!problemes.length) {
-                liste.innerHTML = '<div class="text-gray-400">Aucun problème lié à cette société.</div>';
+                liste.innerHTML = '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème lié à cette société.</div>';
                 return;
             }
-            liste.innerHTML = problemes.map(p =>
-                `<div class="mb-2 p-2 bg-white rounded shadow">
-                    <div class="font-semibold">${p.title || ''}</div>
-                    <div class="text-xs text-gray-500">${p.statut || ''}</div>
-                    <div>${p.description || ''}</div>
-                </div>`
-            ).join('');
+            const isAdmin = window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase());
+            liste.innerHTML = `
+                <div class="flex flex-col items-start w-full">
+                    ${problemes.map((p, i) =>
+                        `<div class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
+                            <button 
+                                class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover accordion-title flex items-center gap-2"
+                                data-idx="${i}">
+                                <span class="accordion-arrow transition-transform">&#x25BE;</span>
+                                ${p.title || ''}
+                            </button>
+                            <div class="accordion-content mt-2 hidden text-left w-full" id="problem-details-${containerId}-${i}">
+                                <p class="text-sm text-primary-grey w-full">
+                                    ${isAdmin
+                                        ? `<span 
+                                            class="editable-probleme-field outline-none focus:outline-none" 
+                                            data-id="${p.id}" 
+                                            data-key="description" 
+                                            contenteditable="true" 
+                                            style="outline:none;box-shadow:none;">${p.description || ''}</span>`
+                                        : (p.description || '')}
+                                </p>
+                            </div>
+                        </div>`
+                    ).join('')}
+                </div>
+            `;
+            // Ajoute le comportement accordion avec triangle
+            liste.querySelectorAll('.accordion-title').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = this.dataset.idx;
+                    const content = document.getElementById(`problem-details-${containerId}-${idx}`);
+                    const arrow = this.querySelector('.accordion-arrow');
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        if (arrow) {
+                            if (!content.classList.contains('hidden')) {
+                                arrow.style.transform = 'rotate(180deg)';
+                            } else {
+                                arrow.style.transform = 'rotate(0deg)';
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Edition inline AJAX si admin/superadmin
+            if (isAdmin) {
+                liste.querySelectorAll('.editable-probleme-field').forEach(span => {
+                    span.addEventListener('blur', function () {
+                        const id = this.dataset.id;
+                        const key = this.dataset.key;
+                        const value = this.textContent.trim();
+                        fetch(`/probleme/update-field/${id}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": csrfToken,
+                                Accept: "application/json",
+                            },
+                            body: JSON.stringify({ key, value }),
+                        })
+                        .then(res => res.json())
+                        .then(() => {
+                            this.style.background = "#678BD8";
+                            setTimeout(() => (this.style.background = ""), 500);
+                        })
+                        .catch(() => {
+                            this.style.background = "#DB7171";
+                            setTimeout(() => (this.style.background = ""), 1000);
+                        });
+                    });
+                });
+            }
         })
         .catch(() => {
-            liste.innerHTML = '<div class="text-red-500">Erreur lors du chargement des problèmes.</div>';
+            liste.innerHTML = '<div class="text-red-accent text-sm text-left mb-2 px-8 py-1">Erreur lors du chargement des problèmes.</div>';
         });
+}
 }

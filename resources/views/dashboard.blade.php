@@ -34,7 +34,8 @@
         <section class="mx-0 bg-off-white rounded-lg h-auto md:h-[80%]">
 
             <article class="max-w-4xl pt-4 mx-auto">
-                <form id="user-search-form" class="flex flex-col md:flex-row items-center gap-4 relative">
+                <form id="user-search-form"
+                    class="flex flex-col md:flex-row items-center justify-center gap-4 relative">
                     <div class="w-full md:w-1/2 relative">
                         <input type="text" id="user-search-input" name="q" autocomplete="off"
                             placeholder="Recherche..."
@@ -58,10 +59,6 @@
                             <option value="interlocutors">Interlocuteurs</option>
                         </select>
                     </div>
-                    <button type="submit" id="submit"
-                        class="px-6 py-2 bg-blue-accent text-off-white rounded-md uppercase font-semibold hover:bg-blue-hover transition">
-                        Rechercher
-                    </button>
                 </form>
             </article>
             <article class="mx-auto">
@@ -69,7 +66,8 @@
             </article>
         </section>
 
-        <section id="selected-entity-card" class="flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8">
+        <section id="selected-entity-card"
+            class="flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8">
             <article id="card-1"
                 class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-96 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
@@ -85,8 +83,11 @@
         </section>
 
         <section id='bandeau-problem' class="overflow-y-auto h-72 bg-off-white rounded-lg mt-4">
-            <article id="problemes-list" class="min-h-full p-4 md:p-6"></article>
+            <article class="min-h-full w-full flex p-4 md:p-6">
+                <div id="problemes-list-1" class="w-1/2 border-r border-secondary-grey"></div>
+                <div id="problemes-list-2" class="w-1/2"></div>
+            </article>
         </section>
-        </section>
+    </section>
     </section>
 </x-app-layout>

@@ -208,7 +208,7 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById("card-1").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg mb-2">
+                <h2 class="font-bold text-blue-accent text-sm mb-2">
                     ${
                         ent1.model === "société"
                             ? ent1.name
@@ -313,7 +313,7 @@ function showSelectedEntitiesCard(entities) {
             `;
             document.getElementById("card-2").innerHTML = `
                 <div class="flex flex-col w-full h-full">
-                    <h2 class="font-bold text-blue-accent text-lg mb-2">Services activés</h2>
+                    <h2 class="font-bold text-blue-accent text-sm mb-2">Services activés</h2>
                     ${servicesHtml}
                 </div>
             `;
@@ -360,7 +360,7 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById("card-3").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg mb-2">
+                <h2 class="font-bold text-blue-accent text-sm mb-2">
                     ${
                         ent2.model === "société"
                             ? ent2.name
@@ -467,7 +467,7 @@ function showSelectedEntitiesCard(entities) {
             `;
             document.getElementById("card-4").innerHTML = `
                 <div class="flex flex-col w-full h-full">
-                    <h2 class="font-bold text-blue-accent text-lg mb-2">Services activés</h2>
+                    <h2 class="font-bold text-blue-accent text-sm mb-2">Services activés</h2>
                     ${servicesHtml}
                 </div>
             `;

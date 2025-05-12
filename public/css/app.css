@@ -1634,7 +1634,7 @@ select {
   line-height: 2rem;
 }
 
-.text-lg {
+.text-sm {
   font-size: 1.125rem;
   line-height: 1.75rem;
 }
