@@ -901,4 +901,39 @@ function showSelectedEntitiesCard(entities) {
             showSelectedEntitiesCard(selectedEntities);
         });
     });
+
+    if (ent1 && ent1.model === "société") {
+        afficherProblemesSociete(ent1.id);
+    } else {
+        document.getElementById('problemes-list').innerHTML = "";
+    }
+    if (ent2 && ent2.model === "société") {
+        afficherProblemesSociete(ent2.id);
+    } else {
+        document.getElementById('problemes-list').innerHTML = "";
+    }
+}
+
+function afficherProblemesSociete(societeId) {
+    const liste = document.getElementById('problemes-list');
+    if (!liste) return;
+    liste.innerHTML = '<div>Chargement...</div>';
+    fetch(`/societe/${societeId}/problemes`)
+        .then(res => res.json())
+        .then(problemes => {
+            if (!problemes.length) {
+                liste.innerHTML = '<div class="text-gray-400">Aucun problème lié à cette société.</div>';
+                return;
+            }
+            liste.innerHTML = problemes.map(p =>
+                `<div class="mb-2 p-2 bg-white rounded shadow">
+                    <div class="font-semibold">${p.title || ''}</div>
+                    <div class="text-xs text-gray-500">${p.statut || ''}</div>
+                    <div>${p.description || ''}</div>
+                </div>`
+            ).join('');
+        })
+        .catch(() => {
+            liste.innerHTML = '<div class="text-red-500">Erreur lors du chargement des problèmes.</div>';
+        });
 }
