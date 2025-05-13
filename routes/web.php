@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\ContextualSearchController;
-use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\ModelController;
-use App\Http\Controllers\ModelSearchController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocietyController;
 use App\Http\Controllers\UserSearchController;
@@ -46,6 +44,13 @@ Route::get('/societe/{id}/interlocuteurs', function($id) {
 });
 
 Route::get('/societe/{id}/problemes', [SocietyController::class, 'problemes']);
+
+Route::post('/problemes/update-description/{id}', function ($id, \Illuminate\Http\Request $request) {
+    $problem = \App\Models\Problem::findOrFail($id);
+    $problem->description = $request->input('description');
+    $problem->save();
+    return response()->json(['success' => true]);
+})->name('problemes.update-description')->middleware('auth');
 
 Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
     $q = $request->input('q');
@@ -91,6 +96,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/model/{model}/{action}/{id?}', [ModelController::class, 'submit'])
         ->name('model.submit');
 });
-
 
 require __DIR__ . '/auth.php';

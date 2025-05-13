@@ -240,6 +240,9 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                     }
                 });
             });
+        window.addEventListener("resize", function () {
+            updateCardsVisibility(selectedEntities);
+        });
     };
 
     // Fonction pour charger les problèmes avec filtres
@@ -523,6 +526,7 @@ function highlightText(text, query) {
             `<mark style="background:#ffe066;color:#222;">${match}</mark>`
     );
 }
+
 function updateCardsVisibility(entities) {
     const cardSection = document.getElementById("selected-entity-card");
     const card1 = document.getElementById("card-1");
@@ -534,7 +538,8 @@ function updateCardsVisibility(entities) {
     if (window.innerWidth < 768) {
         // On considère que ent1 = société, ent2 = interlocuteur
         const hasSociete = entities[0] && entities[0].model === "société";
-        const hasInterlocuteur = entities[1] && entities[1].model === "interlocuteur";
+        const hasInterlocuteur =
+            entities[1] && entities[1].model === "interlocuteur";
 
         // Affiche la section si au moins une entité sélectionnée
         if (hasSociete || hasInterlocuteur) {
@@ -545,36 +550,39 @@ function updateCardsVisibility(entities) {
             cardSection.classList.remove("flex");
         }
 
-        // Cards 1 et 2 (société)
-        card1.style.display = hasSociete ? "" : "none";
-        card2.style.display = hasSociete ? "" : "none";
-        // Cards 3 et 4 (interlocuteur)
-        card3.style.display = hasInterlocuteur ? "" : "none";
-        card4.style.display = hasInterlocuteur ? "" : "none";
+        if (card1) card1.style.display = hasSociete ? "" : "none";
+        if (card2) card2.style.display = hasSociete ? "" : "none";
+        if (card3) card3.style.display = hasInterlocuteur ? "" : "none";
+        if (card4) card4.style.display = hasInterlocuteur ? "" : "none";
     } else {
         // Desktop : tout visible, layout classique
         cardSection.classList.remove("hidden");
         cardSection.classList.remove("flex");
-        cardSection.classList.add("md:flex");
-        card1.style.display = "";
-        card2.style.display = "";
-        card3.style.display = "";
-        card4.style.display = "";
+        if (card1) card1.style.display = "";
+        if (card2) card2.style.display = "";
+        if (card3) card3.style.display = "";
+        if (card4) card4.style.display = "";
     }
 }
-function showSelectedEntitiesCard(entities) {
+
+function showSelectedEntitiesCard(entities, { reset = true } = {}) {
     entities = normalizeSelectedEntities(entities);
 
     updateCardsVisibility(entities);
 
-    for (let i = 1; i <= 4; i++) {
-        document.getElementById(`card-${i}`).innerHTML = "";
+    if (reset) {
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`card-${i}`).innerHTML = "";
+        }
     }
 
     const ent1 = entities[0]; // société
     const ent2 = entities[1]; // interlocuteur
 
     if (ent1) {
+        const card1 = document.getElementById("card-1");
+        card1.innerHTML = "";
+
         let coordonneesHtml = "";
         (allowedKeys[ent1.model] || []).forEach((key) => {
             if (ent1[key]) {
@@ -637,74 +645,76 @@ function showSelectedEntitiesCard(entities) {
             .setAttribute("data-societe", ent1.societe || ent1.name || "");
 
         // Ajout du select interlocuteur si ent1 est une société
-        if (ent1.model === "société") {
+        if (ent1 && ent1.model === "société") {
             fetch(`/societe/${ent1.id}/interlocuteurs`, {
                 headers: { Accept: "application/json" },
             })
                 .then((res) => res.json())
                 .then((interlocutors) => {
                     const selectHtml = `
-                        <label for="interlocutor-select-1" class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
-                        <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
-                            <option value="">-- Choisir --</option>
-                            ${interlocutors
-                                .map(
-                                    (i) =>
-                                        `<option value="${i.id}">${
-                                            i.fullname || i.name
-                                        }</option>`
-                                )
-                                .join("")}
-                        </select>
-                    `;
-                    document
-                        .getElementById("card-1")
-                        .insertAdjacentHTML("beforeend", selectHtml);
+                <label for="interlocutor-select-1" class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
+                <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
+                    <option value="">-- Choisir --</option>
+                    ${interlocutors
+                        .map(
+                            (i) =>
+                                `<option value="${i.id}">${
+                                    i.fullname || i.name
+                                }</option>`
+                        )
+                        .join("")}
+                </select>
+            `;
 
-                    document
-                        .getElementById("interlocutor-select-1")
-                        .addEventListener("change", function () {
-                            const interlocutorId = this.value;
-                            if (interlocutorId) {
-                                fetch(
-                                    `/model/interlocuteur/show/${interlocutorId}`,
-                                    {
-                                        headers: {
-                                            Accept: "application/json",
-                                        },
-                                    }
-                                )
-                                    .then((res) => res.json())
-                                    .then((data) => {
-                                        const allowed =
-                                            allowedKeys["interlocuteur"];
-                                        const entity = {
-                                            model: "interlocuteur",
-                                        };
-                                        allowed.forEach((key) => {
-                                            if (data[key] !== undefined)
-                                                entity[key] = data[key];
+                    // Supprime l'ancien select s'il existe
+                    const oldSelect = document.getElementById(
+                        "interlocutor-select-1"
+                    );
+                    if (oldSelect) oldSelect.parentElement.remove();
+
+                    const card1 = document.getElementById("card-1");
+                    if (card1) {
+                        card1.insertAdjacentHTML("beforeend", selectHtml);
+                        const select1 = document.getElementById(
+                            "interlocutor-select-1"
+                        );
+                        if (select1) {
+                            select1.addEventListener("change", function () {
+                                const interlocutorId = this.value;
+                                if (interlocutorId) {
+                                    fetch(
+                                        `/model/interlocuteur/show/${interlocutorId}`,
+                                        {
+                                            headers: {
+                                                Accept: "application/json",
+                                            },
+                                        }
+                                    )
+                                        .then((res) => res.json())
+                                        .then((data) => {
+                                            const allowed =
+                                                allowedKeys["interlocuteur"];
+                                            const entity = {
+                                                model: "interlocuteur",
+                                            };
+                                            allowed.forEach((key) => {
+                                                if (data[key] !== undefined)
+                                                    entity[key] = data[key];
+                                            });
+                                            entity.id = data.id;
+                                            if (data.fullname)
+                                                entity.fullname = data.fullname;
+                                            if (data.active_services)
+                                                entity.active_services =
+                                                    data.active_services;
+                                            if (data.societe)
+                                                entity.societe = data.societe;
+                                            addEntityToSelection(entity); // <-- met à jour selectedEntities et réaffiche les cards
                                         });
-                                        entity.id = data.id;
-                                        if (data.fullname)
-                                            entity.fullname = data.fullname;
-                                        if (data.active_services)
-                                            entity.active_services =
-                                                data.active_services;
-                                        if (data.societe)
-                                            entity.societe = data.societe;
-                                        if (data.phone_fix)
-                                            entity.phone_fix = data.phone_fix;
-                                        if (data.phone_mobile)
-                                            entity.phone_mobile =
-                                                data.phone_mobile;
-                                        if (data.id_teamviewer)
-                                            entity.id_teamviewer =
-                                                data.id_teamviewer;
-                                        addEntityToSelection(entity);
-                                    });
-                            }
-                        });
+                                }
+                            });
+                        }
+                    }
                 });
         }
 
@@ -892,7 +902,7 @@ function showSelectedEntitiesCard(entities) {
             .setAttribute("data-societe", ent2.societe || ent2.name || "");
 
         // Ajout du select interlocuteur si ent2 est une société
-        if (ent2.model === "société") {
+        if (ent2 && ent2.model === "société") {
             fetch(`/societe/${ent2.id}/interlocuteurs`, {
                 headers: { Accept: "application/json" },
             })
@@ -900,59 +910,73 @@ function showSelectedEntitiesCard(entities) {
                 .then((interlocutors) => {
                     if (interlocutors.length) {
                         const selectHtml = `
-                            <label class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
-                            <select id="interlocutor-select-2" class="mt-1 p-2 border rounded w-full">
-                                <option value="">-- Choisir --</option>
-                                ${interlocutors
-                                    .map(
-                                        (i) =>
-                                            `<option value="${i.id}">${
-                                                i.fullname || i.name
-                                            }</option>`
-                                    )
-                                    .join("")}
-                            </select>
-                        `;
-                        document
-                            .getElementById("card-3")
-                            .insertAdjacentHTML("beforeend", selectHtml);
+                    <label for="interlocutor-select-2" class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
+                    <select id="interlocutor-select-2" class="mt-1 p-2 border rounded w-full">
+                        <option value="">-- Choisir --</option>
+                        ${interlocutors
+                            .map(
+                                (i) =>
+                                    `<option value="${i.id}">${
+                                        i.fullname || i.name
+                                    }</option>`
+                            )
+                            .join("")}
+                    </select>
+                `;
 
-                        document
-                            .getElementById("interlocutor-select-2")
-                            .addEventListener("change", function () {
-                                const interlocutorId = this.value;
-                                if (interlocutorId) {
-                                    fetch(
-                                        `/model/interlocuteur/show/${interlocutorId}`,
-                                        {
-                                            headers: {
-                                                Accept: "application/json",
-                                            },
-                                        }
-                                    )
-                                        .then((res) => res.json())
-                                        .then((data) => {
-                                            const allowed =
-                                                allowedKeys["interlocuteur"];
-                                            const entity = {
-                                                model: "interlocuteur",
-                                            };
-                                            allowed.forEach((key) => {
-                                                if (data[key] !== undefined)
-                                                    entity[key] = data[key];
+                        // Supprime l'ancien select s'il existe
+                        const oldSelect = document.getElementById(
+                            "interlocutor-select-2"
+                        );
+                        if (oldSelect) oldSelect.parentElement.remove();
+
+                        const card3 = document.getElementById("card-3");
+                        if (card3) {
+                            card3.insertAdjacentHTML("beforeend", selectHtml);
+                            const select2 = document.getElementById(
+                                "interlocutor-select-2"
+                            );
+                            if (select2) {
+                                select2.addEventListener("change", function () {
+                                    const interlocutorId = this.value;
+                                    if (interlocutorId) {
+                                        fetch(
+                                            `/model/interlocuteur/show/${interlocutorId}`,
+                                            {
+                                                headers: {
+                                                    Accept: "application/json",
+                                                },
+                                            }
+                                        )
+                                            .then((res) => res.json())
+                                            .then((data) => {
+                                                const allowed =
+                                                    allowedKeys[
+                                                        "interlocuteur"
+                                                    ];
+                                                const entity = {
+                                                    model: "interlocuteur",
+                                                };
+                                                allowed.forEach((key) => {
+                                                    if (data[key] !== undefined)
+                                                        entity[key] = data[key];
+                                                });
+                                                entity.id = data.id;
+                                                if (data.fullname)
+                                                    entity.fullname =
+                                                        data.fullname;
+                                                if (data.active_services)
+                                                    entity.active_services =
+                                                        data.active_services;
+                                                if (data.societe)
+                                                    entity.societe =
+                                                        data.societe;
+                                                addEntityToSelection(entity);
                                             });
-                                            entity.id = data.id;
-                                            if (data.fullname)
-                                                entity.fullname = data.fullname;
-                                            if (data.active_services)
-                                                entity.active_services =
-                                                    data.active_services;
-                                            if (data.societe)
-                                                entity.societe = data.societe;
-                                            addEntityToSelection(entity);
-                                        });
-                                }
-                            });
+                                    }
+                                });
+                            }
+                        }
                     }
                 });
         }
@@ -1222,10 +1246,14 @@ function showSelectedEntitiesCard(entities) {
     document.querySelectorAll(".remove-entity-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
             let idx = parseInt(this.dataset.idx, 10);
-            let selectedEntities = JSON.parse(
-                localStorage.getItem("selectedEntities") || "[]"
-            );
-            selectedEntities.splice(idx, 1);
+            // Utilise la variable JS globale
+            if (idx === 1 && selectedEntities.length > 1) {
+                selectedEntities = [selectedEntities[0]];
+            } else {
+                selectedEntities.splice(idx, 1);
+            }
+            selectedEntities = normalizeSelectedEntities(selectedEntities);
+            // Mets à jour le localStorage si tu veux persister la sélection
             localStorage.setItem(
                 "selectedEntities",
                 JSON.stringify(selectedEntities)
@@ -1233,10 +1261,4 @@ function showSelectedEntitiesCard(entities) {
             showSelectedEntitiesCard(selectedEntities);
         });
     });
-
-    // if (ent1 && ent1.model === "société") {
-    //     afficherRechercheProblemeGlobaleAjax("problemes-list1");
-    // } else {
-    //     document.getElementById("problemes-list1").innerHTML = "";
-    // }
 }
