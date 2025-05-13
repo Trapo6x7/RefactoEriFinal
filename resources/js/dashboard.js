@@ -179,7 +179,7 @@ container.querySelectorAll(".problem-title-btn").forEach((btn) => {
                         class="text-primary-grey editable-problem-solution"
                         ${isAdmin ? 'contenteditable="true"' : ""}
                         data-problem-id="${problem.id || ""}"
-                        style="min-height:2em; border-bottom:1px solid #eee;"
+                        style="min-height:2em;"
                     >${
                         problem.description
                             ? formatServiceInfo(problem.description)
@@ -194,7 +194,7 @@ container.querySelectorAll(".problem-title-btn").forEach((btn) => {
                 editableDiv.addEventListener("blur", function () {
                     const newValue = this.innerText.trim();
                     const problemId = this.dataset.problemId;
-                    fetch(`/problemes/update-solution/${problemId}`, {
+                    fetch(`/problemes/update-description/${problemId}`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
