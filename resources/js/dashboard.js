@@ -176,9 +176,13 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             <div class="text-primary-grey text-sm">
                                 <span 
                                     id="editable-problem-description"
-                                    contenteditable="${isEditable ? "true" : "false"}"
+                                    contenteditable="${
+                                        isEditable ? "true" : "false"
+                                    }"
                                     style="display:block;min-height:2em;border-bottom:1px solid #eee;padding:2px 4px;"
-                                >${formatServiceInfo(problem.description || "")}</span>
+                                >${formatServiceInfo(
+                                    problem.description || ""
+                                )}</span>
                                 ${
                                     isEditable
                                         ? `<div id="edit-desc-info" class="text-xs text-blue-accent mt-1">Double-cliquez pour éditer. Cliquez en dehors pour sauvegarder.</div>`
@@ -197,19 +201,26 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
 
                     // Edition inline AJAX pour admin/superadmin
                     if (isEditable) {
-                        const descSpan = document.getElementById("editable-problem-description");
+                        const descSpan = document.getElementById(
+                            "editable-problem-description"
+                        );
                         // Pour éviter la perte de formatage, on édite en HTML
                         descSpan.addEventListener("blur", function () {
                             const newHtml = this.innerHTML.trim();
-                            fetch(`/problemes/update-description/${problem.id}`, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": csrfToken,
-                                    Accept: "application/json",
-                                },
-                                body: JSON.stringify({ description: newHtml }),
-                            })
+                            fetch(
+                                `/problemes/update-description/${problem.id}`,
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRF-TOKEN": csrfToken,
+                                        Accept: "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        description: newHtml,
+                                    }),
+                                }
+                            )
                                 .then((res) => res.json())
                                 .then(() => {
                                     this.style.background = "#678BD8";
@@ -512,9 +523,49 @@ function highlightText(text, query) {
             `<mark style="background:#ffe066;color:#222;">${match}</mark>`
     );
 }
+function updateCardsVisibility(entities) {
+    const cardSection = document.getElementById("selected-entity-card");
+    const card1 = document.getElementById("card-1");
+    const card2 = document.getElementById("card-2");
+    const card3 = document.getElementById("card-3");
+    const card4 = document.getElementById("card-4");
 
+    // Sur mobile
+    if (window.innerWidth < 768) {
+        // On considère que ent1 = société, ent2 = interlocuteur
+        const hasSociete = entities[0] && entities[0].model === "société";
+        const hasInterlocuteur = entities[1] && entities[1].model === "interlocuteur";
+
+        // Affiche la section si au moins une entité sélectionnée
+        if (hasSociete || hasInterlocuteur) {
+            cardSection.classList.remove("hidden");
+            cardSection.classList.add("flex");
+        } else {
+            cardSection.classList.add("hidden");
+            cardSection.classList.remove("flex");
+        }
+
+        // Cards 1 et 2 (société)
+        card1.style.display = hasSociete ? "" : "none";
+        card2.style.display = hasSociete ? "" : "none";
+        // Cards 3 et 4 (interlocuteur)
+        card3.style.display = hasInterlocuteur ? "" : "none";
+        card4.style.display = hasInterlocuteur ? "" : "none";
+    } else {
+        // Desktop : tout visible, layout classique
+        cardSection.classList.remove("hidden");
+        cardSection.classList.remove("flex");
+        cardSection.classList.add("md:flex");
+        card1.style.display = "";
+        card2.style.display = "";
+        card3.style.display = "";
+        card4.style.display = "";
+    }
+}
 function showSelectedEntitiesCard(entities) {
     entities = normalizeSelectedEntities(entities);
+
+    updateCardsVisibility(entities);
 
     for (let i = 1; i <= 4; i++) {
         document.getElementById(`card-${i}`).innerHTML = "";
@@ -548,6 +599,7 @@ function showSelectedEntitiesCard(entities) {
                             style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
                                 ent1[key]
                             }</span>
+                            
                     </div>`;
             }
         });

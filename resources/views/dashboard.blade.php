@@ -42,7 +42,7 @@
     </article>
 
     <section id="main-content">
-        <section class="mx-0 bg-off-white rounded-lg h-auto md:h-[80%]">
+        <section class="mx-0 bg-off-white rounded-lg md:h-[80%]">
 
             <article class="max-w-4xl pt-4 mx-auto">
                 <form id="user-search-form"
@@ -50,7 +50,7 @@
                     <div class="w-full md:w-1/2 relative">
                         <input type="text" id="user-search-input" name="q" autocomplete="off"
                             placeholder="Recherche..."
-                            class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
+                            class="w-full px-4 py-2 border text-sm h-9 border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
                         <button type="button" id="reset-search-input"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xl hidden"
                             aria-label="Effacer">
@@ -64,13 +64,18 @@
 
                     <div class="w-full md:w-1/4">
                         <select id="user-search-table" name="table"
-                            class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
+                            class="w-full px-4 text-sm py-2 border h-9 border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
                             <option value="" class="hover:bg-blue-accent">Toutes les tables</option>
                             <option value="societies">Sociétés</option>
                             <option value="interlocutors">Interlocuteurs</option>
                         </select>
                     </div>
                 </form>
+
+                <div id="edit-desc-info" class="text-xs text-center text-blue-accent mt-1">
+                    Cliquez sur une entrée pour l'éditer. Cliquez en dehors pour sauvegarder.
+                </div>
+
             </article>
             <article class="mx-auto">
                 <div id="user-search-results" class="mt-4 flex justify-center items-center"></div>
@@ -78,14 +83,14 @@
         </section>
 
         <section id="selected-entity-card"
-            class="flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8">
+            class="hidden md:flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8">
             <article id="card-1"
                 class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
             <article id="card-2"
                 class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
             </article>
-            <div class="border-r border-secondary-grey"></div>
+            <div class="border-r border-blue-accent"></div>
             <article id="card-3"
                 class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
@@ -94,15 +99,15 @@
             </article>
         </section>
 
-        <section class=" h-96 flex bg-off-white rounded-lg mt-4 px-8">
+        <section class="flex flex-col md:flex-row h-auto md:h-96 bg-off-white rounded-lg mt-4 px-2 sm:px-4 md:px-8">
             <article id="problemes-list1"
-                class="w-1/2 px-8 py-4 border-r overflow-y-auto overflow-hidden border-secondary-grey">
+                class="w-full md:w-1/2 px-2 sm:px-4 py-4 border-b md:border-b-0 md:border-r overflow-y-auto overflow-hidden border-blue-accent">
             </article>
-            <article id="problemes-list2" class="w-1/2 px-8 py-4 overflow-y-auto overflow-hidden">
+            <article id="problemes-list2" class="w-full md:w-1/2 px-2 sm:px-8 py-4 overflow-y-auto overflow-hidden">
             </article>
         </section>
     </section>
-    </section>
+
     <script>
         const modal = document.getElementById('add-model-modal');
         const mainContent = document.getElementById('main-content');
@@ -138,6 +143,18 @@
             header.classList.remove('modal-blur');
         });
 
+        window.userRoles = @json(Auth::user() ? Auth::user()->isAdmin() || Auth::user()->isSuperAdmin() : []);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.userRoles && (window.userRoles.includes('admin') || window.userRoles.includes(
+                    'superadmin'))) {
+                document.getElementById('edit-desc-info').style.display = '';
+            } else {
+                document.getElementById('edit-desc-info').style.display = 'none';
+            }
+        });
+
+        
     </script>
     @vite('resources/js/dashboard.js')
 </x-app-layout>
