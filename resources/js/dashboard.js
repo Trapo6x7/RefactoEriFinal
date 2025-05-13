@@ -49,14 +49,19 @@ function formatServiceInfo(raw) {
     let formatted = raw.replace(/\r?\n/g, "<br>");
     // 2. Mets en gras les mots-clés courants (à adapter selon tes besoins)
     formatted = formatted.replace(
-        /\b(Login|Mdp|IP|Compte|Rétention|courriel|script|copy|utilisateur|office)\b\s*:/gi,
-        '<span>$&</span>'
+        /([A-Za-zÀ-ÿ0-9_\-\.\/'’\(\)\[\] ]+?)\s*:/g,
+        '<span class="font-bold">$&</span>'
     );
-    // 3. Transforme les listes commençant par - ou • en <li>
-    formatted = formatted.replace(/(?:^|<br>)[\-\•]\s?(.*?)(?=<br>|$)/g, '<li>$1</li>');
+    // 2bis. Supprime tous les tirets/puces en début de ligne (même multiples)
+    formatted = formatted.replace(/(<br>|^)\s*[-–—•]+(\s*)/g, "$1");
+    // 3. Transforme les listes commençant par - ou • en <li> (en ignorant les tirets déjà supprimés)
+    formatted = formatted.replace(/(?:^|<br>)(.*?)(?=<br>|$)/g, (m, p1) => {
+        if (p1.trim().length === 0) return m;
+        return `<li>${p1.trim()}</li>`;
+    });
     // 4. Si on a des <li>, entoure d'une <ul>
     if (formatted.includes("<li>")) {
-        formatted = formatted.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+        formatted = formatted.replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>");
     }
     return formatted;
 }
@@ -78,13 +83,20 @@ function addEntityToSelection(entity) {
 
     if (entity.model === "société") {
         // Remplace la société (card 1/2)
-        selectedEntities = selectedEntities.filter(e => e.model !== "société");
+        selectedEntities = selectedEntities.filter(
+            (e) => e.model !== "société"
+        );
         selectedEntities.unshift(entity);
     } else if (entity.model === "interlocuteur") {
         // Remplace l'interlocuteur (card 3/4)
-        selectedEntities = selectedEntities.filter(e => e.model !== "interlocuteur");
+        selectedEntities = selectedEntities.filter(
+            (e) => e.model !== "interlocuteur"
+        );
         // On garde la société si présente en premier
-        if (selectedEntities.length && selectedEntities[0].model === "société") {
+        if (
+            selectedEntities.length &&
+            selectedEntities[0].model === "société"
+        ) {
             selectedEntities = [selectedEntities[0], entity];
         } else {
             selectedEntities = [entity];
@@ -156,14 +168,18 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             <h2 class="font-bold text-blue-accent text-lg mb-2">${
                                 problem.title || ""
                             }</h2>
-                            <div class="text-primary-grey text-sm">${
+                            <div class="text-primary-grey text-sm">${formatServiceInfo(
                                 problem.description || ""
-                            }</div>
+                            )}</div>
                         </div>
                     `;
-                    document.getElementById("close-probleme-details")?.addEventListener("click", function () {
-                        document.getElementById("problemes-list2").innerHTML = "";
-                    });
+                    document
+                        .getElementById("close-probleme-details")
+                        ?.addEventListener("click", function () {
+                            document.getElementById(
+                                "problemes-list2"
+                            ).innerHTML = "";
+                        });
                 });
             });
     };
@@ -621,14 +637,19 @@ function showSelectedEntitiesCard(entities) {
                                             data-service-key="${service.label}"
                                             contenteditable="${
                                                 window.currentUserRole &&
-                                                ["admin", "superadmin"].includes(
+                                                [
+                                                    "admin",
+                                                    "superadmin",
+                                                ].includes(
                                                     window.currentUserRole.toLowerCase()
                                                 )
                                                     ? "true"
                                                     : "false"
                                             }"
                                             style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                                ${formatServiceInfo(service.info ?? "Oui")}
+                                                ${formatServiceInfo(
+                                                    service.info ?? "Oui"
+                                                )}
                                         </span>
                                     </div>
                                 </div>
@@ -854,9 +875,7 @@ function showSelectedEntitiesCard(entities) {
                                 class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1"
                                 data-idx="${idx}"
                                 style="background:none;border:none;outline:none;cursor:pointer;">
-                                <p>${
-                                    service.label
-                                }  </p>
+                                <p>${service.label}  </p>
                                 <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
                               
                                 </button>
@@ -878,7 +897,9 @@ function showSelectedEntitiesCard(entities) {
                                                     : "false"
                                             }"
                                             style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                                ${formatServiceInfo(service.info ?? "Oui")}                                
+                                                ${formatServiceInfo(
+                                                    service.info ?? "Oui"
+                                                )}                                
                                         </span>
                                     </div>
                                 </div>
