@@ -43,6 +43,24 @@ function normalizeSelectedEntities(entities) {
     return result;
 }
 
+function formatServiceInfo(raw) {
+    if (!raw) return "";
+    // 1. Remplace les retours à la ligne par <br>
+    let formatted = raw.replace(/\r?\n/g, "<br>");
+    // 2. Mets en gras les mots-clés courants (à adapter selon tes besoins)
+    formatted = formatted.replace(
+        /\b(Login|Mdp|IP|Compte|Rétention|courriel|script|copy|utilisateur|office)\b\s*:/gi,
+        '<span>$&</span>'
+    );
+    // 3. Transforme les listes commençant par - ou • en <li>
+    formatted = formatted.replace(/(?:^|<br>)[\-\•]\s?(.*?)(?=<br>|$)/g, '<li>$1</li>');
+    // 4. Si on a des <li>, entoure d'une <ul>
+    if (formatted.includes("<li>")) {
+        formatted = formatted.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+    }
+    return formatted;
+}
+
 function addEntityToSelection(entity) {
     // Ne pas stocker dans le localStorage, garder uniquement en mémoire
     // On veut société uniquement sur card 1/2, interlocuteur uniquement sur card 3/4
@@ -610,7 +628,7 @@ function showSelectedEntitiesCard(entities) {
                                                     : "false"
                                             }"
                                             style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                            ${service.info ?? "Oui"}
+                                                ${formatServiceInfo(service.info ?? "Oui")}
                                         </span>
                                     </div>
                                 </div>
@@ -860,7 +878,7 @@ function showSelectedEntitiesCard(entities) {
                                                     : "false"
                                             }"
                                             style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                            ${service.info ?? "Oui"}
+                                                ${formatServiceInfo(service.info ?? "Oui")}                                
                                         </span>
                                     </div>
                                 </div>

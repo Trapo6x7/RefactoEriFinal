@@ -137,6 +137,7 @@
             mainContent.classList.remove('modal-blur');
             header.classList.remove('modal-blur');
         });
+
     </script>
     @vite('resources/js/dashboard.js')
 </x-app-layout>
