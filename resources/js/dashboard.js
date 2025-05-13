@@ -127,122 +127,96 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         <div id="problemes-list-inner-global"></div>
     `;
 
-    const renderProblemes = (problemes) => {
-        document.getElementById("problemes-list-inner-global").innerHTML = `
-            <div class="flex flex-col items-start w-full">
-            ${
-                problemes.length
-                    ? problemes
-                          .map(
-                              (p, i) =>
-                                  `<article class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
-                                    <button 
-                                        class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover problem-title-btn flex items-center gap-2"
-                                        data-idx="${i}">
-                                        <h3 class="text-left">${
-                                            p.title || ""
-                                        }</h3>
-                                    </button>
-                                </article>`
-                          )
-                          .join("")
-                    : '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème trouvé.</div>'
-            }
+    const renderProblemes = (problemes, query = "") => {
+        const container = document.getElementById(
+            "problemes-list-inner-global"
+        );
+        if (!query) {
+            container.innerHTML = `
+            <div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">
+                Commencez à taper pour rechercher un problème...
             </div>
         `;
+            return;
+        }
+        container.innerHTML = `
+        <div class="flex flex-col items-start w-full">
+        ${
+            problemes.length
+                ? problemes
+                      .map(
+                          (p, i) =>
+                              `<article class="mb-2 px-8 py-1 bg-off-white rounded text-sm w-full max-w-2xl text-left">
+                                <button 
+                                    class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover problem-title-btn flex items-center gap-2"
+                                    data-idx="${i}">
+                                    <h3 class="text-left">${p.title || ""}</h3>
+                                </button>
+                            </article>`
+                      )
+                      .join("")
+                : '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-sm text-left">Aucun problème trouvé.</div>'
+        }
+        </div>
+    `;
 
-        // Ajoute l'affichage de la solution dans problemes-list2 au clic
-        document
-            .getElementById("problemes-list-inner-global")
-            .querySelectorAll(".problem-title-btn")
-            .forEach((btn) => {
-                btn.addEventListener("click", function () {
-                    const idx = this.dataset.idx;
-                    const problem = problemes[idx];
-                    const isEditable =
-                        window.currentUserRole &&
-                        ["admin", "superadmin"].includes(
-                            window.currentUserRole.toLowerCase()
-                        );
-                    document.getElementById("problemes-list2").innerHTML = `
-                        <div class="p-4 bg-white rounded max-w-2xl mx-auto relative">
-                            <button type="button" 
-                                class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold" 
-                                id="close-probleme-details"
-                                title="Fermer">&times;</button>
-                            <h2 class="font-bold text-blue-accent text-lg mb-2">${
-                                problem.title || ""
-                            }</h2>
-                            <div class="text-primary-grey text-sm">
-                                <span 
-                                    id="editable-problem-description"
-                                    contenteditable="${
-                                        isEditable ? "true" : "false"
-                                    }"
-                                    style="display:block;min-height:2em;border-bottom:1px solid #eee;padding:2px 4px;"
-                                >${formatServiceInfo(
-                                    problem.description || ""
-                                )}</span>
-                                ${
-                                    isEditable
-                                        ? `<div id="edit-desc-info" class="text-xs text-blue-accent mt-1">Double-cliquez pour éditer. Cliquez en dehors pour sauvegarder.</div>`
-                                        : ""
-                                }
-                            </div>
-                        </div>
-                    `;
-                    document
-                        .getElementById("close-probleme-details")
-                        ?.addEventListener("click", function () {
-                            document.getElementById(
-                                "problemes-list2"
-                            ).innerHTML = "";
-                        });
+        // Ajoute l'événement pour afficher la solution dans problemes-list2
+container.querySelectorAll(".problem-title-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+        const idx = btn.getAttribute("data-idx");
+        const problem = problemes[idx];
+        const solutionContainer = document.getElementById("problemes-list2");
+        const isAdmin =
+            window.currentUserRole &&
+            ["admin", "superadmin"].includes(
+                window.currentUserRole.toLowerCase()
+            );
+        if (problem && solutionContainer) {
+            solutionContainer.innerHTML = `
+                <div class="bg-white text-sm rounded p-4">
+                    <h2 class="font-bold text-blue-accent mb-2">${problem.title || ""}</h2>
+                    <div 
+                        class="text-primary-grey editable-problem-solution"
+                        ${isAdmin ? 'contenteditable="true"' : ""}
+                        data-problem-id="${problem.id || ""}"
+                        style="min-height:2em; border-bottom:1px solid #eee;"
+                    >${
+                        problem.description
+                            ? formatServiceInfo(problem.description)
+                            : "<em>Aucune solution enregistrée.</em>"
+                    }</div>
+                </div>
+            `;
 
-                    // Edition inline AJAX pour admin/superadmin
-                    if (isEditable) {
-                        const descSpan = document.getElementById(
-                            "editable-problem-description"
-                        );
-                        // Pour éviter la perte de formatage, on édite en HTML
-                        descSpan.addEventListener("blur", function () {
-                            const newHtml = this.innerHTML.trim();
-                            fetch(
-                                `/problemes/update-description/${problem.id}`,
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        "X-CSRF-TOKEN": csrfToken,
-                                        Accept: "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        description: newHtml,
-                                    }),
-                                }
-                            )
-                                .then((res) => res.json())
-                                .then(() => {
-                                    this.style.background = "#678BD8";
-                                    setTimeout(
-                                        () => (this.style.background = ""),
-                                        500
-                                    );
-                                })
-                                .catch(() => {
-                                    this.style.background = "#DB7171";
-                                    setTimeout(
-                                        () => (this.style.background = ""),
-                                        1000
-                                    );
-                                });
+            // Si admin, ajoute la sauvegarde auto au blur
+            if (isAdmin) {
+                const editableDiv = solutionContainer.querySelector(".editable-problem-solution");
+                editableDiv.addEventListener("blur", function () {
+                    const newValue = this.innerText.trim();
+                    const problemId = this.dataset.problemId;
+                    fetch(`/problemes/update-solution/${problemId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify({ description: newValue }),
+                    })
+                        .then((res) => res.json())
+                        .then(() => {
+                            this.style.background = "#678BD8";
+                            setTimeout(() => (this.style.background = ""), 500);
+                        })
+                        .catch(() => {
+                            this.style.background = "#DB7171";
+                            setTimeout(() => (this.style.background = ""), 1000);
                         });
-                    }
                 });
-            });
-        window.addEventListener("resize", function () {
-            updateCardsVisibility(selectedEntities);
-        });
+            }
+        }
+    });
+});
     };
 
     // Fonction pour charger les problèmes avec filtres
@@ -262,7 +236,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         fetch("/problemes/search?" + params.toString())
             .then((res) => res.json())
             .then((data) => {
-                renderProblemes(data.problems);
+                renderProblemes(data.problems, q, env, tool, societe);
                 // Remplir les filtres au premier chargement
                 if (!document.getElementById("filter-tool").dataset.loaded) {
                     const toolSelect = document.getElementById("filter-tool");
