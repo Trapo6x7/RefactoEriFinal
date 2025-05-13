@@ -159,6 +159,11 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                 btn.addEventListener("click", function () {
                     const idx = this.dataset.idx;
                     const problem = problemes[idx];
+                    const isEditable =
+                        window.currentUserRole &&
+                        ["admin", "superadmin"].includes(
+                            window.currentUserRole.toLowerCase()
+                        );
                     document.getElementById("problemes-list2").innerHTML = `
                         <div class="p-4 bg-white rounded max-w-2xl mx-auto relative">
                             <button type="button" 
@@ -168,9 +173,18 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             <h2 class="font-bold text-blue-accent text-lg mb-2">${
                                 problem.title || ""
                             }</h2>
-                            <div class="text-primary-grey text-sm">${formatServiceInfo(
-                                problem.description || ""
-                            )}</div>
+                            <div class="text-primary-grey text-sm">
+                                <span 
+                                    id="editable-problem-description"
+                                    contenteditable="${isEditable ? "true" : "false"}"
+                                    style="display:block;min-height:2em;border-bottom:1px solid #eee;padding:2px 4px;"
+                                >${formatServiceInfo(problem.description || "")}</span>
+                                ${
+                                    isEditable
+                                        ? `<div id="edit-desc-info" class="text-xs text-blue-accent mt-1">Double-cliquez pour éditer. Cliquez en dehors pour sauvegarder.</div>`
+                                        : ""
+                                }
+                            </div>
                         </div>
                     `;
                     document
@@ -180,6 +194,39 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                 "problemes-list2"
                             ).innerHTML = "";
                         });
+
+                    // Edition inline AJAX pour admin/superadmin
+                    if (isEditable) {
+                        const descSpan = document.getElementById("editable-problem-description");
+                        // Pour éviter la perte de formatage, on édite en HTML
+                        descSpan.addEventListener("blur", function () {
+                            const newHtml = this.innerHTML.trim();
+                            fetch(`/problemes/update-description/${problem.id}`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": csrfToken,
+                                    Accept: "application/json",
+                                },
+                                body: JSON.stringify({ description: newHtml }),
+                            })
+                                .then((res) => res.json())
+                                .then(() => {
+                                    this.style.background = "#678BD8";
+                                    setTimeout(
+                                        () => (this.style.background = ""),
+                                        500
+                                    );
+                                })
+                                .catch(() => {
+                                    this.style.background = "#DB7171";
+                                    setTimeout(
+                                        () => (this.style.background = ""),
+                                        1000
+                                    );
+                                });
+                        });
+                    }
                 });
             });
     };
