@@ -36,10 +36,24 @@ Ce projet est une application Laravel 12 utilisant Tailwind CSS v4 pour la mise 
    ```bash
    php artisan key:generate
    ```
+   Ou, pour l'environnement local :
+   ```bash
+   php artisan key:generate --env=local
+   ```
 
 6. **Configurer la base de données**
 
-   Modifiez le fichier `.env` pour renseigner vos identifiants de base de données.
+   Modifiez le fichier `.env` pour renseigner vos identifiants de base de données.  
+   Pour utiliser MySQL avec ce projet, configurez les variables suivantes dans le fichier `.env` :
+
+   ```env
+   BASE_DE_DONNEES_CONNEXION=mysql
+   BASE_DE_DONNEES_HOTE=127.0.0.1
+   BASE_DE_DONNEES_PORT=3306
+   BASE_DE_DONNEES_NOM=test_eri
+   BASE_DE_DONNEES_UTILISATEUR=VotreNomUtilisateur
+   BASE_DE_DONNEES_MOT_DE_PASSE=VotreMotDePasse
+   ```
 
 7. **Lancer les migrations**
    ```bash
@@ -64,8 +78,8 @@ Ce projet est une application Laravel 12 utilisant Tailwind CSS v4 pour la mise 
 
 ## Fonctionnalités
 
-- Authentification (login, register, logout)
-- Dashboard utilisateur
+- Authentification (connexion, inscription, déconnexion)
+- Tableau de bord utilisateur
 - Navigation responsive
 
 ---
