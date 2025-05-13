@@ -94,7 +94,7 @@
             </article>
         </section>
 
-        <section id='bandeau-problem' class=" h-80 flex bg-off-white rounded-lg mt-4 px-8">
+        <section class=" h-80 flex bg-off-white rounded-lg mt-4 px-8">
             <article id="problemes-list1"
                 class="w-1/2 px-8 py-4 border-r overflow-y-auto overflow-hidden border-secondary-grey">
             </article>
@@ -136,43 +136,6 @@
             modal.classList.remove('flex');
             mainContent.classList.remove('modal-blur');
             header.classList.remove('modal-blur');
-        });
-
-        // Délégation d'événement pour intercepter tous les submit dans la modale
-        modal.addEventListener('submit', function(e) {
-            const form = e.target;
-            if (form.id === 'add-model-form') {
-                e.preventDefault();
-
-                const url = form.action;
-                const formData = new FormData(form);
-
-                fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
-                        },
-                        body: formData
-                    })
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('add-model-modal-content').innerHTML = html;
-                        if (html.includes('Succès')) {
-                            modal.classList.add('hidden');
-                            modal.classList.remove('flex');
-                            mainContent.classList.remove('modal-blur');
-                            header.classList.remove('modal-blur');
-
-                            // Rafraîchir la liste des problèmes (exemple pour #problemes-list1)
-                            fetch('/problemes/list') // <-- adapte l’URL à ta route qui retourne la liste HTML
-                                .then(resp => resp.text())
-                                .then(listHtml => {
-                                    document.getElementById('problemes-list2').innerHTML = listHtml;
-                                });
-                        }
-                    });
-            }
         });
     </script>
     @vite('resources/js/dashboard.js')

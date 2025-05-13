@@ -350,16 +350,4 @@ class ModelController extends Controller
         });
         return response()->json($data);
     }
-
-    public function problemsList()
-    {
-        $filteredProblemes = \App\Models\Problem::all();
-        $user = Auth::user();
-    
-        return view('model.partials.problemes_list', [
-            'filteredProblemes' => $filteredProblemes,
-            'isAdmin' => $user ? ($user->is_admin ?? false) : false,
-            'containerId' => 'default',
-        ]);
-    }
 }

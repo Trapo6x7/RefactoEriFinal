@@ -13,3 +13,9 @@
     pointer-events: none;
     user-select: none;
 }
+
+.border{
+    border-width: 1px;
+    border-style: solid;
+    border-color: #F5F5F5;
+}

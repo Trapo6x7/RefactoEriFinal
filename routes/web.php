@@ -51,17 +51,26 @@ Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
     $q = $request->input('q');
     $tool = $request->input('tool');
     $env = $request->input('env');
+    $societe = $request->input('societe');
 
-    $problems = \App\Models\Problem::select('id', 'title', 'description', 'tool', 'env')
+    $problems = \App\Models\Problem::select('id', 'title', 'description', 'tool', 'env', 'societe')
         ->when($q, function ($query, $q) {
-            $query->where('title', 'like', "%$q%")
-                  ->orWhere('description', 'like', "%$q%");
+            $query->where(function ($subQuery) use ($q) {
+                $subQuery->where('title', 'like', "%$q%")
+                         ->orWhere('description', 'like', "%$q%");
+            });
         })
         ->when($tool, function ($query, $tool) {
             $query->where('tool', $tool);
         })
         ->when($env, function ($query, $env) {
             $query->where('env', $env);
+        })
+        ->when($societe, function ($query, $societe) {
+            $query->where('societe', $societe)
+                  ->orWhereHas('society', function ($q2) use ($societe) {
+                      $q2->where('name', 'like', "%$societe%");
+                  });
         })
         ->limit(50)
         ->get();
@@ -70,10 +79,9 @@ Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
         'problems' => $problems,
         'tools' => \App\Models\Tool::select('id', 'name')->get(),
         'envs' => \App\Models\Env::select('id', 'name')->get(),
+        'societies' => \App\Models\Society::select('id', 'name')->get(),
     ];
 });
-
-Route::get('/problemes/list', [ModelController::class, 'problemsList']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/model/{model}', [ModelController::class, 'index'])
