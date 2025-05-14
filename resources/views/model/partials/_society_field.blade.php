@@ -9,7 +9,6 @@
     </label>
     <select name="status_combined" id="status_combined"
         class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
-        <option value="none" {{ $selectedStatus == 'none' ? 'selected' : '' }}>Aucun</option>
         <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
         <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur</option>
         <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur</option>
@@ -41,9 +40,8 @@
                 </select>
             @elseif ($name === 'id_main')
                 <select name="id_main" id="id_main"
-                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
-                    @if ($config['required']) required @endif>
-                    <option value="">Sélectionnez une société</option>
+                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
+                    <option value="0">Sélectionnez une société</option>
                     @foreach ($societies as $society)
                         <option value="{{ $society->id }}"
                             {{ old('id_main', $instance->id_main ?? '') == $society->id ? 'selected' : '' }}>
@@ -102,9 +100,6 @@
                     client.value = 1;
                     distrib.value = 1;
                     break;
-                default:
-                    client.value = 0;
-                    distrib.value = 0;
             }
         }
         if (select) {

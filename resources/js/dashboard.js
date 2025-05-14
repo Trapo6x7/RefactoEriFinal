@@ -525,8 +525,8 @@ function updateCardsVisibility(entities) {
     const card4 = document.getElementById("card-4");
 
     // Cherche la société et l'interlocuteur peu importe l'ordre
-    const hasSociete = entities.some(e => e.model === "société");
-    const hasInterlocuteur = entities.some(e => e.model === "interlocuteur");
+    const hasSociete = entities.some((e) => e.model === "société");
+    const hasInterlocuteur = entities.some((e) => e.model === "interlocuteur");
 
     if (window.innerWidth < 768) {
         // Affiche la section si au moins une entité sélectionnée

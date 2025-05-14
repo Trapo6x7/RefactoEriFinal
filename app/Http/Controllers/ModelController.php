@@ -36,10 +36,14 @@ class ModelController extends Controller
 
         $rules = [
             'société' => [
-                'id_main'                           => 'required|integer',
+                'id_main'                           => 'required|integer|min:0',
                 'name'                              => 'required|string|max:255',
                 'status_client'                     => 'required|integer',
                 'status_distrib'                    => 'required|integer',
+                'boss_name'                         => 'required|string|max:60',
+                'boss_phone'                        => 'required|string|max:100',
+                'recep_phone'                       => 'nullable|string|max:50',
+                'address'                           => 'required|string|max:300',
                 'service_backup'                    => 'required|integer',
                 'infos_backup'                      => 'nullable|string',
                 'service_connect'                   => 'required|integer',
@@ -66,10 +70,6 @@ class ModelController extends Controller
                 'infos_maintenance_ESET'            => 'nullable|string',
                 'service_maintenance_domaine_DNS'   => 'required|integer',
                 'infos_maintenance_domaine_DNS'     => 'nullable|string',
-                'boss_name'                         => 'required|string|max:60',
-                'boss_phone'                        => 'required|string|max:100',
-                'recep_phone'                       => 'nullable|string|max:50',
-                'address'                           => 'required|string|max:300',
                 'status'                            => 'required|string|in:active,inactive',
             ],
             'interlocuteur' => [
@@ -147,10 +147,14 @@ class ModelController extends Controller
 
         $rules = [
             'société' => [
-                'id_main'                           => 'required|integer',
+                'id_main'                           => 'required|integer|min:0',
                 'name'                              => 'required|string|max:255',
                 'status_client'                     => 'required|integer',
                 'status_distrib'                    => 'required|integer',
+                'boss_name'                         => 'required|string|max:60',
+                'boss_phone'                        => 'required|string|max:100',
+                'recep_phone'                       => 'nullable|string|max:50',
+                'address'                           => 'required|string|max:300',
                 'service_backup'                    => 'required|integer',
                 'infos_backup'                      => 'nullable|string',
                 'service_connect'                   => 'required|integer',
@@ -177,10 +181,6 @@ class ModelController extends Controller
                 'infos_maintenance_ESET'            => 'nullable|string',
                 'service_maintenance_domaine_DNS'   => 'required|integer',
                 'infos_maintenance_domaine_DNS'     => 'nullable|string',
-                'boss_name'                         => 'required|string|max:60',
-                'boss_phone'                        => 'required|string|max:100',
-                'recep_phone'                       => 'nullable|string|max:50',
-                'address'                           => 'required|string|max:300',
                 'status'                            => 'required|string|in:active,inactive',
             ],
             'interlocuteur' => [
