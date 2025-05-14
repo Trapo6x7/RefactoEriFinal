@@ -11,8 +11,8 @@
         <select name="{{ $name }}" id="{{ $name }}"
             class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm"
             onchange="document.getElementById('container_{{ $infoField }}').style.display = this.value == 1 ? '' : 'none';">
-            <option value="0" {{ $serviceValue == 0 ? 'selected' : '' }}>{{ __('Non') }}</option>
-            <option value="1" {{ $serviceValue == 1 ? 'selected' : '' }}>{{ __('Oui') }}</option>
+            <option value="0" {{ $serviceValue == 0 ? 'selected' : '' }}>Non</option>
+            <option value="1" {{ $serviceValue == 1 ? 'selected' : '' }}>Oui</option>
         </select>
         <div class="mt-2" id="container_{{ $infoField }}" style="display: {{ $serviceValue == 1 ? '' : 'none' }};">
             <input type="text" name="{{ $infoField }}" id="{{ $infoField }}" value="{{ $infoValue }}"
@@ -27,7 +27,7 @@
             <select id="societe" name="societe"
                 class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
                 required>
-                <option value="">{{ __('Sélectionner une société') }}</option>
+                <option value="">Sélectionner une société</option>
                 @foreach ($societies as $society)
                     <option value="{{ $society->id }}"
                         {{ old('societe', $instance->societe ?? '') == $society->id ? 'selected' : '' }}>
