@@ -160,5 +160,5 @@
     window.translatedFields = @json(__('fields'));
     window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
 </script>
-<script src="{{ asset('build/assets/dashboard-OtqMiIpZ.js') }}"></script>
+<script src="{{ asset('build/assets/dashboard-D2rRUM3a.js') }}"></script>
 </x-app-layout>
