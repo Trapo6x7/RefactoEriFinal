@@ -143,7 +143,10 @@
             header.classList.remove('modal-blur');
         });
 
-        window.userRoles = @json(Auth::user() ? Auth::user()->isAdmin() || Auth::user()->isSuperAdmin() : []);
+        window.userRoles = @json(Auth::user()
+                ? collect([Auth::user()->isAdmin() ? 'admin' : null, Auth::user()->isSuperAdmin() ? 'superadmin' : null])->filter()->values()
+                : []
+        );
 
         document.addEventListener('DOMContentLoaded', function() {
             if (window.userRoles && (window.userRoles.includes('admin') || window.userRoles.includes(
@@ -153,8 +156,6 @@
                 document.getElementById('edit-desc-info').style.display = 'none';
             }
         });
-
-        
     </script>
     @vite('resources/js/dashboard.js')
 </x-app-layout>

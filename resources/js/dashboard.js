@@ -161,20 +161,23 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     `;
 
         // Ajoute l'événement pour afficher la solution dans problemes-list2
-container.querySelectorAll(".problem-title-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-        const idx = btn.getAttribute("data-idx");
-        const problem = problemes[idx];
-        const solutionContainer = document.getElementById("problemes-list2");
-        const isAdmin =
-            window.currentUserRole &&
-            ["admin", "superadmin"].includes(
-                window.currentUserRole.toLowerCase()
-            );
-        if (problem && solutionContainer) {
-            solutionContainer.innerHTML = `
+        container.querySelectorAll(".problem-title-btn").forEach((btn) => {
+            btn.addEventListener("click", function () {
+                const idx = btn.getAttribute("data-idx");
+                const problem = problemes[idx];
+                const solutionContainer =
+                    document.getElementById("problemes-list2");
+                const isAdmin =
+                    window.currentUserRole &&
+                    ["admin", "superadmin"].includes(
+                        window.currentUserRole.toLowerCase()
+                    );
+                if (problem && solutionContainer) {
+                    solutionContainer.innerHTML = `
                 <div class="bg-white text-sm rounded p-4">
-                    <h2 class="font-bold text-blue-accent mb-2">${problem.title || ""}</h2>
+                    <h2 class="font-bold text-blue-accent mb-2">${
+                        problem.title || ""
+                    }</h2>
                     <div 
                         class="text-primary-grey editable-problem-solution"
                         ${isAdmin ? 'contenteditable="true"' : ""}
@@ -188,35 +191,48 @@ container.querySelectorAll(".problem-title-btn").forEach((btn) => {
                 </div>
             `;
 
-            // Si admin, ajoute la sauvegarde auto au blur
-            if (isAdmin) {
-                const editableDiv = solutionContainer.querySelector(".editable-problem-solution");
-                editableDiv.addEventListener("blur", function () {
-                    const newValue = this.innerText.trim();
-                    const problemId = this.dataset.problemId;
-                    fetch(`/problemes/update-description/${problemId}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            Accept: "application/json",
-                        },
-                        body: JSON.stringify({ description: newValue }),
-                    })
-                        .then((res) => res.json())
-                        .then(() => {
-                            this.style.background = "#678BD8";
-                            setTimeout(() => (this.style.background = ""), 500);
-                        })
-                        .catch(() => {
-                            this.style.background = "#DB7171";
-                            setTimeout(() => (this.style.background = ""), 1000);
+                    // Si admin, ajoute la sauvegarde auto au blur
+                    if (isAdmin) {
+                        const editableDiv = solutionContainer.querySelector(
+                            ".editable-problem-solution"
+                        );
+                        editableDiv.addEventListener("blur", function () {
+                            const newValue = this.innerText.trim();
+                            const problemId = this.dataset.problemId;
+                            fetch(
+                                `/problemes/update-description/${problemId}`,
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRF-TOKEN": csrfToken,
+                                        Accept: "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        description: newValue,
+                                    }),
+                                }
+                            )
+                                .then((res) => res.json())
+                                .then(() => {
+                                    this.style.background = "#678BD8";
+                                    setTimeout(
+                                        () => (this.style.background = ""),
+                                        500
+                                    );
+                                })
+                                .catch(() => {
+                                    this.style.background = "#DB7171";
+                                    setTimeout(
+                                        () => (this.style.background = ""),
+                                        1000
+                                    );
+                                });
                         });
-                });
-            }
-        }
-    });
-});
+                    }
+                }
+            });
+        });
     };
 
     // Fonction pour charger les problèmes avec filtres
@@ -508,13 +524,11 @@ function updateCardsVisibility(entities) {
     const card3 = document.getElementById("card-3");
     const card4 = document.getElementById("card-4");
 
-    // Sur mobile
-    if (window.innerWidth < 768) {
-        // On considère que ent1 = société, ent2 = interlocuteur
-        const hasSociete = entities[0] && entities[0].model === "société";
-        const hasInterlocuteur =
-            entities[1] && entities[1].model === "interlocuteur";
+    // Cherche la société et l'interlocuteur peu importe l'ordre
+    const hasSociete = entities.some(e => e.model === "société");
+    const hasInterlocuteur = entities.some(e => e.model === "interlocuteur");
 
+    if (window.innerWidth < 768) {
         // Affiche la section si au moins une entité sélectionnée
         if (hasSociete || hasInterlocuteur) {
             cardSection.classList.remove("hidden");
@@ -1234,5 +1248,11 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
             );
             showSelectedEntitiesCard(selectedEntities);
         });
+    });
+
+    window.addEventListener("resize", () => {
+        // Recharge la visibilité des cards à chaque resize
+        selectedEntities = normalizeSelectedEntities(selectedEntities);
+        updateCardsVisibility(selectedEntities);
     });
 }
