@@ -6,15 +6,14 @@ use App\Models\Problem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class ModelController extends Controller
 {
     protected $models = [
         'société'       => \App\Models\Society::class,
         'interlocuteur' => \App\Models\Interlocutor::class,
         'environnement' => \App\Models\Env::class,
-        'problème'       => \App\Models\Problem::class,
-        'outil'          => \App\Models\Tool::class,
+        'problème'      => \App\Models\Problem::class,
+        'outil'         => \App\Models\Tool::class,
     ];
 
     public function index($model)
@@ -77,7 +76,7 @@ class ModelController extends Controller
                 'name'              => 'required|string|max:50',
                 'lastname'          => 'nullable|string|max:50',
                 'fullname'          => 'nullable|string|max:110',
-                'societe'           => 'required|integer', // correspond à l'id de la société
+                'societe'           => 'required|integer',
                 'phone_fix'         => 'nullable|string|max:50',
                 'phone_mobile'      => 'nullable|string|max:50',
                 'email'             => 'nullable|email|max:100',
@@ -113,12 +112,21 @@ class ModelController extends Controller
         $tools = null;
         $envs = null;
 
+        // Pour le select société parente (id_main) dans le formulaire société
+        if ($model === 'société') {
+            $excludeId = $instance ? $instance->id : 0;
+            $societies = \App\Models\Society::where('id', '!=', $excludeId)
+                ->alphabetical()
+                ->get(['id', 'name']);
+        }
+
+        // Pour les autres modèles qui ont besoin de sociétés
         if (in_array($model, ['interlocuteur', 'problème'])) {
-            $societies = \App\Models\Society::alphabetical()->get();
+            $societies = \App\Models\Society::alphabetical()->get(['id', 'name']);
         }
         if ($model === 'problème') {
-            $tools = \App\Models\Tool::alphabetical()->get();
-            $envs = \App\Models\Env::alphabetical()->get();
+            $tools = \App\Models\Tool::alphabetical()->get(['id', 'name']);
+            $envs = \App\Models\Env::alphabetical()->get(['id', 'name']);
         }
 
         $viewData = compact('model', 'action', 'instance', 'fields', 'societies', 'tools', 'envs');
@@ -210,6 +218,10 @@ class ModelController extends Controller
 
         $validated = $request->validate($rules[$model]);
 
+        if ($model === 'interlocuteur') {
+            $validated['fullname'] = trim(($validated['name'] ?? '') . ' ' . ($validated['lastname'] ?? ''));
+        }
+
         if ($action === 'create') {
             $class::create($validated);
             $instance = null;
@@ -225,12 +237,18 @@ class ModelController extends Controller
         $tools = null;
         $envs = null;
 
+        if ($model === 'société') {
+            $excludeId = $instance ? $instance->id : 0;
+            $societies = \App\Models\Society::where('id', '!=', $excludeId)
+                ->alphabetical()
+                ->get(['id', 'name']);
+        }
         if (in_array($model, ['interlocuteur', 'problème'])) {
-            $societies = \App\Models\Society::alphabetical()->get();
+            $societies = \App\Models\Society::alphabetical()->get(['id', 'name']);
         }
         if ($model === 'problème') {
-            $tools = \App\Models\Tool::alphabetical()->get();
-            $envs = \App\Models\Env::alphabetical()->get();
+            $tools = \App\Models\Tool::alphabetical()->get(['id', 'name']);
+            $envs = \App\Models\Env::alphabetical()->get(['id', 'name']);
         }
 
         $fields = self::getFieldsFromRules($rules[$model]);

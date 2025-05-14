@@ -46,4 +46,5 @@ return [
     'society_id' => 'Société',
     'fullname' => 'Nom complet',
     'main_name' => 'Société principale',
+    'id_main' => 'Société principale',
 ];
