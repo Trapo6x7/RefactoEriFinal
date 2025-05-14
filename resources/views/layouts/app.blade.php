@@ -15,7 +15,8 @@
 
     <!-- Scripts -->
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('build/assets/app-BaLUhxgp.css') }}">
+<script src="{{ asset('build/assets/app-D5UJA6KW.js') }}" type="module"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 

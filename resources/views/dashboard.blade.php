@@ -156,6 +156,9 @@
                 document.getElementById('edit-desc-info').style.display = 'none';
             }
         });
-    </script>
-    @vite('resources/js/dashboard.js')
+        
+    window.translatedFields = @json(__('fields'));
+    window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
+</script>
+<script src="{{ asset('build/assets/dashboard-OtqMiIpZ.js') }}"></script>
 </x-app-layout>

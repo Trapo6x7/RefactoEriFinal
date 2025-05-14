@@ -106,9 +106,9 @@ return [
 
     // CSS files that are loaded in all pages, using Laravel's @vite() helper
     // Please note that support for Vite was added in Laravel 9.19. Earlier versions are not able to use this feature.
-    'vite_styles' => [ // resource file_path
-        'resources/css/custom.css',
-    ],
+    // 'vite_styles' => [ // resource file_path
+    //     'resources/css/custom.css',
+    // ],
 
     // --------------
     // GLOBAL SCRIPTS
@@ -116,6 +116,7 @@ return [
 
     // JS files that are loaded in all pages, using Laravel's asset() helper
     'scripts' => [
+        'js/dashboard.js',
         // 'css/app.css',
         // 'https://cdn.jsdelivr.net/npm/vue@2.4.4/dist/vue.min.js',
         // 'https://cdn.jsdelivr.net/npm/react@16/umd/react.production.min.js',
@@ -127,10 +128,11 @@ return [
         // 'js/app.js' => '',
     ],
 
-    // JS files that are loaded in all pages, using Laravel's @vite() helper
-    'vite_scripts' => [ // resource file_path
-        // 'resources/js/app.js',
-    ],
+    // // JS files that are loaded in all pages, using Laravel's @vite() helper
+    // 'vite_scripts' => [ // resource file_path
+    //     // 'resources/js/app.js',
+    //     'js/dashboard.js',
+    // ],
 
     'classes' => [
         /**
