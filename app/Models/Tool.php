@@ -18,4 +18,9 @@ class Tool extends Model
     {
         return $this->hasMany(Problem::class, 'tool');
     }
+
+    public function scopeAlphabetical($query)
+    {
+        return $query->orderBy('name', 'asc');
+    }
 }

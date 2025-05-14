@@ -48,4 +48,9 @@ class Interlocutor extends Model
         }
         return $result;
     }
+
+    public function scopeAlphabetical($query)
+    {
+        return $query->orderBy('name', 'asc');
+    }
 }

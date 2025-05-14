@@ -12,16 +12,8 @@ class GlobalSearchController extends Controller
         $table = $request->input('table');
 
         // Initialisation vide
-        $users = $societies = $techs = $problems = $problemStatuses = $interlocutors = $envs = $tools = $menus = collect();
+        $societies = $interlocutors = collect();
 
-        if (
-            !$table ||
-            $table === 'users' || $table === 'user'
-        ) {
-            $users = \App\Models\User::where('name', 'like', "%$q%")
-                ->orWhere('email', 'like', "%$q%")
-                ->get();
-        }
         if (
             !$table ||
             $table === 'societies' || $table === 'society'
@@ -60,28 +52,10 @@ class GlobalSearchController extends Controller
                 ->orWhere('recep_phone', 'like', "%$q%")
                 ->orWhere('address', 'like', "%$q%")
                 ->orWhere('status', 'like', "%$q%")
+                ->alphabetical()
                 ->get();
         }
-        if (
-            !$table ||
-            $table === 'techs' || $table === 'tech'
-        ) {
-            $techs = \App\Models\Tech::where('name', 'like', "%$q%")->get();
-        }
-        if (
-            !$table ||
-            $table === 'problems' || $table === 'problem'
-        ) {
-            $problems = \App\Models\Problem::where('title', 'like', "%$q%")
-                ->orWhere('description', 'like', "%$q%")
-                ->get();
-        }
-        if (
-            !$table ||
-            $table === 'problemStatuses' || $table === 'problemStatus'
-        ) {
-            $problemStatuses = \App\Models\ProblemStatus::where('name', 'like', "%$q%")->get();
-        }
+
         if (
             !$table ||
             $table === 'interlocutors' || $table === 'interlocutor'
@@ -90,38 +64,14 @@ class GlobalSearchController extends Controller
                 ->orWhere('lastname', 'like', "%$q%")
                 ->orWhere('fullname', 'like', "%$q%")
                 ->orWhere('email', 'like', "%$q%")
+                ->alphabetical()
                 ->get();
-        }
-        if (
-            !$table ||
-            $table === 'envs' || $table === 'env'
-        ) {
-            $envs = \App\Models\Env::where('name', 'like', "%$q%")->get();
-        }
-        if (
-            !$table ||
-            $table === 'tools' || $table === 'tool'
-        ) {
-            $tools = \App\Models\Tool::where('name', 'like', "%$q%")->get();
-        }
-        if (
-            !$table ||
-            $table === 'menus' || $table === 'menu'
-        ) {
-            $menus = \App\Models\Menu::where('title', 'like', "%$q%")->get();
         }
 
         return view('vendor.backpack.theme-tabler.global_search_results', compact(
             'q',
-            'users',
             'societies',
-            'techs',
-            'problems',
-            'problemStatuses',
             'interlocutors',
-            'envs',
-            'tools',
-            'menus',
         ));
     }
 
@@ -130,17 +80,8 @@ class GlobalSearchController extends Controller
         $q = $request->input('q');
         $table = $request->input('table');
 
-        $users = $societies = $techs = $problems = $problemStatuses = $interlocutors = $envs = $tools = $menus = collect();
+        $societies = $interlocutors = collect();
 
-        if (
-            !$table ||
-            $table === 'users' || $table === 'user'
-        ) {
-            $users = \App\Models\User::where('name', 'like', "%$q%")
-                ->orWhere('email', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('name');
-        }
         if (
             !$table ||
             $table === 'societies' || $table === 'society'
@@ -180,33 +121,10 @@ class GlobalSearchController extends Controller
                 ->orWhere('address', 'like', "%$q%")
                 ->orWhere('status', 'like', "%$q%")
                 ->limit(5)
+                ->alphabetical()
                 ->pluck('name');
         }
-        if (
-            !$table ||
-            $table === 'techs' || $table === 'tech'
-        ) {
-            $techs = \App\Models\Tech::where('name', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('name');
-        }
-        if (
-            !$table ||
-            $table === 'problems' || $table === 'problem'
-        ) {
-            $problems = \App\Models\Problem::where('title', 'like', "%$q%")
-                ->orWhere('description', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('title');
-        }
-        if (
-            !$table ||
-            $table === 'problemStatuses' || $table === 'problemStatus'
-        ) {
-            $problemStatuses = \App\Models\ProblemStatus::where('name', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('name');
-        }
+
         if (
             !$table ||
             $table === 'interlocutors' || $table === 'interlocutor'
@@ -216,44 +134,21 @@ class GlobalSearchController extends Controller
                 ->orWhere('fullname', 'like', "%$q%")
                 ->orWhere('email', 'like', "%$q%")
                 ->limit(5)
+                ->alphabetical()
                 ->pluck('fullname');
         }
-        if (
-            !$table ||
-            $table === 'envs' || $table === 'env'
-        ) {
-            $envs = \App\Models\Env::where('name', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('name');
-        }
-        if (
-            !$table ||
-            $table === 'tools' || $table === 'tool'
-        ) {
-            $tools = \App\Models\Tool::where('name', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('name');
-        }
-        if (
-            !$table ||
-            $table === 'menus' || $table === 'menu'
-        ) {
-            $menus = \App\Models\Menu::where('title', 'like', "%$q%")
-                ->limit(5)
-                ->pluck('title');
-        }
 
-        $suggestions = $users
-            ->merge($societies)
-            ->merge($techs)
-            ->merge($problems)
-            ->merge($problemStatuses)
+        $suggestions = $societies
             ->merge($interlocutors)
-            ->merge($envs)
-            ->merge($tools)
-            ->merge($menus)
             ->unique()
             ->values();
+
+        $suggestions = $suggestions->sortBy(function ($item) {
+            if (is_object($item)) {
+                return $item->label ?? $item->name ?? '';
+            }
+            return $item;
+        }, SORT_NATURAL | SORT_FLAG_CASE)->values();
 
         return response()->json($suggestions);
     }

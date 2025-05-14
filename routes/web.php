@@ -77,14 +77,15 @@ Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
                       $q2->where('name', 'like', "%$societe%");
                   });
         })
+        ->alphabetical()
         ->limit(50)
         ->get();
 
     return [
         'problems' => $problems,
-        'tools' => \App\Models\Tool::select('id', 'name')->get(),
-        'envs' => \App\Models\Env::select('id', 'name')->get(),
-        'societies' => \App\Models\Society::select('id', 'name')->get(),
+        'tools' => \App\Models\Tool::select('id', 'name')->alphabetical()->get(),
+        'envs' => \App\Models\Env::select('id', 'name')->alphabetical()->get(),
+        'societies' => \App\Models\Society::select('id', 'name')->alphabetical()->get(),
     ];
 });
 

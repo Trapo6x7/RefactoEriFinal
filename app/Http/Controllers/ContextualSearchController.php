@@ -22,6 +22,7 @@ class ContextualSearchController extends Controller
         if ($table === 'users' || $table === 'user') {
             $users = \App\Models\User::where('name', 'like', "%$q%")
                 ->orWhere('email', 'like', "%$q%")
+                ->alphabetical()
                 ->get();
             $currentItem = \App\Models\User::find($currentId);
         }
@@ -60,21 +61,27 @@ class ContextualSearchController extends Controller
                 ->orWhere('recep_phone', 'like', "%$q%")
                 ->orWhere('address', 'like', "%$q%")
                 ->orWhere('status', 'like', "%$q%")
+                ->alphabetical()
                 ->get();
             $currentItem = \App\Models\Society::find($currentId);
         }
         if ($table === 'techs' || $table === 'tech') {
-            $techs = \App\Models\Tech::where('name', 'like', "%$q%")->get();
+            $techs = \App\Models\Tech::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
             $currentItem = \App\Models\Tech::find($currentId);
         }
         if ($table === 'problems' || $table === 'problem') {
             $problems = \App\Models\Problem::where('title', 'like', "%$q%")
                 ->orWhere('description', 'like', "%$q%")
+                ->alphabetical()
                 ->get();
             $currentItem = \App\Models\Problem::find($currentId);
         }
         if ($table === 'problemStatuses' || $table === 'problemStatus') {
-            $problemStatuses = \App\Models\ProblemStatus::where('name', 'like', "%$q%")->get();
+            $problemStatuses = \App\Models\ProblemStatus::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
             $currentItem = \App\Models\ProblemStatus::find($currentId);
         }
         if ($table === 'interlocutors' || $table === 'interlocutor') {
@@ -82,19 +89,26 @@ class ContextualSearchController extends Controller
                 ->orWhere('lastname', 'like', "%$q%")
                 ->orWhere('fullname', 'like', "%$q%")
                 ->orWhere('email', 'like', "%$q%")
+                ->alphabetical()
                 ->get();
             $currentItem = \App\Models\Interlocutor::find($currentId);
         }
         if ($table === 'envs' || $table === 'env') {
-            $envs = \App\Models\Env::where('name', 'like', "%$q%")->get();
+            $envs = \App\Models\Env::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
             $currentItem = \App\Models\Env::find($currentId);
         }
         if ($table === 'tools' || $table === 'tool') {
-            $tools = \App\Models\Tool::where('name', 'like', "%$q%")->get();
+            $tools = \App\Models\Tool::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
             $currentItem = \App\Models\Tool::find($currentId);
         }
         if ($table === 'menus' || $table === 'menu') {
-            $menus = \App\Models\Menu::where('title', 'like', "%$q%")->get();
+            $menus = \App\Models\Menu::where('title', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
             $currentItem = \App\Models\Menu::find($currentId);
         }
 

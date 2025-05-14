@@ -52,7 +52,7 @@
                             placeholder="Recherche..."
                             class="w-full px-4 py-2 border text-sm h-9 border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
                         <button type="button" id="reset-search-input"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xl hidden"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-accent text-xl hidden"
                             aria-label="Effacer">
                             &times;
                         </button>
@@ -66,8 +66,8 @@
                         <select id="user-search-table" name="table"
                             class="w-full px-4 text-sm py-2 border h-9 border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
                             <option value="" class="hover:bg-blue-accent">Toutes les tables</option>
-                            <option value="societies">Sociétés</option>
                             <option value="interlocutors">Interlocuteurs</option>
+                            <option value="societies">Sociétés</option>
                         </select>
                     </div>
                 </form>

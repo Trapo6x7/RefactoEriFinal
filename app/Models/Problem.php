@@ -30,4 +30,9 @@ class Problem extends Model
     {
         return $this->belongsTo(Society::class, 'societe');
     }
+
+    public function scopeAlphabetical($query)
+    {
+        return $query->orderBy('title', 'asc');
+    }
 }

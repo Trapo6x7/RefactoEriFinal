@@ -13,24 +13,37 @@ class UserSearchController extends Controller
         $table = $request->input('table');
         $results = [];
 
-        // Search in all tables if $table is not specified, otherwise only in the specified table
+        // Recherche avec tri alphabétique
         if (!$table || $table === 'societies') {
-            $results['societies'] = \App\Models\Society::where('name', 'like', "%$q%")->get();
+            $results['societies'] = \App\Models\Society::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
         }
         if (!$table || $table === 'problems') {
-            $results['problems'] = \App\Models\Problem::where('title', 'like', "%$q%")->get();
+            $results['problems'] = \App\Models\Problem::where('title', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
         }
         if (!$table || $table === 'problemStatuses') {
-            $results['problemStatuses'] = \App\Models\ProblemStatus::where('name', 'like', "%$q%")->get();
+            $results['problemStatuses'] = \App\Models\ProblemStatus::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
         }
         if (!$table || $table === 'interlocutors') {
-            $results['interlocutors'] = \App\Models\Interlocutor::where('fullname', 'like', "%$q%")->orWhere('name', 'like', "%$q%")->get();
+            $results['interlocutors'] = \App\Models\Interlocutor::where('fullname', 'like', "%$q%")
+                ->orWhere('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
         }
         if (!$table || $table === 'envs') {
-            $results['envs'] = \App\Models\Env::where('name', 'like', "%$q%")->get();
+            $results['envs'] = \App\Models\Env::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
         }
         if (!$table || $table === 'tools') {
-            $results['tools'] = \App\Models\Tool::where('name', 'like', "%$q%")->get();
+            $results['tools'] = \App\Models\Tool::where('name', 'like', "%$q%")
+                ->alphabetical()
+                ->get();
         }
 
         return view('profile.partials.global_user_search_results', [
@@ -48,11 +61,12 @@ class UserSearchController extends Controller
         $q = $request->input('q');
         $table = $request->input('table');
         $suggestions = [];
-    
+
         if (!$table || $table === 'societies') {
             $suggestions = array_merge(
                 $suggestions,
                 \App\Models\Society::where('name', 'like', "%$q%")
+                    ->alphabetical()
                     ->limit(5)
                     ->get()
                     ->map(fn($s) => [
@@ -63,12 +77,13 @@ class UserSearchController extends Controller
                     ->toArray()
             );
         }
-    
+
         if (!$table || $table === 'interlocutors') {
             $suggestions = array_merge(
                 $suggestions,
                 \App\Models\Interlocutor::where('fullname', 'like', "%$q%")
                     ->orWhere('name', 'like', "%$q%")
+                    ->alphabetical()
                     ->limit(5)
                     ->get()
                     ->map(fn($i) => [
@@ -79,10 +94,15 @@ class UserSearchController extends Controller
                     ->toArray()
             );
         }
-    
+
         // Déduplique les suggestions
         $suggestions = array_unique($suggestions, SORT_REGULAR);
-    
+
+        // Trie alphabétiquement sur le champ 'label'
+        usort($suggestions, function($a, $b) {
+            return strcasecmp($a['label'], $b['label']);
+        });
+
         return response()->json($suggestions);
     }
 }

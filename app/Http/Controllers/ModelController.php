@@ -114,11 +114,11 @@ class ModelController extends Controller
         $envs = null;
 
         if (in_array($model, ['interlocuteur', 'problème'])) {
-            $societies = \App\Models\Society::all();
+            $societies = \App\Models\Society::alphabetical()->get();
         }
         if ($model === 'problème') {
-            $tools = \App\Models\Tool::all();
-            $envs = \App\Models\Env::all();
+            $tools = \App\Models\Tool::alphabetical()->get();
+            $envs = \App\Models\Env::alphabetical()->get();
         }
 
         $viewData = compact('model', 'action', 'instance', 'fields', 'societies', 'tools', 'envs');
@@ -226,11 +226,11 @@ class ModelController extends Controller
         $envs = null;
 
         if (in_array($model, ['interlocuteur', 'problème'])) {
-            $societies = \App\Models\Society::all();
+            $societies = \App\Models\Society::alphabetical()->get();
         }
         if ($model === 'problème') {
-            $tools = \App\Models\Tool::all();
-            $envs = \App\Models\Env::all();
+            $tools = \App\Models\Tool::alphabetical()->get();
+            $envs = \App\Models\Env::alphabetical()->get();
         }
 
         $fields = self::getFieldsFromRules($rules[$model]);
