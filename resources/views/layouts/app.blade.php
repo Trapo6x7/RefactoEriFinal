@@ -15,12 +15,13 @@
 
     <!-- Scripts -->
 
-    <link rel="stylesheet" href="{{ asset('build/assets/app-BaLUhxgp.css') }}">
-<script src="{{ asset('build/assets/app-D5UJA6KW.js') }}" type="module"></script>
+    <link rel="stylesheet" href="{{ asset('build/assets/app-DGGxN_h7.css') }}">
+    <script src="{{ asset('build/assets/app-BBCQS6KE.js') }}" type="module"></script>
+
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 
-<body class="font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="font-sans antialiased min-h-screen flex flex-col justify-between bg-off-white">
     <div class="min-h-screen ">
         @include('layouts.navigation')
 
@@ -42,7 +43,7 @@
 </body>
 <script>
     window.translatedFields = @json(__('fields'));
-    window.currentUserRole = "{{ Auth::user()->role }}";
+    window.currentUserRole = "{{ Auth::check() ? Auth::user()->role : '' }}";
 </script>
 
 </html>

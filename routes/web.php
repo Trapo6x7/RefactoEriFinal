@@ -22,37 +22,37 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('public/global-search', [GlobalSearchController::class, 'index'])->name('global-search');
-Route::get('public/global-suggestions', [GlobalSearchController::class, 'suggestions'])->name('global-suggestions');
+Route::get('/global-search', [GlobalSearchController::class, 'index'])->name('global-search');
+Route::get('/global-suggestions', [GlobalSearchController::class, 'suggestions'])->name('global-suggestions');
 
-Route::get('public/contextual-search', [ContextualSearchController::class, 'index'])->name('contextual-search');
-Route::get('public/contextual-suggestions', [ContextualSearchController::class, 'suggestions'])->name('contextual-suggestions');
+Route::get('/contextual-search', [ContextualSearchController::class, 'index'])->name('contextual-search');
+Route::get('/contextual-suggestions', [ContextualSearchController::class, 'suggestions'])->name('contextual-suggestions');
 
-Route::get('public/user-search', [UserSearchController::class, 'index'])->name('user-search');
-Route::post('public/user-search', [UserSearchController::class, 'search'])->name('user-search.post');
+Route::get('/user-search', [UserSearchController::class, 'index'])->name('user-search');
+Route::post('/user-search', [UserSearchController::class, 'search'])->name('user-search.post');
 
-Route::get('public/user-suggestions', [UserSearchController::class, 'suggestions'])->name('user-suggestions');
+Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('user-suggestions');
 
-Route::get('public/model-suggestions', [ModelController::class, 'suggestions'])->name('model-suggestions');
+Route::get('/model-suggestions', [ModelController::class, 'suggestions'])->name('model-suggestions');
 
-Route::get('public/model/{model}/show/{id}', [ModelController::class, 'show'])->name('model.show');
+Route::get('/model/{model}/show/{id}', [ModelController::class, 'show'])->name('model.show');
 
-Route::post('public/model/{model}/update-field/{id}', [ModelController::class, 'updateField'])->name('model.updateField');
+Route::post('/model/{model}/update-field/{id}', [ModelController::class, 'updateField'])->name('model.updateField');
 
-Route::get('public/societe/{id}/interlocuteurs', function($id) {
+Route::get('/societe/{id}/interlocuteurs', function($id) {
     return \App\Models\Interlocutor::where('societe', $id)->get();
 });
 
-Route::get('public/societe/{id}/problemes', [SocietyController::class, 'problemes']);
+Route::get('/societe/{id}/problemes', [SocietyController::class, 'problemes']);
 
-Route::post('public/problemes/update-description/{id}', function ($id, \Illuminate\Http\Request $request) {
+Route::post('/problemes/update-description/{id}', function ($id, \Illuminate\Http\Request $request) {
     $problem = \App\Models\Problem::findOrFail($id);
     $problem->description = $request->input('description');
     $problem->save();
     return response()->json(['success' => true]);
 })->name('problemes.update-description')->middleware('auth');
 
-Route::get('public/problemes/search', function (\Illuminate\Http\Request $request) {
+Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
     $q = $request->input('q');
     $tool = $request->input('tool');
     $env = $request->input('env');

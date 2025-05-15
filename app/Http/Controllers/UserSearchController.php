@@ -24,11 +24,6 @@ class UserSearchController extends Controller
                 ->alphabetical()
                 ->get();
         }
-        if (!$table || $table === 'problemStatuses') {
-            $results['problemStatuses'] = \App\Models\ProblemStatus::where('name', 'like', "%$q%")
-                ->alphabetical()
-                ->get();
-        }
         if (!$table || $table === 'interlocutors') {
             $results['interlocutors'] = \App\Models\Interlocutor::where('fullname', 'like', "%$q%")
                 ->orWhere('name', 'like', "%$q%")

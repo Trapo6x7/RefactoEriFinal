@@ -10,8 +10,8 @@
             ];
         @endphp
 
-        <article class="w-full flex justify-center" id="header">
-            <div class="rounded-lg px-4 md:px-8 flex flex-col items-center max-w-full md:max-w-sm w-full">
+        <article class="w-full flex justify-center bg-white rounded-md" id="header">
+            <div class="rounded-lg p-2 md:p-4 flex flex-col items-center max-w-full md:max-w-sm w-full h-1/5">
                 <div class="text-sm font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
                 <div class="flex gap-2 w-full">
                     <select id="add-model-select" class="border rounded px-4 py-1 flex-1">
@@ -42,7 +42,7 @@
     </article>
 
     <section id="main-content">
-        <section class="mx-0 bg-off-white rounded-lg md:h-[80%]">
+        <section class="mx-0 bg-off-white rounded-lg md:h-1/5">
 
             <article class="max-w-4xl pt-4 mx-auto">
                 <form id="user-search-form"
@@ -83,26 +83,26 @@
         </section>
 
         <section id="selected-entity-card"
-            class="hidden md:flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8">
+            class="hidden md:flex flex-col md:flex-row flex-wrap gap-4 w-full min-w-0 p-2 sm:p-4 md:p-8 h-2/5">
             <article id="card-1"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
+                class="flex-1 min-w-0 md:min-w-1/4 max-w-full bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
             <article id="card-2"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
+                class="flex-1 min-w-0 md:min-w-1/4 max-w-full bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="card-3"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
+                class="flex-1 min-w-0 md:min-w-1/4 max-w-full bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll relative text-sm">
             </article>
             <article id="card-4"
-                class="flex-1 min-w-0 md:min-w-[22%] max-w-full md:max-w-[24%] bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
+                class="flex-1 min-w-0 md:min-w-1/4 max-w-full bg-white rounded-lg p-4 md:p-6 flex flex-col h-80 overflow-hidden overflow-y-scroll text-sm">
             </article>
         </section>
 
-        <section class="flex flex-col md:flex-row h-auto md:h-96 bg-off-white rounded-lg mt-4 px-2 sm:px-4 md:px-8">
-            <article id="problemes-list1"
-                class="w-full md:w-1/2 px-2 sm:px-4 py-4 border-b md:border-b-0 md:border-r overflow-y-auto overflow-hidden border-blue-accent">
+        <section class="flex flex-col md:flex-row h-auto bg-off-white rounded-lg mt-4 px-2 sm:px-4 md:px-8">
+            <article id="problemes-list1" class="w-full md:w-1/2 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden">
             </article>
+            <div class="border-r border-blue-accent"></div>
             <article id="problemes-list2" class="w-full md:w-1/2 px-2 sm:px-8 py-4 overflow-y-auto overflow-hidden">
             </article>
         </section>
@@ -156,9 +156,9 @@
                 document.getElementById('edit-desc-info').style.display = 'none';
             }
         });
-        
-    window.translatedFields = @json(__('fields'));
-    window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
-</script>
-<script src="{{ asset('build/assets/dashboard-D2rRUM3a.js') }}"></script>
+
+        window.translatedFields = @json(__('fields'));
+        window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
+    </script>
+    <script src="{{ asset('build/assets/dashboard-D2rRUM3a.js') }}"></script>
 </x-app-layout>

@@ -63,7 +63,7 @@ return [
     'home_link' => '',
 
     // Menu logo. You can replace this with an <img> tag if you have a logo.
-    'project_logo' => '<b>E.R.I.</b>admin',
+    'project_logo' => '<b>E-R.I.</b>admin',
 
     // Show / hide breadcrumbs on admin panel pages.
     'breadcrumbs' => true,
@@ -94,15 +94,15 @@ return [
 
     // CSS files that are loaded in all pages, using Laravel's asset() helper
     'styles' => [
-        'css/app.css',
+        'build/assets/app-DAxogLot.css'
         // 'https://some-cdn.com/example.css',
     ],
 
     // CSS files that are loaded in all pages, using Laravel's mix() helper
-    'mix_styles' => [ // file_path => manifest_directory_path
-        'css/app.css' => '',
-        'css/style.css' => '',
-    ],
+    // 'mix_styles' => [ // file_path => manifest_directory_path
+    //     'css/app.css' => '',
+    //     'css/style.css' => '',
+    // ],
 
     // CSS files that are loaded in all pages, using Laravel's @vite() helper
     // Please note that support for Vite was added in Laravel 9.19. Earlier versions are not able to use this feature.
@@ -116,7 +116,7 @@ return [
 
     // JS files that are loaded in all pages, using Laravel's asset() helper
     'scripts' => [
-        'js/dashboard.js',
+        'build/assets/dashboard-D2rRUM3a.js',
         // 'css/app.css',
         // 'https://cdn.jsdelivr.net/npm/vue@2.4.4/dist/vue.min.js',
         // 'https://cdn.jsdelivr.net/npm/react@16/umd/react.production.min.js',
@@ -124,14 +124,14 @@ return [
     ],
 
     // JS files that are loaded in all pages, using Laravel's mix() helper
-    'mix_scripts' => [ // file_path => manifest_directory_path
-        // 'js/app.js' => '',
-    ],
+    // 'mix_scripts' => [ // file_path => manifest_directory_path
+    //     // 'js/app.js' => '',
+    // ],
 
     // // JS files that are loaded in all pages, using Laravel's @vite() helper
     // 'vite_scripts' => [ // resource file_path
     //     // 'resources/js/app.js',
-    //     'js/dashboard.js',
+    //     'resources/js/dashboard.js',
     // ],
 
     'classes' => [

@@ -23,6 +23,7 @@ export default {
             "blue-hover" : "#5c7dc4",
             "red-accent" : "#DB7171",
             "red-hover" : "#bf6363",
+            "white" : "#ffffff",
         }
     },
     safelist: [
