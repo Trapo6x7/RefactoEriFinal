@@ -7,8 +7,6 @@
                 'interlocuteur' => 'Interlocuteur',
                 'environnement' => 'Environnement',
                 'outil' => 'Outil',
-                'user' => 'Utilisateur',
-                'tech' => 'Technicien',
             ];
         @endphp
 
@@ -67,9 +65,9 @@
                     <div class="w-full md:w-1/4">
                         <select id="user-search-table" name="table"
                             class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-sm md:text-md lg:text-lg">
-                            <option value="" class="hover:bg-blue-accent">Toutes les tables</option>
+                            <option value="" class="hover:bg-blue-accent">Tous</option>
                             <option value="interlocutors">Interlocuteurs</option>
-                            <option value="societies">societes</option>
+                            <option value="societies">Sociétés</option>
                         </select>
                     </div>
                 </form>
@@ -96,6 +94,10 @@
                 class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
             </article>
         </section>
+
+        <div class="hidden lg:flex flex-col items-center justify-center">
+            <div class="border-t border-blue-accent mb-2 w-4/5"></div>
+        </div>
 
         <section
             class="flex flex-col lg:flex-row h-[30vh] lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 sm:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
@@ -148,18 +150,6 @@
                 ? collect([Auth::user()->isAdmin() ? 'admin' : null, Auth::user()->isSuperAdmin() ? 'superadmin' : null])->filter()->values()
                 : []
         );
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const select = document.getElementById('add-model-select');
-            if (!window.userRoles.includes('superadmin')) {
-                // Supprime les options "Utilisateur" et "Technicien"
-                Array.from(select.options).forEach(option => {
-                    if (option.value === 'user' || option.value === 'tech') {
-                        option.remove();
-                    }
-                });
-            }
-        });
 
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';

@@ -8,7 +8,7 @@
                 </a>
             </div>
 
-            <nav class="w-2/4 gap-5 hidden lg:flex justify-center items-center">
+            <nav class="w-2/4 gap-5 hidden lg:flex justify-between items-center">
                 <a href="{{ route('dashboard') }}"
                     class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg px-2 {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-accent' : '' }}">
                     ACCUEIL
@@ -68,7 +68,7 @@
 
             <!-- User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                @if(Auth::check())
+                @if (Auth::check())
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button
@@ -85,6 +85,29 @@
                             </button>
                         </x-slot>
                         <x-slot name="content">
+                            @if (Auth::user() && Auth::user()->role === 'superadmin')
+                                <div x-data="{ open: false }" class="relative">
+                                    <button @mouseenter="open = true" @mouseleave="open = false"
+                                        class="w-full text-left flex items-center gap-2 px-4 py-2 hover:text-blue-accent">
+                                        {{ __('GÉRER LES UTILISATEURS') }}
+                                        <svg class="w-4 h-4 transform rotate-0" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                    <div x-show="open" @mouseenter="open = true" @mouseleave="open = false"
+                                        class="absolute left-full top-0 ml-2 w-48 bg-off-white rounded-lg shadow-lg z-50 py-1"
+                                        x-transition>
+                                        <x-dropdown-link href="#" @click.prevent="$dispatch('open-user-modal')">
+                                            {{ __('UTILISATEURS') }}
+                                        </x-dropdown-link>
+                                        <x-dropdown-link href="#" @click.prevent="$dispatch('open-tech-modal')">
+                                            {{ __('TECHNICIENS') }}
+                                        </x-dropdown-link>
+                                    </div>
+                                </div>
+                            @endif
                             <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('PROFIL') }}
                             </x-dropdown-link>
@@ -144,6 +167,16 @@
             class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             PROBLEMES
         </a>
+        @if (Auth::user() && Auth::user()->role === 'superadmin')
+            <div class="flex flex-col gap-0">
+                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-user-modal')">
+                    {{ __('UTILISATEURS') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-tech-modal')">
+                    {{ __('TECHNICIENS') }}
+                </x-responsive-nav-link>
+            </div>
+        @endif
         <x-responsive-nav-link :href="route('profile.edit')">
             {{ __('PROFIL') }}
         </x-responsive-nav-link>
@@ -157,3 +190,19 @@
 
     </nav>
 </nav>
+
+<!-- Modale Utilisateur -->
+<div x-data="{ open: false }" x-on:open-user-modal.window="open = true" x-on:keydown.escape.window="open = false" x-show="open" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-off-white rounded-lg shadow-lg p-6 w-full max-w-xl relative">
+        <button @click="open = false" class="absolute top-2 right-2 text-2xl text-red-accent">&times;</button>
+        @include('model.form_modal', ['model' => 'user', 'action' => 'create'])
+    </div>
+</div>
+
+<!-- Modale Technicien -->
+<div x-data="{ open: false }" x-on:open-tech-modal.window="open = true" x-on:keydown.escape.window="open = false" x-show="open" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-off-white rounded-lg shadow-lg p-6 w-full max-w-xl relative">
+        <button @click="open = false" class="absolute top-2 right-2 text-2xl text-red-accent">&times;</button>
+        @include('model.form_modal', ['model' => 'tech', 'action' => 'create'])
+    </div>
+</div>

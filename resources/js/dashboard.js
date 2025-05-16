@@ -527,7 +527,7 @@ function updateCardsVisibility(entities) {
     const hasSociete = entities.some((e) => e.model === "societe");
     const hasInterlocuteur = entities.some((e) => e.model === "interlocuteur");
 
-    if (window.innerWidth < 768) {
+    if (window.innerWidth <= 1023) {
         // Affiche la section si au moins une entité sélectionnée
         if (hasSociete || hasInterlocuteur) {
             cardSection.classList.remove("hidden");
@@ -537,18 +537,18 @@ function updateCardsVisibility(entities) {
             cardSection.classList.remove("flex");
         }
 
-        if (card1) card1.style.display = hasSociete ? "" : "none";
-        if (card2) card2.style.display = hasSociete ? "" : "none";
-        if (card3) card3.style.display = hasInterlocuteur ? "" : "none";
-        if (card4) card4.style.display = hasInterlocuteur ? "" : "none";
+        if (card1) card1.classList.toggle("hidden", !hasSociete);
+        if (card2) card2.classList.toggle("hidden", !hasSociete);
+        if (card3) card3.classList.toggle("hidden", !hasInterlocuteur);
+        if (card4) card4.classList.toggle("hidden", !hasInterlocuteur);
     } else {
         // Desktop : tout visible, layout classique
         cardSection.classList.remove("hidden");
         cardSection.classList.remove("flex");
-        if (card1) card1.style.display = "";
-        if (card2) card2.style.display = "";
-        if (card3) card3.style.display = "";
-        if (card4) card4.style.display = "";
+        if (card1) card1.classList.remove("hidden");
+        if (card2) card2.classList.remove("hidden");
+        if (card3) card3.classList.remove("hidden");
+        if (card4) card4.classList.remove("hidden");
     }
 }
 
@@ -756,6 +756,8 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     list.querySelectorAll(".service-item").forEach((div) => {
                         const labelElem = div.querySelector("p");
                         const valueElem = div.querySelector(".editable-service-field");
+                        const accordionContent = div.querySelector(".accordion-content");
+                        const arrow = div.querySelector(".accordion-arrow");
                         const label = labelElem?.textContent || "";
                         const value = valueElem?.innerText || "";
                         const match =
@@ -765,9 +767,19 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         if (match && q) {
                             labelElem.innerHTML = highlightText(label, q);
                             valueElem.innerHTML = highlightText(value, q);
+                            // Ouvre l'accordéon si match
+                            if (accordionContent && arrow) {
+                                accordionContent.style.display = "block";
+                                arrow.style.transform = "rotate(180deg)";
+                            }
                         } else {
                             labelElem.innerHTML = label;
                             valueElem.innerHTML = value;
+                            // Ferme l'accordéon si pas de match
+                            if (accordionContent && arrow) {
+                                accordionContent.style.display = "none";
+                                arrow.style.transform = "rotate(0deg)";
+                            }
                         }
                     });
                 });
@@ -970,6 +982,8 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     list.querySelectorAll(".service-item").forEach((div) => {
                         const labelElem = div.querySelector("p");
                         const valueElem = div.querySelector(".editable-service-field");
+                        const accordionContent = div.querySelector(".accordion-content");
+                        const arrow = div.querySelector(".accordion-arrow");
                         const label = labelElem?.textContent || "";
                         const value = valueElem?.innerText || "";
                         const match =
@@ -979,9 +993,19 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         if (match && q) {
                             labelElem.innerHTML = highlightText(label, q);
                             valueElem.innerHTML = highlightText(value, q);
+                            // Ouvre l'accordéon si match
+                            if (accordionContent && arrow) {
+                                accordionContent.style.display = "block";
+                                arrow.style.transform = "rotate(180deg)";
+                            }
                         } else {
                             labelElem.innerHTML = label;
                             valueElem.innerHTML = value;
+                            // Ferme l'accordéon si pas de match
+                            if (accordionContent && arrow) {
+                                accordionContent.style.display = "none";
+                                arrow.style.transform = "rotate(0deg)";
+                            }
                         }
                     });
                 });
