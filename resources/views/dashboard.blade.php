@@ -74,10 +74,6 @@
                     </div>
                 </form>
 
-                <div id="edit-desc-info" class="text-xs text-center text-blue-accent mt-1">
-                    Cliquez sur une entrée pour l'éditer. Cliquez en dehors pour sauvegarder.
-                </div>
-
             </article>
             <article class="mx-auto">
                 <div id="user-search-results" class="mt-4 flex justify-center items-center"></div>
@@ -162,15 +158,6 @@
                         option.remove();
                     }
                 });
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.userRoles && (window.userRoles.includes('admin') || window.userRoles.includes(
-                    'superadmin'))) {
-                document.getElementById('edit-desc-info').style.display = '';
-            } else {
-                document.getElementById('edit-desc-info').style.display = 'none';
             }
         });
 

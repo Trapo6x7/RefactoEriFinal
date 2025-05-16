@@ -347,8 +347,18 @@ document.addEventListener("DOMContentLoaded", function () {
                             let item = document.createElement("button");
                             item.type = "button";
                             item.className =
-                                "text-left text-primary-grey px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer";
-                            item.textContent = suggestion.label ?? suggestion;
+                                "text-left text-primary-grey px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer flex items-center justify-between w-full";
+                            // Détermine l'icône selon le modèle
+                            let iconHtml = '';
+                            const model = suggestion.model || tableSelect.value;
+                            if (model === "societe") {
+                                iconHtml = '<i class="fa-solid fa-building text-blue-accent ml-2"></i>';
+                            } else if (model === "interlocuteur") {
+                                iconHtml = '<i class="fa-solid fa-user text-blue-accent ml-2"></i>';
+                            } else {
+                                iconHtml = '';
+                            }
+                            item.innerHTML = `<span>${suggestion.label ?? suggestion}</span><span>${iconHtml}</span>`;
                             item.onclick = function () {
                                 input.value = suggestion.label ?? suggestion;
                                 suggestionBox.innerHTML = "";
@@ -544,7 +554,8 @@ function updateCardsVisibility(entities) {
             cardSection.classList.remove("flex");
         }
 
-        if (card1) card1.style.display = hasSociete ? "" : "none";
+        // Correction ici : card-1 doit s'afficher si ent1 existe (même interlocuteur)
+        if (card1) card1.style.display = entities[0] ? "" : "none";
         if (card2) card2.style.display = hasSociete ? "" : "none";
         if (card3) card3.style.display = hasInterlocuteur ? "" : "none";
         if (card4) card4.style.display = hasInterlocuteur ? "" : "none";
@@ -579,24 +590,12 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         (allowedKeys[ent1.model] || []).forEach((key) => {
             if (ent1[key]) {
                 coordonneesHtml += `
-                    <div class="my-4 pr-2 w-full break-words flex flex-col">
-                        <p class="font-semibold text-blue-accent">${
-                            window.translatedFields[key]
-                        } :</p>
-                        <span class="editable-field" data-model="${
-                            ent1.model
-                        }" data-id="${
-                    ent1.id
-                }" data-key="${key}" contenteditable="${
-                    window.currentUserRole &&
-                    ["admin", "superadmin"].includes(
-                        window.currentUserRole.toLowerCase()
-                    )
-                        ? "true"
-                        : "false"
-                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
-                    ent1[key]
-                }</span>
+                    <div class="my-2 pr-2 w-full break-words flex flex-col">
+                        <div class="flex items-center justify-between w-full">
+                            <p class="font-semibold text-blue-accent mb-0">${window.translatedFields[key]} :</p>
+                            <span class="edit-lock-btn-placeholder"></span>
+                        </div>
+                        <span class="editable-field" data-model="${ent1.model}" data-id="${ent1.id}" data-key="${key}" contenteditable="${window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase()) ? "true" : "false"}" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;margin-top:2px;">${getClickableValue(key, ent1[key])}</span>
                     </div>`;
             }
         });
@@ -605,8 +604,8 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 ? `<p class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent1.main_obj.id}">Filiale de ${ent1.main_obj.name}</p>`
                 : "";
         card1.innerHTML = `
-            <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
-            <div class="flex flex-col items-center w-full h-full">
+            <div class="relative flex flex-col items-center w-full h-full">
+                <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
                 <h2 class="font-bold text-blue-accent text-lg uppercase">
                     ${
                         ent1.model === "societe"
@@ -633,18 +632,20 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 .then((res) => res.json())
                 .then((interlocutors) => {
                     const selectHtml = `
-                        <label for="interlocutor-select-1" class="block mt-4 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
-                        <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
-                            <option value="">-- Choisir --</option>
-                            ${interlocutors
-                                .map(
-                                    (i) =>
-                                        `<option value="${i.id}">${
-                                            i.fullname || i.name
-                                        }</option>`
-                                )
-                                .join("")}
-                        </select>
+                        <div style="position:sticky;bottom:0;z-index:2;background:white;">
+                            <label for="interlocutor-select-1" class="block mt-2 font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
+                            <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
+                                <option value="">-- Choisir --</option>
+                                ${interlocutors
+                                    .map(
+                                        (i) =>
+                                            `<option value="${i.id}">${
+                                                i.fullname || i.name
+                                            }</option>`
+                                    )
+                                    .join("")}
+                            </select>
+                        </div>
                     `;
                     const oldSelect = document.getElementById(
                         "interlocutor-select-1"
@@ -701,30 +702,21 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     ${services
                         .map(
                             (service, idx) => `
-                        <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
-                                <p>${service.label}</p>
-                                <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
-                            </button>
-                            <div class="accordion-content" style="display:none;">
-                                <span class="editable-service-field" data-model="${
-                                    ent1.model
-                                }" data-id="${ent1.id}" data-service-key="${
-                                service.label
-                            }" contenteditable="${
-                                window.currentUserRole &&
-                                ["admin", "superadmin"].includes(
-                                    window.currentUserRole.toLowerCase()
-                                )
-                                    ? "true"
-                                    : "false"
-                            }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                    ${formatServiceInfo(service.info ?? "Oui")}
-                                </span>
-                            </div>
-                        </div>
-                    `
-                        )
+                    <div class="mb-1 pr-2 w-full break-words flex flex-col service-item">
+                      <button type="button" class="accordion-label flex items-center justify-between w-full px-0 py-1 font-semibold text-blue-accent bg-transparent border-0 focus:outline-none" style="cursor:pointer;">
+                        <span>${service.label}</span>
+                        <span class="flex items-center gap-2">
+                          <span class="accordion-arrow transition-transform duration-200" style="display:inline-block;">
+                            <i class="fa-solid fa-chevron-down"></i>
+                          </span>
+                          <span class="edit-lock-btn-placeholder"></span>
+                        </span>
+                      </button>
+                      <div class="accordion-content" style="display:none;padding-left:0.5em;">
+                        <span class="editable-service-field" data-model="${ent1.model}" data-id="${ent1.id}" data-service-key="${service.label}" contenteditable="${window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase()) ? "true" : "false"}" style="margin-top:2px; border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;">${formatServiceInfo(service.info ?? "Oui")}</span>
+                      </div>
+                    </div>
+                `)
                         .join("")}
                 </div>
             </div>
@@ -734,10 +726,9 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 .querySelectorAll("#services-list-1 .accordion-label")
                 .forEach((btn) => {
                     btn.addEventListener("click", function () {
-                        const content =
-                            this.parentElement.querySelector(
-                                ".accordion-content"
-                            );
+                        const content = this.parentElement.querySelector(
+                            ".accordion-content"
+                        );
                         const arrow = this.querySelector(".accordion-arrow");
                         if (
                             content.style.display === "none" ||
@@ -751,22 +742,14 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         }
                     });
                 });
-        }, 0);
-        document.getElementById("card-2").innerHTML = `
-            <div class="flex flex-col w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
-                ${servicesHtml}
-            </div>
-        `;
-        setTimeout(() => {
             const input = document.getElementById(searchInputId);
             const list = document.getElementById("services-list-1");
             if (input && list) {
                 input.addEventListener("input", function () {
                     const q = this.value.toLowerCase();
                     list.querySelectorAll(".service-item").forEach((div) => {
-                        const labelElem = div.querySelector("p");
-                        const valueElem = div.querySelector("span");
+                        const labelElem = div.querySelector(".accordion-label span");
+                        const valueElem = div.querySelector(".editable-service-field");
                         const label = labelElem?.textContent || "";
                         const value = valueElem?.textContent || "";
                         const match =
@@ -784,6 +767,12 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 });
             }
         }, 0);
+        document.getElementById("card-2").innerHTML = `
+            <div class="flex flex-col w-full h-full">
+                <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+                ${servicesHtml}
+            </div>
+        `;
     }
 
     // --- CARD 3 ---
@@ -793,24 +782,12 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         (allowedKeys[ent2.model] || []).forEach((key) => {
             if (ent2[key]) {
                 coordonneesHtml += `
-                    <div class="my-4 pr-2 w-full break-words flex flex-col">
-                        <p class="font-semibold text-blue-accent">${
-                            window.translatedFields[key]
-                        } :</p>
-                        <span class="editable-field" data-model="${
-                            ent2.model
-                        }" data-id="${
-                    ent2.id
-                }" data-key="${key}" contenteditable="${
-                    window.currentUserRole &&
-                    ["admin", "superadmin"].includes(
-                        window.currentUserRole.toLowerCase()
-                    )
-                        ? "true"
-                        : "false"
-                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
-                    ent2[key]
-                }</span>
+                    <div class="my-2 pr-2 w-full break-words flex flex-col">
+                        <div class="flex items-center justify-between w-full">
+                            <p class="font-semibold text-blue-accent mb-0">${window.translatedFields[key]} :</p>
+                            <span class="edit-lock-btn-placeholder"></span>
+                        </div>
+                        <span class="editable-field" data-model="${ent2.model}" data-id="${ent2.id}" data-key="${key}" contenteditable="${window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase()) ? "true" : "false"}" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;margin-top:2px;">${getClickableValue(key, ent2[key])}</span>
                     </div>`;
             }
         });
@@ -819,8 +796,8 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 ? `<a href="#" class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent2.main_obj.id}">Filiale de ${ent2.main_obj.name}</a>`
                 : "";
         card3.innerHTML = `
-            <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
-            <div class="flex flex-col items-center w-full h-full">
+            <div class="relative flex flex-col items-center w-full h-full">
+                <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
                 <h2 class="font-bold text-blue-accent text-lg uppercase">
                     ${
                         ent2.model === "societe"
@@ -921,30 +898,21 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     ${services
                         .map(
                             (service, idx) => `
-                        <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
-                                <p>${service.label}</p>
-                                <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
-                            </button>
-                            <div class="accordion-content" style="display:none;">
-                                <span class="editable-service-field" data-model="${
-                                    ent2.model
-                                }" data-id="${ent2.id}" data-service-key="${
-                                service.label
-                            }" contenteditable="${
-                                window.currentUserRole &&
-                                ["admin", "superadmin"].includes(
-                                    window.currentUserRole.toLowerCase()
-                                )
-                                    ? "true"
-                                    : "false"
-                            }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                    ${formatServiceInfo(service.info ?? "Oui")}
-                                </span>
-                            </div>
-                        </div>
-                    `
-                        )
+                    <div class="mb-1 pr-2 w-full break-words flex flex-col service-item">
+                      <button type="button" class="accordion-label flex items-center justify-between w-full px-0 py-1 font-semibold text-blue-accent bg-transparent border-0 focus:outline-none" style="cursor:pointer;">
+                        <span>${service.label}</span>
+                        <span class="flex items-center gap-2">
+                          <span class="accordion-arrow transition-transform duration-200" style="display:inline-block;">
+                            <i class="fa-solid fa-chevron-down"></i>
+                          </span>
+                          <span class="edit-lock-btn-placeholder"></span>
+                        </span>
+                      </button>
+                      <div class="accordion-content" style="display:none;padding-left:0.5em;">
+                        <span class="editable-service-field" data-model="${ent2.model}" data-id="${ent2.id}" data-service-key="${service.label}" contenteditable="${window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase()) ? "true" : "false"}" style="margin-top:2px; border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;">${formatServiceInfo(service.info ?? "Oui")}</span>
+                      </div>
+                    </div>
+                `)
                         .join("")}
                 </div>
             </div>
@@ -954,10 +922,9 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 .querySelectorAll("#services-list-2 .accordion-label")
                 .forEach((btn) => {
                     btn.addEventListener("click", function () {
-                        const content =
-                            this.parentElement.querySelector(
-                                ".accordion-content"
-                            );
+                        const content = this.parentElement.querySelector(
+                            ".accordion-content"
+                        );
                         const arrow = this.querySelector(".accordion-arrow");
                         if (
                             content.style.display === "none" ||
@@ -971,22 +938,14 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         }
                     });
                 });
-        }, 0);
-        document.getElementById("card-4").innerHTML = `
-            <div class="flex flex-col w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
-                ${servicesHtml}
-            </div>
-        `;
-        setTimeout(() => {
             const input = document.getElementById(searchInputId);
             const list = document.getElementById("services-list-2");
             if (input && list) {
                 input.addEventListener("input", function () {
                     const q = this.value.toLowerCase();
                     list.querySelectorAll(".service-item").forEach((div) => {
-                        const labelElem = div.querySelector("p");
-                        const valueElem = div.querySelector("span");
+                        const labelElem = div.querySelector(".accordion-label span");
+                        const valueElem = div.querySelector(".editable-service-field");
                         const label = labelElem?.textContent || "";
                         const value = valueElem?.textContent || "";
                         const match =
@@ -1004,6 +963,12 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 });
             }
         }, 0);
+        document.getElementById("card-4").innerHTML = `
+            <div class="flex flex-col w-full h-full">
+                <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+                ${servicesHtml}
+            </div>
+        `;
     }
 
     // --- Listeners dynamiques ---
@@ -1070,7 +1035,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         });
     });
 
-    // Edition inline des coordonnées (cards 1 et 3)
+    // Edition inline des coordonnées (cards 1 et 3) et services (cards 2 et 4) avec lock/délock et modale
     setTimeout(() => {
         if (
             window.currentUserRole &&
@@ -1080,84 +1045,101 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         ) {
             document
                 .querySelectorAll(
-                    "#card-1 .editable-field, #card-3 .editable-field"
+                    "#card-1 .editable-field, #card-3 .editable-field, #card-2 .editable-service-field, #card-4 .editable-service-field"
                 )
                 .forEach((span) => {
-                    span.addEventListener("blur", function () {
-                        const model = this.dataset.model;
-                        const id = this.dataset.id;
-                        const key = this.dataset.key;
-                        const value = this.textContent.trim();
-                        fetch(`/model/${model}/update-field/${id}`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": csrfToken,
-                                Accept: "application/json",
-                            },
-                            body: JSON.stringify({ field: key, value }),
-                        })
-                            .then((res) => res.json())
-                            .then(() => {
-                                this.style.background = "#678BD8";
-                                setTimeout(
-                                    () => (this.style.background = ""),
-                                    500
+                    span.setAttribute("contenteditable", "false");
+                    // Pour les services, le placeholder est dans le bouton accordéon, donc on cherche dans le .service-item parent
+                    let placeholder = span.parentElement.querySelector('.edit-lock-btn-placeholder');
+                    if (!placeholder && span.closest('.service-item')) {
+                        placeholder = span.closest('.service-item').querySelector('.edit-lock-btn-placeholder');
+                    }
+                    if (
+                        (!placeholder && (!span.nextElementSibling || !span.nextElementSibling.classList.contains("edit-lock-btn"))) ||
+                        (placeholder && !placeholder.querySelector('.edit-lock-btn'))
+                    ) {
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "edit-lock-btn ml-2 text-blue-accent";
+                        btn.title = "Déverrouiller pour éditer";
+                        btn.innerHTML = '<i class="fa-solid fa-lock"></i>';
+                        if (placeholder) placeholder.appendChild(btn);
+                        else span.after(btn);
+                        let originalValue = span.textContent;
+                        btn.onclick = async function () {
+                            if (span.isContentEditable) {
+                                // On veut sauvegarder
+                                const confirmed = await showConfirmModal(
+                                    "Voulez-vous enregistrer la modification ?"
                                 );
-                            })
-                            .catch(() => {
-                                this.style.background = "#DB7171";
-                                setTimeout(
-                                    () => (this.style.background = ""),
-                                    1000
-                                );
-                            });
-                    });
-                });
-
-            // Edition inline des services activés (cards 2 et 4)
-            document
-                .querySelectorAll(
-                    "#card-2 .editable-service-field, #card-4 .editable-service-field"
-                )
-                .forEach((span) => {
-                    span.addEventListener("blur", function () {
-                        const model = this.dataset.model;
-                        const id = this.dataset.id;
-                        const serviceLabel = this.dataset.serviceKey;
-                        const value = this.textContent.trim();
-                        const key =
-                            "infos_" +
-                            serviceLabel
-                                .toLowerCase()
-                                .normalize("NFD")
-                                .replace(/[\u0300-\u036f]/g, "")
-                                .replace(/ /g, "_");
-                        fetch(`/model/${model}/update-field/${id}`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": csrfToken,
-                                Accept: "application/json",
-                            },
-                            body: JSON.stringify({ key, value }),
-                        })
-                            .then((res) => res.json())
-                            .then(() => {
-                                this.style.background = "#678BD8";
-                                setTimeout(
-                                    () => (this.style.background = ""),
-                                    500
-                                );
-                            })
-                            .catch(() => {
-                                this.style.background = "#DB7171";
-                                setTimeout(
-                                    () => (this.style.background = ""),
-                                    1000
-                                );
-                            });
-                    });
+                                if (confirmed) {
+                                    // Save (reprend la logique existante)
+                                    const model = span.dataset.model;
+                                    const id = span.dataset.id;
+                                    const key =
+                                        span.dataset.key ||
+                                        "infos_" +
+                                            span.dataset.serviceKey
+                                                ?.toLowerCase()
+                                                .normalize("NFD")
+                                                .replace(/[\u0300-\u036f]/g, "")
+                                                .replace(/ /g, "_");
+                                    const value = span.textContent.trim();
+                                    fetch(
+                                        `/model/${model}/update-field/${id}`,
+                                        {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                                "X-CSRF-TOKEN": csrfToken,
+                                                Accept: "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                field: key,
+                                                value,
+                                            }),
+                                        }
+                                    )
+                                        .then((res) => res.json())
+                                        .then(() => {
+                                            span.style.background = "#678BD8";
+                                            setTimeout(
+                                                () =>
+                                                    (span.style.background =
+                                                        ""),
+                                                500
+                                            );
+                                        })
+                                        .catch(() => {
+                                            span.style.background = "#DB7171";
+                                            setTimeout(
+                                                () =>
+                                                    (span.style.background =
+                                                        ""),
+                                                1000
+                                            );
+                                        });
+                                    originalValue = value;
+                                } else {
+                                    // Annule la modif
+                                    span.textContent = originalValue;
+                                }
+                                span.setAttribute("contenteditable", "false");
+                                btn.innerHTML =
+                                    '<i class="fa-solid fa-lock"></i>';
+                                btn.title = "Déverrouiller pour éditer";
+                            } else {
+                                // On veut déverrouiller
+                                originalValue = span.textContent;
+                                span.setAttribute("contenteditable", "true");
+                                span.focus();
+                                btn.innerHTML =
+                                    '<i class="fa-solid fa-floppy-disk"></i>';
+                                btn.title = "Sauvegarder";
+                            }
+                        };
+                    }
                 });
         } else {
             document
@@ -1191,4 +1173,56 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         selectedEntities = normalizeSelectedEntities(selectedEntities);
         updateCardsVisibility(selectedEntities);
     });
+}
+
+// Helper pour la modale de confirmation
+function showConfirmModal(message) {
+    return new Promise((resolve) => {
+        let modal = document.getElementById("confirm-modal");
+        if (!modal) {
+            modal = document.createElement("div");
+            modal.id = "confirm-modal";
+            modal.style.position = "fixed";
+            modal.style.top = "0";
+            modal.style.left = "0";
+            modal.style.width = "100vw";
+            modal.style.height = "100vh";
+            modal.style.background = "rgba(0,0,0,0.3)";
+            modal.style.display = "flex";
+            modal.style.alignItems = "center";
+            modal.style.justifyContent = "center";
+            modal.style.zIndex = 9999;
+            modal.innerHTML = `
+                <div style="background:white;padding:2em;border-radius:8px;min-width:300px;box-shadow:0 2px 8px #0002;text-align:center;">
+                    <div id="confirm-modal-message" class="mb-4"></div>
+                    <button id="confirm-modal-yes" class="bg-blue-accent text-white px-4 py-2 rounded mr-2">Oui</button>
+                    <button id="confirm-modal-no" class="bg-gray-300 px-4 py-2 rounded">Non</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        modal.querySelector("#confirm-modal-message").textContent = message;
+        modal.style.display = "flex";
+        modal.querySelector("#confirm-modal-yes").onclick = () => {
+            modal.style.display = "none";
+            resolve(true);
+        };
+        modal.querySelector("#confirm-modal-no").onclick = () => {
+            modal.style.display = "none";
+            resolve(false);
+        };
+    });
+}
+
+// Helper pour rendre les champs cliquables (mailto/tel)
+function getClickableValue(key, value) {
+    if (!value) return "";
+    if (key === "email") {
+        return `<a href="mailto:${value}" class="text-blue-accent">${value}</a>`;
+    }
+    if (["phone_fix", "phone_mobile", "boss_phone", "recep_phone"].includes(key)) {
+        const tel = value.replace(/[^+\d]/g, "");
+        return `<a href="tel:${tel}" class="text-blue-accent">${value}</a>`;
+    }
+    return value;
 }

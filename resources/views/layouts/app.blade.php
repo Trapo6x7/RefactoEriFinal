@@ -12,7 +12,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Scripts -->
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -20,22 +20,22 @@
 
 <body class="font-sans antialiased min-h-screen flex flex-col bg-off-white">
 
-        @include('layouts.navigation')
+    @include('layouts.navigation')
 
-        <!-- Page Heading -->
-        @isset($header)
-            <header id="dashboard-header" class="hidden">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endisset
+    <!-- Page Heading -->
+    @isset($header)
+        <header id="dashboard-header" class="hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {{ $header }}
+            </div>
+        </header>
+    @endisset
 
-        <!-- Page Content -->
-        <main class="flex-1">
-            {{ $slot }}
-        </main>
-        @include('layouts.footer')
+    <!-- Page Content -->
+    <main class="flex-1">
+        {{ $slot }}
+    </main>
+    @include('layouts.footer')
 
 </body>
 <script>
