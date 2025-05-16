@@ -17,9 +17,9 @@
                 style="max-width:180px;">
                 <option value="">Toutes les tables</option>
                 <option value="users">Utilisateurs</option>
-                <option value="societies">Sociétés</option>
+                <option value="societies">societes</option>
                 <option value="techs">Techniciens</option>
-                <option value="problems">Problèmes</option>
+                <option value="problems">problemes</option>
                 <option value="problemStatuses">Statuts</option>
                 <option value="interlocutors">Interlocuteurs</option>
                 <option value="envs">Environnements</option>

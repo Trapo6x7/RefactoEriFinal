@@ -133,7 +133,7 @@ return [
 
     // The guard that protects the Backpack admin panel.
     // If null, the config.auth.defaults.guard value will be used.
-    'guard' => 'admin',
+    'guard' => 'backpack',
 
     // The password reset configuration for Backpack.
     // If null, the config.auth.defaults.passwords value will be used.
@@ -144,11 +144,11 @@ return [
     // Other options:
     // - null (generic image with their first letter)
     // - example_method_name (specify the method on the User model that returns the URL)
-    // 'avatar_type' => 'gravatar',
-    'favicon' => 'imgs/logobleusanstexte.png',
+    'avatar_type' => 'gravatar',
+
     // Gravatar fallback options are 'identicon', 'monsterid', 'wavatar', 'retro', 'robohash', 'blank'
     // 'blank' will keep the generic image with the user first letter
-    // 'gravatar_fallback' => 'blank',
+    'gravatar_fallback' => 'blank',
 
     /*
     |--------------------------------------------------------------------------

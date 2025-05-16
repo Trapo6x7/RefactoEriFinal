@@ -4,7 +4,7 @@
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
                     <span class="mr-2"><i class="la la-building"></i></span>
-                    <h3 class="font-bold text-sm text-primary-grey">Sociétés</h3>
+                    <h3 class="font-bold text-lg text-primary-grey">societes</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @php
@@ -14,9 +14,9 @@
                     @foreach ($societies as $society)
                         <li>
                             @if ($society->main)
-                                <a href="{{ route('model.show', ['model' => 'société', 'id' => $society->main->id]) }}"
+                                <a href="{{ route('model.show', ['model' => 'societe', 'id' => $society->main->id]) }}"
                                     class="search-result-link text-primary-grey hover:text-blue-accent"
-                                    data-model="société"
+                                    data-model="societe"
                                     @foreach (\Illuminate\Support\Arr::only($society->getAttributes(), $allowedKeys) as $key => $value)
                                     data-{{ $key }}="{{ $value }}" @endforeach
                                     data-id="{{ $society->id }}" data-main_name="{{ $society->main->name }}">
@@ -25,9 +25,9 @@
                                         class="ml-2 text-xs text-blue-hover font-semibold">({{ $society->main->name }})</span>
                                 </a>
                             @else
-                                <a href="{{ route('model.show', ['model' => 'société', 'id' => $society->id]) }}"
+                                <a href="{{ route('model.show', ['model' => 'societe', 'id' => $society->id]) }}"
                                     class="search-result-link text-primary-grey hover:text-blue-accent"
-                                    data-model="société"
+                                    data-model="societe"
                                     @foreach (\Illuminate\Support\Arr::only($society->getAttributes(), $allowedKeys) as $key => $value)
                                     data-{{ $key }}="{{ $value }}" @endforeach
                                     data-id="{{ $society->id }}">
@@ -44,7 +44,7 @@
             <div class=" rounded-lg p-4 min-w-[300px] max-w-xs flex-shrink-0">
                 <div class="flex items-center mb-2">
                     <span class="mr-2"><i class="la la-user"></i></span>
-                    <h3 class="font-bold text-sm text-primary-grey">Interlocuteurs</h3>
+                    <h3 class="font-bold text-lg text-primary-grey">Interlocuteurs</h3>
                 </div>
                 <ul class="text-primary-grey">
                     @php

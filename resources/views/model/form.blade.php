@@ -20,17 +20,21 @@
             @method('POST')
         @endif
 
-        <div class="overflow-y-auto max-h-[60vh] px-2 flex flex-col gap-4 text-sm">
-            @if ($model === 'société')
+        <div class="overflow-y-auto max-h-[60vh] px-2 flex flex-col gap-4 text-lg">
+            @if ($model === 'societe')
                 @include('model.partials._society_field')
             @elseif($model === 'interlocuteur')
                 @include('model.partials._interlocutor_field')
             @elseif($model === 'environnement')
                 @include('model.partials._env_field')
-            @elseif($model === 'problème')
+            @elseif($model === 'probleme')
                 @include('model.partials._problem_field')
             @elseif($model === 'outil')
                 @include('model.partials._tool_field')
+            @elseif($model === 'user')
+                @include('model.partials._user_field')
+            @elseif($model === 'tech')
+                @include('model.partials._tech_field')
             @endif
         </div>
 

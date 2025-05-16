@@ -5,29 +5,29 @@
             $serviceValue = old($name, $instance->$name ?? 0);
             $infoValue = old($infoField, $instance->$infoField ?? '');
         @endphp
-        <label for="{{ $name }}" class="block text-sm font-medium text-gray-700 mb-1 text-center uppercase">
+        <label for="{{ $name }}" class="block text-lg font-medium text-gray-700 mb-1 text-center uppercase">
             {{ __('fields.' . $name) }}
         </label>
         <select name="{{ $name }}" id="{{ $name }}"
-            class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm"
+            class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg"
             onchange="document.getElementById('container_{{ $infoField }}').style.display = this.value == 1 ? '' : 'none';">
             <option value="0" {{ $serviceValue == 0 ? 'selected' : '' }}>Non</option>
             <option value="1" {{ $serviceValue == 1 ? 'selected' : '' }}>Oui</option>
         </select>
         <div class="mt-2" id="container_{{ $infoField }}" style="display: {{ $serviceValue == 1 ? '' : 'none' }};">
             <input type="text" name="{{ $infoField }}" id="{{ $infoField }}" value="{{ $infoValue }}"
-                class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm"
+                class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg"
                 placeholder="{{ __('fields.' . $infoField) }}">
         </div>
     @elseif (!str_starts_with($name, 'infos_') && !str_starts_with($name, 'fullname'))
-        <label for="{{ $name }}" class="block text-sm font-medium text-gray-700 mb-1 text-center uppercase">
+        <label for="{{ $name }}" class="block text-lg font-medium text-gray-700 mb-1 text-center uppercase">
             {{ __('fields.' . $name) }}
         </label>
         @if ($name === 'societe')
             <select id="societe" name="societe"
                 class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
                 required>
-                <option value="">Sélectionner une société</option>
+                <option value="">Sélectionner une societe</option>
                 @foreach ($societies as $society)
                     <option value="{{ $society->id }}"
                         {{ old('societe', $instance->societe ?? '') == $society->id ? 'selected' : '' }}>

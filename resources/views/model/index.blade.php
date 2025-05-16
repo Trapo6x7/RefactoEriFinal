@@ -8,7 +8,7 @@
         </div>
 
         <div class=" rounded-lg" style="max-height: 600px; overflow-y: auto;">
-            <table class="w-full text-sm">
+            <table class="w-full text-lg">
                 <thead>
                     <tr>
                         <th class="py-2 px-4 border-b text-center bg-blue-accent text-secondary-grey">NOM</th>

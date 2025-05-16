@@ -27,7 +27,7 @@ class SocietyCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Society::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/society');
-        CRUD::setEntityNameStrings('society', 'Sociétés');
+        CRUD::setEntityNameStrings('society', 'societes');
     }
 
     /**

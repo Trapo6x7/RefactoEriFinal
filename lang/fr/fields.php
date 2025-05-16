@@ -43,8 +43,8 @@ return [
     'phone_mobile' => 'Téléphone portable',
     'env' => "Environnement",
     'tool' => 'Outil',
-    'society_id' => 'Société',
+    'society_id' => 'societe',
     'fullname' => 'Nom complet',
-    'main_name' => 'Société principale',
-    'id_main' => 'Société principale',
+    'main_name' => 'societe principale',
+    'id_main' => 'societe principale',
 ];

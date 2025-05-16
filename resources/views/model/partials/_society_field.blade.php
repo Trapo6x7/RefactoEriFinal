@@ -4,11 +4,11 @@
     $selectedStatus = $client && $distrib ? 'both' : ($client ? 'client' : ($distrib ? 'distrib' : 'none'));
 @endphp
 <div class="mb-4">
-    <label for="status_combined" class="block text-sm font-medium text-gray-700 mb-1 text-center uppercase">
+    <label for="status_combined" class="block text-lg font-medium text-gray-700 mb-1 text-center uppercase">
         Client / Distributeur
     </label>
     <select name="status_combined" id="status_combined"
-        class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
+        class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
         <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
         <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur</option>
         <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur</option>
@@ -22,14 +22,14 @@
         <div class="mb-4">
             @if (!str_starts_with($name, 'infos_'))
                 <label for="{{ $name }}"
-                    class="block text-sm font-medium text-gray-700 mb-1 text-center uppercase">
+                    class="block text-lg font-medium text-gray-700 mb-1 text-center uppercase">
                     {{ __('fields.' . $name) }}
                 </label>
             @endif
 
             @if ($name === 'status')
                 <select name="status" id="status"
-                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
                     @if ($config['required']) required @endif>
                     <option value="active" {{ old('status', $instance->status ?? '') == 'active' ? 'selected' : '' }}>
                         Actif
@@ -40,8 +40,8 @@
                 </select>
             @elseif ($name === 'id_main')
                 <select name="id_main" id="id_main"
-                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
-                    <option value="0">Sélectionnez une société</option>
+                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
+                    <option value="0">Sélectionnez une societe</option>
                     @foreach ($societies as $society)
                         <option value="{{ $society->id }}"
                             {{ old('id_main', $instance->id_main ?? '') == $society->id ? 'selected' : '' }}>
@@ -56,7 +56,7 @@
                     $infoValue = old($infoField, $instance->$infoField ?? '');
                 @endphp
                 <select name="{{ $name }}" id="{{ $name }}"
-                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm"
+                    class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg"
                     onchange="document.getElementById('container_{{ $infoField }}').style.display = this.value == 1 ? '' : 'none';">
                     <option value="0" {{ $serviceValue == 0 ? 'selected' : '' }}>Non</option>
                     <option value="1" {{ $serviceValue == 1 ? 'selected' : '' }}>Oui</option>
@@ -65,7 +65,7 @@
                     style="display: {{ $serviceValue == 1 ? '' : 'none' }};">
                     <input type="text" name="{{ $infoField }}" id="{{ $infoField }}"
                         value="{{ $infoValue }}"
-                        class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-sm"
+                        class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg"
                         placeholder="{{ __('fields.' . $infoField) }}">
                 </div>
             @elseif (!str_starts_with($name, 'infos_'))
@@ -73,7 +73,7 @@
                     value="{{ old($name, $instance->$name ?? '') }}"
                     placeholder="{{ $config['type'] === 'number' ? __('Entrez un nombre entier') : __('fields.' . $name) }}"
                     @if ($config['required']) required @endif
-                    class="w-full px-4 py-2 border text-sm border-secondary-grey rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
+                    class="w-full px-4 py-2 border text-lg border-secondary-grey rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent">
             @endif
         </div>
     @endif

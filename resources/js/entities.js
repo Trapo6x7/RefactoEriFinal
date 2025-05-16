@@ -15,21 +15,21 @@ export function addEntityToSelection(entity, allowedKeys, showSelectedEntitiesCa
     if (
         entity.model === "interlocuteur" &&
         selectedEntities.length === 2 &&
-        selectedEntities[0].model === "société" &&
+        selectedEntities[0].model === "societe" &&
         selectedEntities[1].model === "interlocuteur"
     ) {
         selectedEntities[1] = entity;
     } else if (
         entity.model === "interlocuteur" &&
         selectedEntities.length === 2 &&
-        selectedEntities[1].model === "société" &&
+        selectedEntities[1].model === "societe" &&
         selectedEntities[0].model === "interlocuteur"
     ) {
         selectedEntities[0] = entity;
     } else if (
         entity.model === "interlocuteur" &&
         selectedEntities.length === 1 &&
-        selectedEntities[0].model === "société"
+        selectedEntities[0].model === "societe"
     ) {
         selectedEntities.push(entity);
     } else if (

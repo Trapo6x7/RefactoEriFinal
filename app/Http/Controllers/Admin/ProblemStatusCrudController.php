@@ -27,7 +27,7 @@ class ProblemStatusCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\ProblemStatus::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/problem-status');
-        CRUD::setEntityNameStrings('problem status', 'Statut des problèmes');
+        CRUD::setEntityNameStrings('problem status', 'Statut des problemes');
     }
 
     /**

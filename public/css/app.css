@@ -1634,12 +1634,12 @@ select {
   line-height: 2rem;
 }
 
-.text-sm {
+.text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
 }
 
-.text-sm {
+.text-lg {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
@@ -2183,7 +2183,7 @@ select {
     line-height: 1.5rem;
   }
 
-  .lg\:text-sm {
+  .lg\:text-lg {
     font-size: 0.875rem;
     line-height: 1.25rem;
   }

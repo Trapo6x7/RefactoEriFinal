@@ -45,9 +45,9 @@ return [
     'tool' => 'Outil',
     'email' => 'Email',
     'id_teamviewer' => 'TeamViewer',
-    'society_id' => 'Société',
+    'society_id' => 'societe',
     'fullname' => 'Nom complet',
-    'main_name' => 'Société principale',
-    'id_main' => 'Société principale',
-    'societe' => 'Société',
+    'main_name' => 'societe principale',
+    'id_main' => 'societe principale',
+    'societe' => 'societe',
 ];

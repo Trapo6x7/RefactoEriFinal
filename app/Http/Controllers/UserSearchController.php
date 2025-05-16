@@ -67,7 +67,7 @@ class UserSearchController extends Controller
                     ->map(fn($s) => [
                         'label' => $s->name,
                         'id' => $s->id,
-                        'model' => 'société'
+                        'model' => 'societe'
                     ])
                     ->toArray()
             );

@@ -27,7 +27,7 @@ class ProblemCrudController extends CrudController
     {
         CRUD::setModel(\App\Models\Problem::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/problem');
-        CRUD::setEntityNameStrings('problem', 'Problèmes courants');
+        CRUD::setEntityNameStrings('problem', 'problemes courants');
     }
 
     /**

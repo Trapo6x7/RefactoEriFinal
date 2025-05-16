@@ -27,7 +27,7 @@
             @endif
 
             @if ($societies->count())
-                <strong class="text-info">Sociétés</strong>
+                <strong class="text-info">societes</strong>
                 <ul class="list-group list-group-flush mb-3">
                     @foreach ($societies as $society)
                         <li class="list-group-item bg-transparent text-light border-0 ps-0">
@@ -57,7 +57,7 @@
             @endif
 
             @if ($problems->count())
-                <strong class="text-info">Problèmes</strong>
+                <strong class="text-info">problemes</strong>
                 <ul class="list-group list-group-flush mb-3">
                     @foreach ($problems as $problem)
                         <li class="list-group-item bg-transparent text-light border-0 ps-0">

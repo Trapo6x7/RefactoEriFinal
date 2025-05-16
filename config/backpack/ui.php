@@ -18,8 +18,8 @@ return [
     // and choosing that view_namespace instead of the default one. Backpack will load a file from there
     // if it exists, otherwise it will load it from the fallback namespace.
 
-    'view_namespace' => 'backpack.theme-tabler::',
-    'view_namespace_fallback' => 'backpack.theme-tabler::',
+    'view_namespace' => 'backpack.theme-coreuiv2::',
+    'view_namespace_fallback' => 'backpack.theme-coreuiv2::',
 
     /*
     |--------------------------------------------------------------------------
@@ -63,7 +63,7 @@ return [
     'home_link' => '',
 
     // Menu logo. You can replace this with an <img> tag if you have a logo.
-    'project_logo' => '<b>E-R.I.</b>admin',
+    'project_logo' => '<b>Back</b>pack',
 
     // Show / hide breadcrumbs on admin panel pages.
     'breadcrumbs' => true,
@@ -73,20 +73,20 @@ return [
     // ------
 
     // Developer or company name. Shown in footer.
-    // 'developer_name' => 'Cristian Tabacitu',
+    'developer_name' => 'Cristian Tabacitu',
 
     // Developer website. Link in footer. Type false if you want to hide it.
-    // 'developer_link' => 'http://tabacitu.ro',
+    'developer_link' => 'http://tabacitu.ro',
 
     // Show powered by Laravel Backpack in the footer? true/false
-    'show_powered_by' => false,
+    'show_powered_by' => true,
 
     // ---------
     // DASHBOARD
     // ---------
 
     // Show "Getting Started with Backpack" info block?
-    'show_getting_started' => env('APP_ENV') == false,
+    'show_getting_started' => env('APP_ENV') == 'local',
 
     // -------------
     // GLOBAL STYLES
@@ -94,21 +94,20 @@ return [
 
     // CSS files that are loaded in all pages, using Laravel's asset() helper
     'styles' => [
-        'build/assets/app-DAxogLot.css'
+        // 'styles/example.css',
         // 'https://some-cdn.com/example.css',
     ],
 
     // CSS files that are loaded in all pages, using Laravel's mix() helper
-    // 'mix_styles' => [ // file_path => manifest_directory_path
-    //     'css/app.css' => '',
-    //     'css/style.css' => '',
-    // ],
+    'mix_styles' => [ // file_path => manifest_directory_path
+        // 'css/app.css' => '',
+    ],
 
     // CSS files that are loaded in all pages, using Laravel's @vite() helper
     // Please note that support for Vite was added in Laravel 9.19. Earlier versions are not able to use this feature.
-    // 'vite_styles' => [ // resource file_path
-    //     'resources/css/custom.css',
-    // ],
+    'vite_styles' => [ // resource file_path
+        // 'resources/css/app.css',
+    ],
 
     // --------------
     // GLOBAL SCRIPTS
@@ -116,23 +115,21 @@ return [
 
     // JS files that are loaded in all pages, using Laravel's asset() helper
     'scripts' => [
-        'build/assets/dashboard-D2rRUM3a.js',
-        // 'css/app.css',
+        // 'js/example.js',
         // 'https://cdn.jsdelivr.net/npm/vue@2.4.4/dist/vue.min.js',
         // 'https://cdn.jsdelivr.net/npm/react@16/umd/react.production.min.js',
         // 'https://cdn.jsdelivr.net/npm/react-dom@16/umd/react-dom.production.min.js',
     ],
 
     // JS files that are loaded in all pages, using Laravel's mix() helper
-    // 'mix_scripts' => [ // file_path => manifest_directory_path
-    //     // 'js/app.js' => '',
-    // ],
+    'mix_scripts' => [ // file_path => manifest_directory_path
+        // 'js/app.js' => '',
+    ],
 
-    // // JS files that are loaded in all pages, using Laravel's @vite() helper
-    // 'vite_scripts' => [ // resource file_path
-    //     // 'resources/js/app.js',
-    //     'resources/js/dashboard.js',
-    // ],
+    // JS files that are loaded in all pages, using Laravel's @vite() helper
+    'vite_scripts' => [ // resource file_path
+        // 'resources/js/app.js',
+    ],
 
     'classes' => [
         /**

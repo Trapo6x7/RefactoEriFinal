@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Auth;
 class ModelController extends Controller
 {
     protected $models = [
-        'société'       => \App\Models\Society::class,
+        'societe'       => \App\Models\Society::class,
         'interlocuteur' => \App\Models\Interlocutor::class,
         'environnement' => \App\Models\Env::class,
-        'problème'      => \App\Models\Problem::class,
+        'probleme'      => \App\Models\Problem::class,
         'outil'         => \App\Models\Tool::class,
+        'user'          => \App\Models\User::class,
+        'tech'          => \App\Models\Tech::class,
     ];
 
     public function index($model)
@@ -35,7 +37,7 @@ class ModelController extends Controller
         $instance = $id ? $this->models[$model]::findOrFail($id) : null;
 
         $rules = [
-            'société' => [
+            'societe' => [
                 'id_main'                           => 'required|integer|min:0',
                 'name'                              => 'required|string|max:255',
                 'status_client'                     => 'required|integer',
@@ -93,7 +95,7 @@ class ModelController extends Controller
             'environnement' => [
                 'name' => 'required|string|max:255',
             ],
-            'problème' => [
+            'probleme' => [
                 'title'       => 'required|string',
                 'env'         => 'nullable|integer',
                 'tool'        => 'nullable|integer',
@@ -101,6 +103,15 @@ class ModelController extends Controller
                 'description' => 'nullable|string',
             ],
             'outil' => [
+                'name' => 'required|string|max:255',
+            ],
+            'user' => [
+                'name'     => 'required|string|max:255',
+                'email'    => 'required|email|max:255|unique:users,email' . ($id ? ',' . $id : ''),
+                'password' => $id ? 'nullable|string|min:8' : 'required|string|min:8',
+                'role'     => 'required|string|max:50',
+            ],
+            'tech' => [
                 'name' => 'required|string|max:255',
             ],
         ];
@@ -112,31 +123,27 @@ class ModelController extends Controller
         $tools = null;
         $envs = null;
 
-        // Pour le select société parente (id_main) dans le formulaire société
-        if ($model === 'société') {
+        if ($model === 'societe') {
             $excludeId = $instance ? $instance->id : 0;
             $societies = \App\Models\Society::where('id', '!=', $excludeId)
                 ->alphabetical()
                 ->get(['id', 'name']);
         }
 
-        // Pour les autres modèles qui ont besoin de sociétés
-        if (in_array($model, ['interlocuteur', 'problème'])) {
+        if (in_array($model, ['interlocuteur', 'probleme'])) {
             $societies = \App\Models\Society::alphabetical()->get(['id', 'name']);
         }
-        if ($model === 'problème') {
+        if ($model === 'probleme') {
             $tools = \App\Models\Tool::alphabetical()->get(['id', 'name']);
             $envs = \App\Models\Env::alphabetical()->get(['id', 'name']);
         }
 
         $viewData = compact('model', 'action', 'instance', 'fields', 'societies', 'tools', 'envs');
 
-        // Si la requête est AJAX (modale), retourne la vue modale
         if (request()->ajax()) {
             return view('model.form_modal', $viewData);
         }
 
-        // Sinon, retourne la vue classique
         return view('model.form', $viewData);
     }
 
@@ -146,7 +153,7 @@ class ModelController extends Controller
         $class = $this->models[$model];
 
         $rules = [
-            'société' => [
+            'societe' => [
                 'id_main'                           => 'required|integer|min:0',
                 'name'                              => 'required|string|max:255',
                 'status_client'                     => 'required|integer',
@@ -204,7 +211,7 @@ class ModelController extends Controller
             'environnement' => [
                 'name' => 'required|string|max:255',
             ],
-            'problème' => [
+            'probleme' => [
                 'title'       => 'required|string',
                 'env'         => 'nullable|integer',
                 'tool'        => 'nullable|integer',
@@ -214,12 +221,28 @@ class ModelController extends Controller
             'outil' => [
                 'name' => 'required|string|max:255',
             ],
+            'user' => [
+                'name'     => 'required|string|max:255',
+                'email'    => 'required|email|max:255|unique:users,email' . ($id ? ',' . $id : ''),
+                'password' => $id ? 'nullable|string|min:8' : 'required|string|min:8',
+                'role'     => 'required|string|max:50',
+            ],
+            'tech' => [
+                'name' => 'required|string|max:255',
+            ],
         ];
 
         $validated = $request->validate($rules[$model]);
 
         if ($model === 'interlocuteur') {
             $validated['fullname'] = trim(($validated['name'] ?? '') . ' ' . ($validated['lastname'] ?? ''));
+        }
+
+        // Hash du mot de passe pour user
+        if ($model === 'user' && !empty($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
+        } elseif ($model === 'user') {
+            unset($validated['password']);
         }
 
         if ($action === 'create') {
@@ -237,16 +260,16 @@ class ModelController extends Controller
         $tools = null;
         $envs = null;
 
-        if ($model === 'société') {
+        if ($model === 'societe') {
             $excludeId = $instance ? $instance->id : 0;
             $societies = \App\Models\Society::where('id', '!=', $excludeId)
                 ->alphabetical()
                 ->get(['id', 'name']);
         }
-        if (in_array($model, ['interlocuteur', 'problème'])) {
+        if (in_array($model, ['interlocuteur', 'probleme'])) {
             $societies = \App\Models\Society::alphabetical()->get(['id', 'name']);
         }
-        if ($model === 'problème') {
+        if ($model === 'probleme') {
             $tools = \App\Models\Tool::alphabetical()->get(['id', 'name']);
             $envs = \App\Models\Env::alphabetical()->get(['id', 'name']);
         }
@@ -279,11 +302,10 @@ class ModelController extends Controller
 
         if (request()->wantsJson() || request()->ajax()) {
             $data = $item->toArray();
-            // Ajoute les services actifs si la méthode existe
             if (method_exists($item, 'activeServicesWithInfos')) {
                 $data['active_services'] = $item->activeServicesWithInfos();
             }
-            if ($model === 'société' && $item->main) {
+            if ($model === 'societe' && $item->main) {
                 $data['main_obj'] = $item->main->toArray();
             }
             return response()->json($data);
@@ -303,7 +325,6 @@ class ModelController extends Controller
         $field = $request->input('field');
         $value = $request->input('value');
 
-        // Sécurise les champs éditables
         if (!array_key_exists($field, $item->getAttributes())) {
             return response()->json(['success' => false, 'message' => 'Invalid field'], 400);
         }

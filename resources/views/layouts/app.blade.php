@@ -15,14 +15,11 @@
 
     <!-- Scripts -->
 
-    <link rel="stylesheet" href="{{ asset('build/assets/app-DGGxN_h7.css') }}">
-    <script src="{{ asset('build/assets/app-BBCQS6KE.js') }}" type="module"></script>
-
-    <script src="//unpkg.com/alpinejs" defer></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased min-h-screen flex flex-col justify-between bg-off-white">
-    <div class="min-h-screen ">
+<body class="font-sans antialiased min-h-screen flex flex-col bg-off-white">
+
         @include('layouts.navigation')
 
         <!-- Page Heading -->
@@ -38,8 +35,8 @@
         <main class="flex-1">
             {{ $slot }}
         </main>
-        {{-- @include('layouts.footer') --}}
-    </div>
+        @include('layouts.footer')
+
 </body>
 <script>
     window.translatedFields = @json(__('fields'));

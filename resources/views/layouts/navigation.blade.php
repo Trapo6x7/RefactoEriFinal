@@ -10,12 +10,12 @@
 
             <nav class="w-2/4 gap-5 hidden lg:flex justify-center items-center">
                 <a href="{{ route('dashboard') }}"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-accent' : '' }}">
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg px-2 {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-accent' : '' }}">
                     ACCUEIL
                 </a>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/société*') || request()->is('model/interlocuteur*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey font-bold text-lg px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'border-b-2 border-blue-accent' : '' }}">
                         EXTERNE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -23,19 +23,19 @@
                     </button>
                     <div x-show="open" @click.away="open = false"
                         class="absolute left-0 mt-2 w-40 bg-off-white rounded-lg shadow-lg z-50 py-1" x-transition>
-                        <a href="{{ route('model.index', ['model' => 'société']) }}"
-                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/société*') ? 'font-bold text-blue-accent' : '' }}">
+                        <a href="{{ route('model.index', ['model' => 'societe']) }}"
+                            class="block px-4 py-2 text-lg  hover:text-blue-accent {{ request()->is('model/societe*') ? 'font-bold text-blue-accent' : '' }}">
                             SOCIETES
                         </a>
                         <a href="{{ route('model.index', ['model' => 'interlocuteur']) }}"
-                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-lg  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
                             INTERLOCUTEURS
                         </a>
                     </div>
                 </div>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/problème*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'border-b-2 border-blue-accent' : '' }}">
                         MAINTENANCE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -44,15 +44,15 @@
                     <div x-show="open" @click.away="open = false"
                         class="absolute left-0 mt-2 w-48 bg-off-white rounded-lg shadow-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
-                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-lg  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
                             ENVIRONNEMENTS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'outil']) }}"
-                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-lg  hover:text-blue-accent {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
                             OUTILS
                         </a>
-                        <a href="{{ route('model.index', ['model' => 'problème']) }}"
-                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/problème*') ? 'font-bold text-blue-accent' : '' }}">
+                        <a href="{{ route('model.index', ['model' => 'probleme']) }}"
+                            class="block px-4 py-2 text-lg  hover:text-blue-accent {{ request()->is('model/probleme*') ? 'font-bold text-blue-accent' : '' }}">
                             PROBLEMES
                         </a>
                     </div>
@@ -72,7 +72,7 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button
-                                class="uppercase hidden lg:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-150">
+                                class="uppercase hidden lg:flex items-center px-3 py-2 border border-transparent text-lg leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-150">
                                 <div>{{ Auth::user()->name }}</div>
                                 <div class="ms-1">
                                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -121,27 +121,27 @@
     <nav x-show="open" @click.away="open = false"
         class="absolute top-20 left-0 w-full bg-off-white flex flex-col items-center gap-4 py-4 lg:hidden z-50">
         <a href="{{ route('dashboard') }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             ACCUEIL
         </a>
         <a href="{{ route('model.index', ['model' => 'society']) }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             SOCIETES
         </a>
         <a href="{{ route('model.index', ['model' => 'interlocuteur']) }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             INTERLOCUTEURS
         </a>
         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             ENVIRONNEMENTS
         </a>
         <a href="{{ route('model.index', ['model' => 'tool']) }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             OUTILS
         </a>
         <a href="{{ route('model.index', ['model' => 'problem']) }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm">
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-lg">
             PROBLEMES
         </a>
         <x-responsive-nav-link :href="route('profile.edit')">

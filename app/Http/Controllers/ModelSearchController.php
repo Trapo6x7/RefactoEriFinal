@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 class ModelSearchController extends Controller
 {
     protected $models = [
-        'société'       => \App\Models\Society::class,
+        'societe'       => \App\Models\Society::class,
         'interlocuteur' => \App\Models\Interlocutor::class,
         'environnement' => \App\Models\Env::class,
-        'problème'      => \App\Models\Problem::class,
+        'probleme'      => \App\Models\Problem::class,
         'outil'         => \App\Models\Tool::class,
     ];
 
@@ -23,9 +23,9 @@ class ModelSearchController extends Controller
         $search = $request->query('q');
 
         $fields = match ($model) {
-            'société', 'outil', 'environnement' => ['name'],
+            'societe', 'outil', 'environnement' => ['name'],
             'interlocuteur' => ['name', 'lastname', 'fullname', 'email'],
-            'problème' => ['title', 'description'],
+            'probleme' => ['title', 'description'],
             default => ['name'],
         };
 

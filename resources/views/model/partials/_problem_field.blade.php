@@ -37,13 +37,13 @@
     @endforeach
 </select>
 
-<label class="uppercase" for="societe">Société</label>
+<label class="uppercase" for="societe">societe</label>
 <select
     id="societe"
     name="societe"
     class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
 >
-    <option value="">Sélectionner une société</option>
+    <option value="">Sélectionner une societe</option>
     @foreach($societies as $societe)
         <option value="{{ $societe->id }}" {{ old('societe', $instance->societe ?? '') == $societe->id ? 'selected' : '' }}>
             {{ $societe->name }}

@@ -4,7 +4,7 @@ import { addServiceEditListeners } from './services.js';
 
 const allowedKeys = {
     interlocuteur: ["lastname", "name", "society_id", "email", "phone"],
-    société: [
+    societe: [
         "name",
         "adress",
         "boss_name",
@@ -185,7 +185,7 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById(`card-${i}`).innerHTML = "";
     }
 
-    // Affiche la première entité (société ou interlocuteur)
+    // Affiche la première entité (societe ou interlocuteur)
     const ent1 = entities[0];
     if (ent1) {
         let coordonneesHtml = "";
@@ -208,9 +208,9 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById("card-1").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-                <h2 class="font-bold text-blue-accent text-sm mb-2">
+                <h2 class="font-bold text-blue-accent text-lg mb-2">
                     ${
-                        ent1.model === "société"
+                        ent1.model === "societe"
                             ? ent1.name
                             : ent1.model === "interlocuteur"
                             ? ent1.fullname
@@ -221,8 +221,8 @@ function showSelectedEntitiesCard(entities) {
             </div>
         `;
 
-        // Ajout du select interlocuteur si ent1 est une société
-        if (ent1.model === "société") {
+        // Ajout du select interlocuteur si ent1 est une societe
+        if (ent1.model === "societe") {
             fetch(`/societe/${ent1.id}/interlocuteurs`, {
                 headers: { Accept: "application/json" },
             })
@@ -313,7 +313,7 @@ function showSelectedEntitiesCard(entities) {
             `;
             document.getElementById("card-2").innerHTML = `
                 <div class="flex flex-col w-full h-full">
-                    <h2 class="font-bold text-blue-accent text-sm mb-2">Services activés</h2>
+                    <h2 class="font-bold text-blue-accent text-lg mb-2">Services activés</h2>
                     ${servicesHtml}
                 </div>
             `;
@@ -338,7 +338,7 @@ function showSelectedEntitiesCard(entities) {
         }
     }
 
-    // Affiche la deuxième entité (société ou interlocuteur)
+    // Affiche la deuxième entité (societe ou interlocuteur)
     const ent2 = entities[1];
     if (ent2) {
         let coordonneesHtml = "";
@@ -360,9 +360,9 @@ function showSelectedEntitiesCard(entities) {
         document.getElementById("card-3").innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
             <div class="flex flex-col items-center w-full h-full">
-                <h2 class="font-bold text-blue-accent text-sm mb-2">
+                <h2 class="font-bold text-blue-accent text-lg mb-2">
                     ${
-                        ent2.model === "société"
+                        ent2.model === "societe"
                             ? ent2.name
                             : ent2.model === "interlocuteur"
                             ? ent2.fullname
@@ -373,8 +373,8 @@ function showSelectedEntitiesCard(entities) {
             </div>
         `;
 
-        // Ajout du select interlocuteur si ent2 est une société
-        if (ent2.model === "société") {
+        // Ajout du select interlocuteur si ent2 est une societe
+        if (ent2.model === "societe") {
             fetch(`/societe/${ent2.id}/interlocuteurs`, {
                 headers: { Accept: "application/json" },
             })
@@ -467,7 +467,7 @@ function showSelectedEntitiesCard(entities) {
             `;
             document.getElementById("card-4").innerHTML = `
                 <div class="flex flex-col w-full h-full">
-                    <h2 class="font-bold text-blue-accent text-sm mb-2">Services activés</h2>
+                    <h2 class="font-bold text-blue-accent text-lg mb-2">Services activés</h2>
                     ${servicesHtml}
                 </div>
             `;
