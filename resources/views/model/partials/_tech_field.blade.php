@@ -1,7 +1,7 @@
 <label class="uppercase" for="name">Nom du technicien</label>
 <input
     type="text"
-    id="name"
+    id="nametech"
     name="name"
     value="{{ old('name', $instance->name ?? '') }}"
     placeholder="Nom du technicien"

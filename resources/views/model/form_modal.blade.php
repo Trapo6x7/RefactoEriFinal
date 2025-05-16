@@ -1,4 +1,4 @@
-<form id="add-model-form" method="POST" action="{{ route('model.submit', [$model, $action, $instance->id ?? null]) }}"
+<form id="add-model-form-{{ $model }}" method="POST" action="{{ route('model.submit', [$model, $action, $instance->id ?? null]) }}"
     class="max-w-4xl mx-auto bg-off-white p-8 rounded-lg shadow space-y-8 flex flex-col gap-4">
     @csrf
 

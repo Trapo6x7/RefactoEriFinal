@@ -14,8 +14,9 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Scripts -->
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+<link rel="stylesheet" href="build/assets/app-CngMNF6j.css">
+<script defer src="build/assets/app-Bf4POITK.js"></script>
+ 
 </head>
 
 <body class="text-sm md:text-md lg:text-lg font-sans antialiased min-h-screen flex flex-col bg-off-white">

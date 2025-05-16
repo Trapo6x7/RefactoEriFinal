@@ -154,5 +154,5 @@
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
     </script>
-    @vite(['resources/js/dashboard.js'])
+<script src="build/assets/dashboard-CdpTZ6GX.js" type="module"></script>
 </x-app-layout>
