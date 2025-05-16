@@ -43,8 +43,8 @@
         </div>
     </article>
 
-    <section id="main-content" class="flex flex-col h-full min-h-0 flex-1">
-        <section class="mx-0 bg-off-white rounded-lg">
+    <section id="main-content" class="text-sm md:text-md lg:text-lg flex flex-col h-full min-h-0 flex-1">
+        <section class="mx-0 bg-off-white rounded-lg text-sm md:text-md lg:text-lg">
 
             <article class="max-w-4xl pt-4 mx-auto">
                 <form id="user-search-form"
@@ -52,7 +52,7 @@
                     <div class="w-full md:w-1/2 relative">
                         <input type="text" id="user-search-input" name="q" autocomplete="off"
                             placeholder="Recherche..."
-                            class="w-full px-4 py-2 border text-lg border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
+                            class="w-full px-4 py-2 border text-sm md:text-md lg:text-lg border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
                         <button type="button" id="reset-search-input"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-accent text-xl hidden"
                             aria-label="Effacer">
@@ -66,7 +66,7 @@
 
                     <div class="w-full md:w-1/4">
                         <select id="user-search-table" name="table"
-                            class="w-full px-4 text-lg py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
+                            class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-sm md:text-md lg:text-lg">
                             <option value="" class="hover:bg-blue-accent">Toutes les tables</option>
                             <option value="interlocutors">Interlocuteurs</option>
                             <option value="societies">societes</option>
@@ -81,30 +81,30 @@
         </section>
 
         <section id="selected-entity-card"
-            class="hidden md:flex flex-col md:flex-row gap-4 w-full min-w-0 p-1 sm:p-2 md:p-4 flex-1 min-h-0 h-[40vh] md:h-[50vh] bg-off-white rounded-lg">
+            class="hidden lg:flex flex-col lg:flex-row gap-4 w-full min-w-0 p-1 sm:p-2 lg:p-4 flex-1 min-h-0 h-[40vh] lg:h-[50vh] bg-off-white rounded-lg">
             <article id="card-1"
-                class="w-full md:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-lg">
+                class="relative w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-2"
-                class="w-full md:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-lg">
+                class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="card-3"
-                class="w-full md:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-lg">
+                class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-4"
-                class="w-full md:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-lg">
+                class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
             </article>
         </section>
 
         <section
-            class="flex flex-col md:flex-row h-[30vh] md:h-[40vh] bg-off-white rounded-lg mt-1 px-2 sm:px-4 md:px-8 min-h-0">
+            class="flex flex-col lg:flex-row h-[30vh] lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 sm:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
             <article id="problemes-list1"
-                class="w-full md:w-1/2 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
+                class="w-full lg:w-1/2 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="problemes-list2"
-                class="w-full md:w-1/2 px-2 sm:px-8 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
+                class="w-full lg:w-1/2 px-2 sm:px-8 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
             </article>
         </section>
     </section>

@@ -18,14 +18,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased min-h-screen flex flex-col bg-off-white">
+<body class="text-sm md:text-md lg:text-lg font-sans antialiased min-h-screen flex flex-col bg-off-white">
 
     @include('layouts.navigation')
 
     <!-- Page Heading -->
     @isset($header)
-        <header id="dashboard-header" class="hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header id="dashboard-header" class="hidden text-sm md:text-md lg:text-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm md:text-md lg:text-lg">
                 {{ $header }}
             </div>
         </header>
