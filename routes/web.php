@@ -33,7 +33,9 @@ Route::post('/user-search', [UserSearchController::class, 'search'])->name('user
 
 Route::get('/user-suggestions', [UserSearchController::class, 'suggestions'])->name('user-suggestions');
 
-Route::get('/model-suggestions', [ModelController::class, 'suggestions'])->name('model-suggestions');
+Route::get('/model/{model}/suggestions', [ModelController::class, 'suggestions'])->name('model-suggestions');
+
+Route::delete('/model/{model}/delete/{id}', [ModelController::class, 'delete'])->name('model.delete');
 
 Route::get('/model/{model}/show/{id}', [ModelController::class, 'show'])->name('model.show');
 

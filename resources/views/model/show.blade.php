@@ -40,7 +40,11 @@
                 @endforeach
             </ul>
         </div>
-
+        <div class="flex justify-center mt-4">
+            <button id="delete-item-btn" class="px-2 py-1 text-sm bg-red-accent text-white rounded hover:bg-red-hover">
+                Supprimer
+            </button>
+        </div>
     </div>
 
     <script>
@@ -84,6 +88,31 @@
                                 setTimeout(() => span.style.background = "", 1000);
                             });
                     });
+                });
+
+                // Bouton supprimer
+                document.getElementById('delete-item-btn').addEventListener('click', function() {
+                    if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
+                        fetch(`/model/${'{{ $model }}'}/delete/${'{{ $item->id }}'}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || '{{ csrf_token() }}',
+                                Accept: 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Élément supprimé.');
+                                window.location.href = "{{ route('model.index', ['model' => $model]) }}";
+                            } else {
+                                alert('Erreur lors de la suppression');
+                            }
+                        })
+                        .catch(() => {
+                            alert('Erreur lors de la suppression');
+                        });
+                    }
                 });
             }
         });

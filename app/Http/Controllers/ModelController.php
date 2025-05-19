@@ -389,4 +389,46 @@ class ModelController extends Controller
         });
         return response()->json($data);
     }
+
+    public function suggestions(Request $request, $model)
+    {
+        try {
+            if (!isset($this->models[$model])) {
+                abort(404);
+            }
+            $modelClass = $this->models[$model];
+            $query = $request->input('q', '');
+
+            // Détermine le champ à rechercher selon le modèle
+            $searchField = 'name';
+            if (in_array($model, ['probleme', 'problem'])) {
+                $searchField = 'title';
+            }
+
+            $items = $modelClass::when($query, function ($q) use ($searchField, $query) {
+                $q->where($searchField, 'like', "%$query%");
+            })->get();
+
+            return view('model.partials.table-rows', [
+                'items' => $items,
+                'model' => $model
+            ]);
+        } catch (\Throwable $e) {
+            return response($e->getMessage(), 500);
+        }
+    }
+
+    public function delete(Request $request, $model, $id)
+    {
+        if (!isset($this->models[$model])) {
+            return response()->json(['success' => false, 'message' => 'Modèle inconnu'], 404);
+        }
+        $modelClass = $this->models[$model];
+        $item = $modelClass::find($id);
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Élément introuvable'], 404);
+        }
+        $item->delete();
+        return response()->json(['success' => true]);
+    }
 }
