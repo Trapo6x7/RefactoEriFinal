@@ -155,5 +155,6 @@
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
     </script>
 <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
-    <script src="{{ asset('build/assets/dashboard-z2NASYLG.js') }}"></script>
+    <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
+@vite('resources/js/dashboard.js')
 </x-app-layout>

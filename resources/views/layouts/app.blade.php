@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Scripts -->
 
-    <link rel="stylesheet" href="{{ asset('build/assets/app-BKHL7wyH.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/assets/app-Bu_bwFjy.css') }}">
     <script defer src="{{ asset('build/assets/app-Bf4POITK.js') }}" type="module"></script>
 </head>
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Problem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ModelController extends Controller
 {
@@ -430,5 +430,40 @@ class ModelController extends Controller
         }
         $item->delete();
         return response()->json(['success' => true]);
+    }
+
+    public function uploadFile(Request $request, $model, $id)
+    {
+        if (!isset($this->models[$model])) {
+            return response()->json(['success' => false, 'message' => 'Modèle inconnu'], 404);
+        }
+        $modelClass = $this->models[$model];
+        $item = $modelClass::find($id);
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Élément introuvable'], 404);
+        }
+
+        $request->validate([
+            'file' => 'required|file|max:10240', // 10 Mo max
+        ]);
+
+        $path = $request->file('file')->store("uploads/{$model}/{$id}", 'public');
+        // Optionnel : stocke le chemin en base si tu veux
+
+        return response()->json(['success' => true, 'path' => $path, 'url' => asset("storage/$path")]);
+    }
+
+    public function listFiles($model, $id)
+    {
+        $dir = "uploads/{$model}/{$id}";
+        $files = [];
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($dir)) {
+            $files = collect(\Illuminate\Support\Facades\Storage::disk('public')->files($dir))
+                ->map(function ($path) {
+                    return asset('storage/' . $path);
+                })
+                ->values();
+        }
+        return response()->json(['files' => $files]);
     }
 }

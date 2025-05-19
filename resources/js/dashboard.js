@@ -56,29 +56,6 @@ function normalizeSelectedEntities(entities) {
     return result;
 }
 
-function formatServiceInfo(raw) {
-    if (!raw) return "";
-    // 1. Remplace les retours à la ligne par <br>
-    let formatted = raw.replace(/\r?\n/g, "<br>");
-    // 2. Mets en gras les mots-clés courants (à adapter selon tes besoins)
-    formatted = formatted.replace(
-        /([A-Za-zÀ-ÿ0-9_\-\.\/'’\(\)\[\] ]+?)\s*:/g,
-        '<span class="font-bold">$&</span>'
-    );
-    // 2bis. Supprime tous les tirets/puces en début de ligne (même multiples)
-    formatted = formatted.replace(/(<br>|^)\s*[-–—•]+(\s*)/g, "$1");
-    // 3. Transforme les listes commençant par - ou • en <li> (en ignorant les tirets déjà supprimés)
-    formatted = formatted.replace(/(?:^|<br>)(.*?)(?=<br>|$)/g, (m, p1) => {
-        if (p1.trim().length === 0) return m;
-        return `<li>${p1.trim()}</li>`;
-    });
-    // 4. Si on a des <li>, entoure d'une <ul>
-    if (formatted.includes("<li>")) {
-        formatted = formatted.replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>");
-    }
-    return formatted;
-}
-
 function addEntityToSelection(entity) {
     // Ne pas stocker dans le localStorage, garder uniquement en mémoire
     // On veut societe uniquement sur card 1/2, interlocuteur uniquement sur card 3/4
@@ -140,13 +117,13 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         <div id="problemes-list-inner-global"></div>
     `;
 
-    const renderProblemes = (
+    function renderProblemes(
         problemes,
         query = "",
         env = "",
         tool = "",
         societe = ""
-    ) => {
+    ) {
         const container = document.getElementById(
             "problemes-list-inner-global"
         );
@@ -160,22 +137,24 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         }
         container.innerHTML = `
         <div class="flex flex-col items-start w-full">
-        ${
-            problemes.length
-                ? problemes
-                      .map(
-                          (p, i) =>
-                              `<article class="mb-2 px-8 py-1 bg-off-white rounded text-lg w-full max-w-2xl text-left">
-                                <button 
-                                    class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover problem-title-btn flex items-center gap-2"
-                                    data-idx="${i}">
-                                    <h3 class="text-left">${p.title || ""}</h3>
-                                </button>
-                            </article>`
-                      )
-                      .join("")
-                : '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-lg text-left">Aucun probleme trouvé.</div>'
-        }
+            ${
+                problemes.length
+                    ? problemes
+                          .map(
+                              (p, i) =>
+                                  `<article class="mb-2 px-8 py-1 bg-off-white rounded text-lg w-full max-w-2xl text-left">
+                                    <button 
+                                        class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover problem-title-btn flex items-center gap-2"
+                                        data-idx="${i}">
+                                        <h3 class="text-left">${
+                                            p.title || ""
+                                        }</h3>
+                                    </button>
+                                </article>`
+                          )
+                          .join("")
+                    : '<div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-lg text-left">Aucun probleme trouvé.</div>'
+            }
         </div>
     `;
 
@@ -193,31 +172,253 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                     );
                 if (problem && solutionContainer) {
                     solutionContainer.innerHTML = `
-                <div class="bg-white text-lg rounded p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="font-bold text-blue-accent mb-2">${
-                            problem.title || ""
-                        }</h2>
-                        <span class="edit-lock-btn-placeholder"></span>
-                    </div>
-                    <div 
-                        class="text-primary-grey editable-problem-solution"
-                        data-problem-id="${problem.id || ""}"
-                        contenteditable="false"
-                        style="min-height:2em;"
-                    >${
-                        problem.description
-                            ? formatServiceInfo(problem.description)
-                            : "<em>Aucune solution enregistrée.</em>"
-                    }</div>
+    <div class="bg-white text-lg rounded p-4">
+        <div id="pbTitle" class="flex items-center justify-between mb-2">
+            <h2 class="font-bold text-blue-accent mb-2">${
+                problem.title || ""
+            }</h2>
+            <span class="edit-lock-btn-placeholder"></span>
+        </div>
+        
+        <div 
+            class="text-primary-grey editable-problem-solution"
+            data-problem-id="${problem.id || ""}"
+            contenteditable="false"
+            style="min-height:2em;"
+        >${
+            problem.description
+                ? problem.description
+                : "<em>Aucune solution enregistrée.</em>"
+        }</div>
+    </div>
+`;
+                    // Ajout du formulaire d'upload sous la description
+                    const descDiv = solutionContainer.querySelector(
+                        ".editable-problem-solution"
+                    );
+
+                    if (descDiv) {
+                        descDiv.insertAdjacentHTML(
+                            "afterend",
+                            `
+                <div id="file-upload-section" class="mt-4">
+                    <form id="upload-form" enctype="multipart/form-data">
+                        <label class="block mb-2 font-semibold">Ajouter un fichier :</label>
+                        <input type="file" name="file" id="file-input" class="mb-2" />
+                        <button type="submit" class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Uploader</button>
+                    </form>
+                    <div id="upload-result" class="mt-2 text-blue-accent"></div>
                 </div>
-            `;
+                `
+                        );
+
+                        const h2 = solutionContainer.querySelector("#pbTitle");
+
+                        // Affiche le bouton "Voir les images" seulement s'il y a des images
+                        fetch(
+                            `/model/probleme/files/${descDiv.dataset.problemId}`
+                        )
+                            .then((res) => res.json())
+                            .then((data) => {
+                                if (data.files && data.files.length) {
+                                    h2.insertAdjacentHTML(
+                                        "afterend",
+                                        `
+                            <button id="show-images-btn" class="mb-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Voir les images</button>
+                            <div id="images-modal" class="w-full fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">                            
+                                <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
+                                    <button id="close-images-modal" class="absolute top-2 text-red-accent right-2 text-xl">&times;</button>
+                                    <div id="images-carousel" class="relative w-full flex flex-col items-center">
+                                        <button id="carousel-prev" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
+                                        <img id="carousel-image" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />
+                                        <button id="carousel-next" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&gt;</button>
+                                        <div id="carousel-indicator" class="mt-2 text-sm text-gray-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            `
+                                    );
+
+                                    // Carrousel JS
+                                    const showImagesBtn =
+                                        document.getElementById(
+                                            "show-images-btn"
+                                        );
+                                    const imagesModal =
+                                        document.getElementById("images-modal");
+                                    const closeImagesModal =
+                                        document.getElementById(
+                                            "close-images-modal"
+                                        );
+
+                                    if (
+                                        showImagesBtn &&
+                                        imagesModal &&
+                                        closeImagesModal
+                                    ) {
+                                        showImagesBtn.onclick = function () {
+                                            imagesModal.classList.remove(
+                                                "hidden"
+                                            );
+                                            imagesModal.classList.add("flex");
+
+                                            const images = data.files || [];
+                                            const carouselImg =
+                                                document.getElementById(
+                                                    "carousel-image"
+                                                );
+                                            const prevBtn =
+                                                document.getElementById(
+                                                    "carousel-prev"
+                                                );
+                                            const nextBtn =
+                                                document.getElementById(
+                                                    "carousel-next"
+                                                );
+                                            const indicator =
+                                                document.getElementById(
+                                                    "carousel-indicator"
+                                                );
+                                            let idx = 0;
+
+                                            function showImage(i) {
+                                                if (!images.length) {
+                                                    carouselImg.style.display =
+                                                        "none";
+                                                    indicator.textContent =
+                                                        "Aucun fichier trouvé.";
+                                                    prevBtn.style.display =
+                                                        "none";
+                                                    nextBtn.style.display =
+                                                        "none";
+                                                    return;
+                                                }
+                                                const url = images[i];
+                                                const ext = url
+                                                    .split(".")
+                                                    .pop()
+                                                    .toLowerCase();
+                                                const isImage = [
+                                                    "jpg",
+                                                    "jpeg",
+                                                    "png",
+                                                    "gif",
+                                                    "webp",
+                                                    "bmp",
+                                                ].includes(ext);
+                                                // Supprime tout lien précédent
+                                                carouselImg.parentElement
+                                                    .querySelector(".file-link")
+                                                    ?.remove();
+                                                if (isImage) {
+                                                    carouselImg.src = url;
+                                                    carouselImg.style.display =
+                                                        "block";
+                                                } else {
+                                                    carouselImg.style.display =
+                                                        "none";
+                                                    let fileLink =
+                                                        document.createElement(
+                                                            "a"
+                                                        );
+                                                    fileLink.className =
+                                                        "file-link text-blue-accent underline mt-4";
+                                                    fileLink.href = url;
+                                                    fileLink.target = "_blank";
+                                                    fileLink.innerHTML = `<i class="fa-solid fa-file mr-2"></i> Télécharger le fichier`;
+                                                    carouselImg.parentElement.appendChild(
+                                                        fileLink
+                                                    );
+                                                }
+                                                indicator.textContent = `${
+                                                    i + 1
+                                                } / ${images.length}`;
+                                                prevBtn.style.display =
+                                                    images.length > 1
+                                                        ? "block"
+                                                        : "none";
+                                                nextBtn.style.display =
+                                                    images.length > 1
+                                                        ? "block"
+                                                        : "none";
+                                            }
+
+                                            prevBtn.onclick = function () {
+                                                idx =
+                                                    (idx - 1 + images.length) %
+                                                    images.length;
+                                                showImage(idx);
+                                            };
+                                            nextBtn.onclick = function () {
+                                                idx = (idx + 1) % images.length;
+                                                showImage(idx);
+                                            };
+
+                                            idx = 0;
+                                            showImage(idx);
+                                        };
+
+                                        closeImagesModal.onclick = function () {
+                                            imagesModal.classList.add("hidden");
+                                            imagesModal.classList.remove(
+                                                "flex"
+                                            );
+                                        };
+                                    }
+                                }
+                            });
+
+                        // Gestion de l'upload
+                        const uploadForm =
+                            document.getElementById("upload-form");
+                        if (uploadForm) {
+                            uploadForm.addEventListener("submit", function (e) {
+                                e.preventDefault();
+                                const fileInput =
+                                    document.getElementById("file-input");
+                                if (!fileInput.files.length) return;
+                                const formData = new FormData();
+                                formData.append("file", fileInput.files[0]);
+                                fetch(
+                                    `/model/probleme/upload/${descDiv.dataset.problemId}`,
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "X-CSRF-TOKEN": document
+                                                .querySelector(
+                                                    'meta[name="csrf-token"]'
+                                                )
+                                                .getAttribute("content"),
+                                        },
+                                        body: formData,
+                                    }
+                                )
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.success) {
+                                            document.getElementById(
+                                                "upload-result"
+                                            ).innerHTML = `Fichier uploadé : <a href="${data.url}" target="_blank">${data.url}</a>`;
+                                        } else {
+                                            document.getElementById(
+                                                "upload-result"
+                                            ).innerText =
+                                                data.message ||
+                                                "Erreur lors de l'upload";
+                                        }
+                                    })
+                                    .catch(() => {
+                                        document.getElementById(
+                                            "upload-result"
+                                        ).innerText = "Erreur lors de l'upload";
+                                    });
+                            });
+                        }
+                    }
+
                     if (isAdmin) {
                         const placeholder = solutionContainer.querySelector(
                             ".edit-lock-btn-placeholder"
-                        );
-                        const descDiv = solutionContainer.querySelector(
-                            ".editable-problem-solution"
                         );
                         if (placeholder && descDiv) {
                             // Bouton édition enrichie (CKEditor)
@@ -399,7 +600,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                 }
             });
         });
-    };
+    }
 
     // Fonction pour charger les problemes avec filtres
     function fetchAndRenderProblems() {
@@ -755,27 +956,40 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         let coordonneesHtml = "";
         (allowedKeys[ent1.model] || []).forEach((key) => {
             if (ent1[key]) {
+                let value = ent1[key];
+                let displayValue = value;
+                // Ajout mailto et tel
+                if (key === "email") {
+                    displayValue = `<a href="mailto:${value}" class="text-blue-accent underline">${value}</a>`;
+                } else if (
+                    key === "phone_fix" ||
+                    key === "phone_mobile" ||
+                    key === "boss_phone" ||
+                    key === "recep_phone"
+                ) {
+                    // Nettoie le numéro pour le lien tel
+                    const tel = value.replace(/[^+\d]/g, "");
+                    displayValue = `<a href="tel:${tel}" class="text-blue-accent underline">${value}</a>`;
+                }
                 coordonneesHtml += `
-            <div class="my-1 pr-2 w-full break-words flex flex-col">
-                <div class="flex items-center justify-between w-full">
-                    <p class="font-semibold text-blue-accent mb-0">${
-                        window.translatedFields[key]
-                    } :</p>
-                    <span class="edit-lock-btn-placeholder ml-auto"></span>
-                </div>
-                <span class="editable-field" data-model="${
-                    ent1.model
-                }" data-id="${ent1.id}" data-key="${key}" contenteditable="${
+        <div class="my-1 pr-2 w-full break-words flex flex-col">
+            <div class="flex items-center justify-between w-full">
+                <p class="font-semibold text-blue-accent mb-0">${
+                    window.translatedFields[key]
+                } :</p>
+                <span class="edit-lock-btn-placeholder ml-auto"></span>
+            </div>
+            <span class="editable-field" data-model="${ent1.model}" data-id="${
+                    ent1.id
+                }" data-key="${key}" contenteditable="${
                     window.currentUserRole &&
                     ["admin", "superadmin"].includes(
                         window.currentUserRole.toLowerCase()
                     )
                         ? "true"
                         : "false"
-                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
-                    ent1[key]
-                }</span>
-            </div>`;
+                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${displayValue}</span>
+        </div>`;
             }
         });
         const maisonMereHtml =
@@ -913,7 +1127,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                     ? "true"
                                     : "false"
                             }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                    ${formatServiceInfo(service.info ?? "Oui")}
+                                    ${service.info ?? "Oui"}
                                 </span>
                             </div>
                         </div>
@@ -952,6 +1166,185 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 ${servicesHtml}
             </div>
         `;
+
+        // // Ajout upload tout en haut de la card (juste après le h2)
+        // if (ent1 && ent1.model === "societe") {
+        //     const card2 = document.getElementById("card-2");
+        //     const h2 = card2.querySelector("h2");
+        //     if (h2) {
+        //         h2.insertAdjacentHTML(
+        //             "afterend",
+        //             `
+        //             <div id="file-upload-section-societe-${ent1.id}" class="mt-4">
+        //                 <form id="upload-form-societe-${ent1.id}" enctype="multipart/form-data">
+        //                     <label class="block mb-2 font-semibold">Ajouter un fichier :</label>
+        //                     <input type="file" name="file" id="file-input-societe-${ent1.id}" class="mb-2" />
+        //                     <button type="submit" class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Uploader</button>
+        //                 </form>
+        //                 <div id="upload-result-societe-${ent1.id}" class="mt-2 text-blue-accent"></div>
+        //             </div>
+        //             `
+        //         );
+        //     }
+        //     // Bouton "Voir les images" juste après la barre de recherche
+        //     fetch(`/model/societe/files/${ent1.id}`)
+        //         .then((res) => res.json())
+        //         .then((data) => {
+        //             if (data.files && data.files.length) {
+        //                 const searchInput =
+        //                     card2.querySelector(`#services-search-1`);
+        //                 if (searchInput) {
+        //                     searchInput.insertAdjacentHTML(
+        //                         "afterend",
+        //                         `
+        //                 <button id="show-images-btn-societe-${ent1.id}" class="mb-4 mt-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover w-full">Voir les fichiers</button>
+        //                 <div id="images-modal-societe-${ent1.id}" class="w-full fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">
+        //                     <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
+        //                         <button id="close-images-modal-societe-${ent1.id}" class="absolute top-2 text-red-accent right-2 text-xl">&times;</button>
+        //                         <div id="images-carousel-societe-${ent1.id}" class="relative w-full flex flex-col items-center">
+        //                             <button id="carousel-prev-societe-${ent1.id}" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
+        //                             <img id="carousel-image-societe-${ent1.id}" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />
+        //                             <button id="carousel-next-societe-${ent1.id}" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&gt;</button>
+        //                             <div id="carousel-indicator-societe-${ent1.id}" class="mt-2 text-sm text-gray-500"></div>
+        //                         </div>
+        //                     </div>
+        //                 </div>
+        //                 `
+        //                     );
+        //                     // JS carrousel fichiers/images
+        //                     const showBtn = document.getElementById(
+        //                         `show-images-btn-societe-${ent1.id}`
+        //                     );
+        //                     const modal = document.getElementById(
+        //                         `images-modal-societe-${ent1.id}`
+        //                     );
+        //                     const closeBtn = document.getElementById(
+        //                         `close-images-modal-societe-${ent1.id}`
+        //                     );
+        //                     if (showBtn && modal && closeBtn) {
+        //                         showBtn.onclick = function () {
+        //                             modal.classList.remove("hidden");
+        //                             modal.classList.add("flex");
+        //                             const files = data.files || [];
+        //                             const carouselImg = document.getElementById(
+        //                                 `carousel-image-societe-${ent1.id}`
+        //                             );
+        //                             const prevBtn = document.getElementById(
+        //                                 `carousel-prev-societe-${ent1.id}`
+        //                             );
+        //                             const nextBtn = document.getElementById(
+        //                                 `carousel-next-societe-${ent1.id}`
+        //                             );
+        //                             const indicator = document.getElementById(
+        //                                 `carousel-indicator-societe-${ent1.id}`
+        //                             );
+        //                             let idx = 0;
+        //                             function showImage(i) {
+        //                                 if (!files.length) {
+        //                                     carouselImg.style.display = "none";
+        //                                     indicator.textContent =
+        //                                         "Aucun fichier trouvé.";
+        //                                     prevBtn.style.display = "none";
+        //                                     nextBtn.style.display = "none";
+        //                                     return;
+        //                                 }
+        //                                 const url = files[i];
+        //                                 const ext = url
+        //                                     .split(".")
+        //                                     .pop()
+        //                                     .toLowerCase();
+        //                                 const isImage = [
+        //                                     "jpg",
+        //                                     "jpeg",
+        //                                     "png",
+        //                                     "gif",
+        //                                     "webp",
+        //                                     "bmp",
+        //                                 ].includes(ext);
+        //                                 // Supprime tout lien précédent
+        //                                 carouselImg.parentElement
+        //                                     .querySelector(".file-link")
+        //                                     ?.remove();
+        //                                 if (isImage) {
+        //                                     carouselImg.src = url;
+        //                                     carouselImg.style.display = "block";
+        //                                 } else {
+        //                                     carouselImg.style.display = "none";
+        //                                     let fileLink =
+        //                                         document.createElement("a");
+        //                                     fileLink.className =
+        //                                         "file-link text-blue-accent underline mt-4";
+        //                                     fileLink.href = url;
+        //                                     fileLink.target = "_blank";
+        //                                     fileLink.innerHTML = `<i class="fa-solid fa-file mr-2"></i> Télécharger le fichier`;
+        //                                     carouselImg.parentElement.appendChild(
+        //                                         fileLink
+        //                                     );
+        //                                 }
+        //                                 indicator.textContent = `${i + 1} / ${
+        //                                     files.length
+        //                                 }`;
+        //                                 prevBtn.style.display =
+        //                                     files.length > 1 ? "block" : "none";
+        //                                 nextBtn.style.display =
+        //                                     files.length > 1 ? "block" : "none";
+        //                             }
+        //                             prevBtn.onclick = function () {
+        //                                 idx =
+        //                                     (idx - 1 + files.length) %
+        //                                     files.length;
+        //                                 showImage(idx);
+        //                             };
+        //                             nextBtn.onclick = function () {
+        //                                 idx = (idx + 1) % files.length;
+        //                                 showImage(idx);
+        //                             };
+        //                             idx = 0;
+        //                             showImage(idx);
+        //                         };
+        //                         closeBtn.onclick = function () {
+        //                             modal.classList.add("hidden");
+        //                             modal.classList.remove("flex");
+        //                         };
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     // Gestion upload
+        //     const uploadForm = document.getElementById(
+        //         `upload-form-societe-${ent1.id}`
+        //     );
+        //     if (uploadForm) {
+        //         uploadForm.addEventListener("submit", function (e) {
+        //             e.preventDefault();
+        //             const fileInput = document.getElementById(
+        //                 `file-input-societe-${ent1.id}`
+        //             );
+        //             if (!fileInput.files.length) return;
+        //             const formData = new FormData();
+        //             formData.append("file", fileInput.files[0]);
+        //             fetch(`/model/societe/upload/${ent1.id}`, {
+        //                 method: "POST",
+        //                 headers: { "X-CSRF-TOKEN": csrfToken },
+        //                 body: formData,
+        //             })
+        //                 .then((res) => res.json())
+        //                 .then((data) => {
+        //                     document.getElementById(
+        //                         `upload-result-societe-${ent1.id}`
+        //                     ).innerHTML = data.success
+        //                         ? `Fichier uploadé : <a href="${data.url}" target="_blank">${data.url}</a>`
+        //                         : data.message || "Erreur lors de l'upload";
+        //                 })
+        //                 .catch(() => {
+        //                     document.getElementById(
+        //                         `upload-result-societe-${ent1.id}`
+        //                     ).innerText = "Erreur lors de l'upload";
+        //                 });
+        //         });
+        //     }
+        // }
+
         setTimeout(() => {
             const input = document.getElementById(searchInputId);
             const list = document.getElementById("services-list-1");
@@ -1001,27 +1394,39 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         let coordonneesHtml = "";
         (allowedKeys[ent2.model] || []).forEach((key) => {
             if (ent2[key]) {
+                let value = ent2[key];
+                let displayValue = value;
+                // Ajout mailto et tel
+                if (key === "email") {
+                    displayValue = `<a href="mailto:${value}" class="text-blue-accent underline">${value}</a>`;
+                } else if (
+                    key === "phone_fix" ||
+                    key === "phone_mobile" ||
+                    key === "boss_phone" ||
+                    key === "recep_phone"
+                ) {
+                    const tel = value.replace(/[^+\d]/g, "");
+                    displayValue = `<a href="tel:${tel}" class="text-blue-accent underline">${value}</a>`;
+                }
                 coordonneesHtml += `
-            <div class="my-1 pr-2 w-full break-words flex flex-col">
-                <div class="flex items-center justify-between w-full">
-                    <p class="font-semibold text-blue-accent mb-0">${
-                        window.translatedFields[key]
-                    } :</p>
-                    <span class="edit-lock-btn-placeholder ml-auto"></span>
-                </div>
-                <span class="editable-field" data-model="${
-                    ent2.model
-                }" data-id="${ent2.id}" data-key="${key}" contenteditable="${
+        <div class="my-1 pr-2 w-full break-words flex flex-col">
+            <div class="flex items-center justify-between w-full">
+                <p class="font-semibold text-blue-accent mb-0">${
+                    window.translatedFields[key]
+                } :</p>
+                <span class="edit-lock-btn-placeholder ml-auto"></span>
+            </div>
+            <span class="editable-field" data-model="${ent2.model}" data-id="${
+                    ent2.id
+                }" data-key="${key}" contenteditable="${
                     window.currentUserRole &&
                     ["admin", "superadmin"].includes(
                         window.currentUserRole.toLowerCase()
                     )
                         ? "true"
                         : "false"
-                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
-                    ent2[key]
-                }</span>
-            </div>`;
+                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${displayValue}</span>
+        </div>`;
             }
         });
         const maisonMereHtml2 =
@@ -1092,7 +1497,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                     const interlocutorId = this.value;
                                     if (interlocutorId) {
                                         fetch(
-                                            `/model/interlocuteur/show/${interlocuteurId}`,
+                                            `/model/interlocuteur/show/${interlocutorId}`,
                                             {
                                                 headers: {
                                                     Accept: "application/json",
@@ -1163,7 +1568,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                     ? "true"
                                     : "false"
                             }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                    ${formatServiceInfo(service.info ?? "Oui")}
+                                    ${service.info ?? "Oui"}
                                 </span>
                             </div>
                         </div>
@@ -1202,6 +1607,185 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 ${servicesHtml}
             </div>
         `;
+
+        // Ajout upload tout en haut de la card (juste après le h2)
+        // if (ent2 && ent2.model === "interlocuteur") {
+        //     const card4 = document.getElementById("card-4");
+        //     const h2 = card4.querySelector("h2");
+        //     if (h2) {
+        //         h2.insertAdjacentHTML(
+        //             "afterend",
+        //             `
+        //             <div id="file-upload-section-interlocuteur-${ent2.id}" class="mt-4">
+        //                 <form id="upload-form-interlocuteur-${ent2.id}" enctype="multipart/form-data">
+        //                     <label class="block mb-2 font-semibold">Ajouter un fichier :</label>
+        //                     <input type="file" name="file" id="file-input-interlocuteur-${ent2.id}" class="mb-2" />
+        //                     <button type="submit" class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Uploader</button>
+        //                 </form>
+        //                 <div id="upload-result-interlocuteur-${ent2.id}" class="mt-2 text-blue-accent"></div>
+        //             </div>
+        //             `
+        //         );
+        //     }
+        //     // Bouton "Voir les images" juste après la barre de recherche
+        //     fetch(`/model/interlocuteur/files/${ent2.id}`)
+        //         .then((res) => res.json())
+        //         .then((data) => {
+        //             if (data.files && data.files.length) {
+        //                 const searchInput =
+        //                     card4.querySelector(`#services-search-2`);
+        //                 if (searchInput) {
+        //                     searchInput.insertAdjacentHTML(
+        //                         "afterend",
+        //                         `
+        //                 <button id="show-images-btn-interlocuteur-${ent2.id}" class="mb-4 mt-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover w-full">Voir les fichiers</button>
+        //                 <div id="images-modal-interlocuteur-${ent2.id}" class="w-full fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">
+        //                     <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
+        //                         <button id="close-images-modal-interlocuteur-${ent2.id}" class="absolute top-2 text-red-accent right-2 text-xl">&times;</button>
+        //                         <div id="images-carousel-interlocuteur-${ent2.id}" class="relative w-full flex flex-col items-center">
+        //                             <button id="carousel-prev-interlocuteur-${ent2.id}" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
+        //                             <img id="carousel-image-interlocuteur-${ent2.id}" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />
+        //                             <button id="carousel-next-interlocuteur-${ent2.id}" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&gt;</button>
+        //                             <div id="carousel-indicator-interlocuteur-${ent2.id}" class="mt-2 text-sm text-gray-500"></div>
+        //                         </div>
+        //                     </div>
+        //                 </div>
+        //                 `
+        //                     );
+        //                     // JS carrousel fichiers/images
+        //                     const showBtn = document.getElementById(
+        //                         `show-images-btn-interlocuteur-${ent2.id}`
+        //                     );
+        //                     const modal = document.getElementById(
+        //                         `images-modal-interlocuteur-${ent2.id}`
+        //                     );
+        //                     const closeBtn = document.getElementById(
+        //                         `close-images-modal-interlocuteur-${ent2.id}`
+        //                     );
+        //                     if (showBtn && modal && closeBtn) {
+        //                         showBtn.onclick = function () {
+        //                             modal.classList.remove("hidden");
+        //                             modal.classList.add("flex");
+        //                             const files = data.files || [];
+        //                             const carouselImg = document.getElementById(
+        //                                 `carousel-image-interlocuteur-${ent2.id}`
+        //                             );
+        //                             const prevBtn = document.getElementById(
+        //                                 `carousel-prev-interlocuteur-${ent2.id}`
+        //                             );
+        //                             const nextBtn = document.getElementById(
+        //                                 `carousel-next-interlocuteur-${ent2.id}`
+        //                             );
+        //                             const indicator = document.getElementById(
+        //                                 `carousel-indicator-interlocuteur-${ent2.id}`
+        //                             );
+        //                             let idx = 0;
+        //                             function showImage(i) {
+        //                                 if (!files.length) {
+        //                                     carouselImg.style.display = "none";
+        //                                     indicator.textContent =
+        //                                         "Aucun fichier trouvé.";
+        //                                     prevBtn.style.display = "none";
+        //                                     nextBtn.style.display = "none";
+        //                                     return;
+        //                                 }
+        //                                 const url = files[i];
+        //                                 const ext = url
+        //                                     .split(".")
+        //                                     .pop()
+        //                                     .toLowerCase();
+        //                                 const isImage = [
+        //                                     "jpg",
+        //                                     "jpeg",
+        //                                     "png",
+        //                                     "gif",
+        //                                     "webp",
+        //                                     "bmp",
+        //                                 ].includes(ext);
+        //                                 // Supprime tout lien précédent
+        //                                 carouselImg.parentElement
+        //                                     .querySelector(".file-link")
+        //                                     ?.remove();
+        //                                 if (isImage) {
+        //                                     carouselImg.src = url;
+        //                                     carouselImg.style.display = "block";
+        //                                 } else {
+        //                                     carouselImg.style.display = "none";
+        //                                     let fileLink =
+        //                                         document.createElement("a");
+        //                                     fileLink.className =
+        //                                         "file-link text-blue-accent underline mt-4";
+        //                                     fileLink.href = url;
+        //                                     fileLink.target = "_blank";
+        //                                     fileLink.innerHTML = `<i class="fa-solid fa-file mr-2"></i> Télécharger le fichier`;
+        //                                     carouselImg.parentElement.appendChild(
+        //                                         fileLink
+        //                                     );
+        //                                 }
+        //                                 indicator.textContent = `${i + 1} / ${
+        //                                     files.length
+        //                                 }`;
+        //                                 prevBtn.style.display =
+        //                                     files.length > 1 ? "block" : "none";
+        //                                 nextBtn.style.display =
+        //                                     files.length > 1 ? "block" : "none";
+        //                             }
+        //                             prevBtn.onclick = function () {
+        //                                 idx =
+        //                                     (idx - 1 + files.length) %
+        //                                     files.length;
+        //                                 showImage(idx);
+        //                             };
+        //                             nextBtn.onclick = function () {
+        //                                 idx = (idx + 1) % files.length;
+        //                                 showImage(idx);
+        //                             };
+        //                             idx = 0;
+        //                             showImage(idx);
+        //                         };
+        //                         closeBtn.onclick = function () {
+        //                             modal.classList.add("hidden");
+        //                             modal.classList.remove("flex");
+        //                         };
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     // Gestion upload
+        //     const uploadForm = document.getElementById(
+        //         `upload-form-interlocuteur-${ent2.id}`
+        //     );
+        //     if (uploadForm) {
+        //         uploadForm.addEventListener("submit", function (e) {
+        //             e.preventDefault();
+        //             const fileInput = document.getElementById(
+        //                 `file-input-interlocuteur-${ent2.id}`
+        //             );
+        //             if (!fileInput.files.length) return;
+        //             const formData = new FormData();
+        //             formData.append("file", fileInput.files[0]);
+        //             fetch(`/model/interlocuteur/upload/${ent2.id}`, {
+        //                 method: "POST",
+        //                 headers: { "X-CSRF-TOKEN": csrfToken },
+        //                 body: formData,
+        //             })
+        //                 .then((res) => res.json())
+        //                 .then((data) => {
+        //                     document.getElementById(
+        //                         `upload-result-interlocuteur-${ent2.id}`
+        //                     ).innerHTML = data.success
+        //                         ? `Fichier uploadé : <a href="${data.url}" target="_blank">${data.url}</a>`
+        //                         : data.message || "Erreur lors de l'upload";
+        //                 })
+        //                 .catch(() => {
+        //                     document.getElementById(
+        //                         `upload-result-interlocuteur-${ent2.id}`
+        //                     ).innerText = "Erreur lors de l'upload";
+        //                 });
+        //         });
+        //     }
+        // }
+
         setTimeout(() => {
             const input = document.getElementById(searchInputId);
             const list = document.getElementById("services-list-2");

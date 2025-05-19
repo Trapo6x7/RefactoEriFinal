@@ -37,6 +37,10 @@ Route::get('/model/{model}/suggestions', [ModelController::class, 'suggestions']
 
 Route::delete('/model/{model}/delete/{id}', [ModelController::class, 'delete'])->name('model.delete');
 
+Route::get('/model/{model}/files/{id}', [ModelController::class, 'listFiles'])->name('model.files');
+
+Route::post('/model/{model}/upload/{id}', [ModelController::class, 'uploadFile'])->name('model.upload');
+
 Route::get('/model/{model}/show/{id}', [ModelController::class, 'show'])->name('model.show');
 
 Route::post('/model/{model}/update-field/{id}', [ModelController::class, 'updateField'])->name('model.updateField');
