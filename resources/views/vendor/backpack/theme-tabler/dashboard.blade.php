@@ -3,7 +3,7 @@
 @section('content')
 <div class="mb-4">
     <form id="global-search-form"
-        class="row  g-md-3 align-items-stretch shadow rounded-3"
+        class="row  g-md-3 align-items-stretch rounded-3"
         style="background:#181622;">
         <div class="col-12 col-md">
             <input type="text" name="q" id="global-search-input"

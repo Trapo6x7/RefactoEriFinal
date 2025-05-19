@@ -15,5 +15,6 @@
 @include(backpack_view('inc.theme_styles'))
 @include(backpack_view('inc.styles'))
 
+<link rel="stylesheet" href="{{ asset('build/assets/custom-25aFYuJv.css') }}">
 @yield('after_styles')
 @stack('after_styles')

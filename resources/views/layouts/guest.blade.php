@@ -12,9 +12,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('build/assets/app-DGGxN_h7.css') }}">
-    <script src="{{ asset('build/assets/vendor-DMAuQEXX.js') }}" type="module"></script>
-    <script src="{{ asset('build/assets/app-BBCQS6KE.js') }}" type="module"></script>
+    <link rel="stylesheet" href="{{ asset('build/assets/app-BlsAu_6K.css') }}">
+    <script src="{{ asset('build/assets/app-Bf4POITK.js') }}"></script>
 </head>
 
 <body class="font-sans text-primary-grey bg-off-white antialiased">

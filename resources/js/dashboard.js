@@ -27,6 +27,19 @@ const csrfToken =
         .querySelector('meta[name="csrf-token"]')
         ?.getAttribute("content") || "";
 
+function onCkeditor5Ready(callback) {
+    if (window.CKEDITOR) {
+        callback();
+    } else {
+        const interval = setInterval(() => {
+            if (window.CKEDITOR) {
+                clearInterval(interval);
+                callback();
+            }
+        }, 100);
+    }
+}
+
 function getEntityFromDataset(dataset) {
     const entity = {};
     for (const key in dataset) entity[key] = dataset[key];
@@ -201,30 +214,184 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
             `;
                     if (isAdmin) {
                         const placeholder = solutionContainer.querySelector(
-                            '.edit-lock-btn-placeholder'
+                            ".edit-lock-btn-placeholder"
                         );
                         const descDiv = solutionContainer.querySelector(
-                            '.editable-problem-solution'
+                            ".editable-problem-solution"
                         );
                         if (placeholder && descDiv) {
-                            const btn = document.createElement('button');
-                            btn.type = 'button';
-                            btn.className = 'edit-lock-btn ml-2 text-blue-accent';
-                            btn.title = 'Déverrouiller pour éditer';
-                            btn.innerHTML = '<i class="fa-solid fa-lock"></i>';
-                            placeholder.appendChild(btn);
+                            // Bouton édition enrichie (CKEditor)
+                            const btnCk = document.createElement("button");
+                            btnCk.type = "button";
+                            btnCk.className =
+                                "edit-ckeditor-btn ml-2 text-blue-accent";
+                            btnCk.title = "Édition enrichie";
+                            btnCk.innerHTML = '<i class="fa-solid fa-pen"></i>';
+                            placeholder.appendChild(btnCk);
+
+                            btnCk.onclick = function () {
+                                let tryCount = 0;
+                                const maxTries = 30; // 3 secondes max (30 x 100ms)
+
+                                function openCkeditor5() {
+                                    if (
+                                        typeof window.ClassicEditor ===
+                                        "undefined"
+                                    ) {
+                                        tryCount++;
+                                        if (tryCount > maxTries) {
+                                            alert(
+                                                "CKEditor 5 n'est pas chargé après plusieurs tentatives. Vérifiez votre connexion ou rechargez la page."
+                                            );
+                                            return;
+                                        }
+                                        setTimeout(openCkeditor5, 100);
+                                        return;
+                                    }
+                                    let modal =
+                                        document.getElementById(
+                                            "ckeditor-modal"
+                                        );
+                                    if (!modal) {
+                                        modal = document.createElement("div");
+                                        modal.id = "ckeditor-modal";
+                                        modal.className =
+                                            "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                                        modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                    <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
+                    <div class="flex gap-2 mt-4">
+                        <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
+                        <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
+                    </div>
+                </div>
+            `;
+                                        document.body.appendChild(modal);
+                                    }
+                                    modal.style.display = "flex";
+                                    document.getElementById(
+                                        "ckeditor-area"
+                                    ).value = descDiv.innerHTML;
+
+                                    if (window.CKEDITOR5_INSTANCE) {
+                                        window.CKEDITOR5_INSTANCE.destroy();
+                                    }
+                                    ClassicEditor.create(
+                                        document.getElementById("ckeditor-area")
+                                    )
+                                        .then((editor) => {
+                                            window.CKEDITOR5_INSTANCE = editor;
+                                            editor.setData(descDiv.innerHTML);
+                                        })
+                                        .catch((error) => {
+                                            console.error(error);
+                                        });
+
+                                    document.getElementById(
+                                        "ckeditor-save"
+                                    ).onclick = function () {
+                                        if (window.CKEDITOR5_INSTANCE) {
+                                            const value =
+                                                window.CKEDITOR5_INSTANCE.getData();
+                                            fetch(
+                                                `/problemes/update-description/${descDiv.dataset.problemId}`,
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type":
+                                                            "application/json",
+                                                        "X-CSRF-TOKEN":
+                                                            csrfToken,
+                                                        Accept: "application/json",
+                                                    },
+                                                    body: JSON.stringify({
+                                                        description: value,
+                                                    }),
+                                                }
+                                            )
+                                                .then((res) => res.json())
+                                                .then(() => {
+                                                    descDiv.innerHTML = value;
+                                                    modal.style.display =
+                                                        "none";
+                                                    window.CKEDITOR5_INSTANCE.destroy();
+                                                    window.CKEDITOR5_INSTANCE =
+                                                        null;
+                                                })
+                                                .catch(() => {
+                                                    modal.style.display =
+                                                        "none";
+                                                    window.CKEDITOR5_INSTANCE.destroy();
+                                                    window.CKEDITOR5_INSTANCE =
+                                                        null;
+                                                });
+                                        }
+                                    };
+                                    document.getElementById(
+                                        "ckeditor-cancel"
+                                    ).onclick = function () {
+                                        modal.style.display = "none";
+                                        if (window.CKEDITOR5_INSTANCE) {
+                                            window.CKEDITOR5_INSTANCE.destroy();
+                                            window.CKEDITOR5_INSTANCE = null;
+                                        }
+                                    };
+                                }
+
+                                // Utilise la fonction utilitaire pour attendre CKEditor 5
+                                function onCkeditor5Ready(callback) {
+                                    if (
+                                        typeof window.ClassicEditor !==
+                                        "undefined"
+                                    ) {
+                                        callback();
+                                    } else {
+                                        const interval = setInterval(() => {
+                                            if (
+                                                typeof window.ClassicEditor !==
+                                                "undefined"
+                                            ) {
+                                                clearInterval(interval);
+                                                callback();
+                                            }
+                                        }, 100);
+                                    }
+                                }
+                                onCkeditor5Ready(openCkeditor5);
+                            };
+
+                            // Bouton lock/save (édition inline)
+                            const btnLock = document.createElement("button");
+                            btnLock.type = "button";
+                            btnLock.className =
+                                "edit-lock-btn ml-2 text-blue-accent";
+                            btnLock.title = "Déverrouiller pour éditer";
+                            btnLock.innerHTML =
+                                '<i class="fa-solid fa-lock"></i>';
+                            placeholder.appendChild(btnLock);
+
                             handleLockSaveButton({
                                 editableElem: descDiv,
-                                btn,
+                                btn: btnLock,
                                 fetchUrl: `/problemes/update-description/${descDiv.dataset.problemId}`,
                                 fetchBody: (value) => ({ description: value }),
                                 onSuccess: (el) => {
                                     el.style.background = "#678BD8";
-                                    setTimeout(() => (el.style.background = ""), 500);
+                                    setTimeout(
+                                        () => (el.style.background = ""),
+                                        500
+                                    );
                                 },
                                 onError: (el) => {
                                     el.style.background = "#DB7171";
-                                    setTimeout(() => (el.style.background = ""), 1000);
+                                    setTimeout(
+                                        () => (el.style.background = ""),
+                                        1000
+                                    );
+                                },
+                                getValue: (el) => el.innerHTML,
+                                setValue: (el, val) => {
+                                    el.innerHTML = val;
                                 },
                             });
                         }
@@ -340,8 +507,25 @@ document.addEventListener("DOMContentLoaded", function () {
                             let item = document.createElement("button");
                             item.type = "button";
                             item.className =
-                                "text-left text-primary-grey px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer";
-                            item.textContent = suggestion.label ?? suggestion;
+                                "flex items-center gap-2 text-left text-primary-grey px-4 py-2 hover:bg-blue-accent hover:text-off-white cursor-pointer";
+                            // Ajoute l’icône selon le type
+                            let icon = "";
+                            if (
+                                (suggestion.model || tableSelect.value) ===
+                                "societe"
+                            ) {
+                                icon =
+                                    '<i class="fa-solid fa-building text-blue-accent"></i>';
+                            } else if (
+                                (suggestion.model || tableSelect.value) ===
+                                "interlocuteur"
+                            ) {
+                                icon =
+                                    '<i class="fa-solid fa-user text-blue-accent"></i>';
+                            }
+                            item.innerHTML = `${icon}<span>${
+                                suggestion.label ?? suggestion
+                            }</span>`;
                             item.onclick = function () {
                                 input.value = suggestion.label ?? suggestion;
                                 suggestionBox.innerHTML = "";
@@ -572,12 +756,25 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         (allowedKeys[ent1.model] || []).forEach((key) => {
             if (ent1[key]) {
                 coordonneesHtml += `
-            <div class="my-4 pr-2 w-full break-words flex flex-col">
+            <div class="my-1 pr-2 w-full break-words flex flex-col">
                 <div class="flex items-center justify-between w-full">
-                    <p class="font-semibold text-blue-accent mb-0">${window.translatedFields[key]} :</p>
+                    <p class="font-semibold text-blue-accent mb-0">${
+                        window.translatedFields[key]
+                    } :</p>
                     <span class="edit-lock-btn-placeholder ml-auto"></span>
                 </div>
-                <span class="editable-field" data-model="${ent1.model}" data-id="${ent1.id}" data-key="${key}" contenteditable="${window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase()) ? "true" : "false"}" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${ent1[key]}</span>
+                <span class="editable-field" data-model="${
+                    ent1.model
+                }" data-id="${ent1.id}" data-key="${key}" contenteditable="${
+                    window.currentUserRole &&
+                    ["admin", "superadmin"].includes(
+                        window.currentUserRole.toLowerCase()
+                    )
+                        ? "true"
+                        : "false"
+                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
+                    ent1[key]
+                }</span>
             </div>`;
             }
         });
@@ -633,9 +830,13 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         "interlocutor-select-1"
                     );
                     if (oldSelect) oldSelect.parentElement.remove();
-                    const card1Content = document.getElementById("card1-content");
+                    const card1Content =
+                        document.getElementById("card1-content");
                     if (card1Content) {
-                        card1Content.insertAdjacentHTML("beforeend", selectHtml);
+                        card1Content.insertAdjacentHTML(
+                            "beforeend",
+                            selectHtml
+                        );
                         const select1 = document.getElementById(
                             "interlocutor-select-1"
                         );
@@ -645,7 +846,11 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                 if (interlocutorId) {
                                     fetch(
                                         `/model/interlocuteur/show/${interlocutorId}`,
-                                        { headers: { Accept: "application/json" } }
+                                        {
+                                            headers: {
+                                                Accept: "application/json",
+                                            },
+                                        }
                                     )
                                         .then((res) => res.json())
                                         .then((data) => {
@@ -755,8 +960,11 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     const q = this.value.toLowerCase();
                     list.querySelectorAll(".service-item").forEach((div) => {
                         const labelElem = div.querySelector("p");
-                        const valueElem = div.querySelector(".editable-service-field");
-                        const accordionContent = div.querySelector(".accordion-content");
+                        const valueElem = div.querySelector(
+                            ".editable-service-field"
+                        );
+                        const accordionContent =
+                            div.querySelector(".accordion-content");
                         const arrow = div.querySelector(".accordion-arrow");
                         const label = labelElem?.textContent || "";
                         const value = valueElem?.innerText || "";
@@ -794,12 +1002,25 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         (allowedKeys[ent2.model] || []).forEach((key) => {
             if (ent2[key]) {
                 coordonneesHtml += `
-            <div class="my-4 pr-2 w-full break-words flex flex-col">
+            <div class="my-1 pr-2 w-full break-words flex flex-col">
                 <div class="flex items-center justify-between w-full">
-                    <p class="font-semibold text-blue-accent mb-0">${window.translatedFields[key]} :</p>
+                    <p class="font-semibold text-blue-accent mb-0">${
+                        window.translatedFields[key]
+                    } :</p>
                     <span class="edit-lock-btn-placeholder ml-auto"></span>
                 </div>
-                <span class="editable-field" data-model="${ent2.model}" data-id="${ent2.id}" data-key="${key}" contenteditable="${window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole.toLowerCase()) ? "true" : "false"}" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${ent2[key]}</span>
+                <span class="editable-field" data-model="${
+                    ent2.model
+                }" data-id="${ent2.id}" data-key="${key}" contenteditable="${
+                    window.currentUserRole &&
+                    ["admin", "superadmin"].includes(
+                        window.currentUserRole.toLowerCase()
+                    )
+                        ? "true"
+                        : "false"
+                }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em">${
+                    ent2[key]
+                }</span>
             </div>`;
             }
         });
@@ -856,9 +1077,13 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                             "interlocutor-select-2"
                         );
                         if (oldSelect) oldSelect.parentElement.remove();
-                        const card3Content = document.getElementById("card3-content");
+                        const card3Content =
+                            document.getElementById("card3-content");
                         if (card3Content) {
-                            card3Content.insertAdjacentHTML("beforeend", selectHtml);
+                            card3Content.insertAdjacentHTML(
+                                "beforeend",
+                                selectHtml
+                            );
                             const select2 = document.getElementById(
                                 "interlocutor-select-2"
                             );
@@ -877,7 +1102,9 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                             .then((res) => res.json())
                                             .then((data) => {
                                                 const allowed =
-                                                    allowedKeys["interlocuteur"];
+                                                    allowedKeys[
+                                                        "interlocuteur"
+                                                    ];
                                                 const entity = {
                                                     model: "interlocuteur",
                                                 };
@@ -887,12 +1114,14 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                                 });
                                                 entity.id = data.id;
                                                 if (data.fullname)
-                                                    entity.fullname = data.fullname;
+                                                    entity.fullname =
+                                                        data.fullname;
                                                 if (data.active_services)
                                                     entity.active_services =
                                                         data.active_services;
                                                 if (data.societe)
-                                                    entity.societe = data.societe;
+                                                    entity.societe =
+                                                        data.societe;
                                                 addEntityToSelection(entity);
                                             });
                                     }
@@ -981,8 +1210,11 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     const q = this.value.toLowerCase();
                     list.querySelectorAll(".service-item").forEach((div) => {
                         const labelElem = div.querySelector("p");
-                        const valueElem = div.querySelector(".editable-service-field");
-                        const accordionContent = div.querySelector(".accordion-content");
+                        const valueElem = div.querySelector(
+                            ".editable-service-field"
+                        );
+                        const accordionContent =
+                            div.querySelector(".accordion-content");
                         const arrow = div.querySelector(".accordion-arrow");
                         const label = labelElem?.textContent || "";
                         const value = valueElem?.innerText || "";
@@ -1091,13 +1323,22 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 )
                 .forEach((span) => {
                     span.setAttribute("contenteditable", "false");
-                    let placeholder = span.parentElement.querySelector('.edit-lock-btn-placeholder');
-                    if (!placeholder && span.closest('.service-item')) {
-                        placeholder = span.closest('.service-item').querySelector('.edit-lock-btn-placeholder');
+                    let placeholder = span.parentElement.querySelector(
+                        ".edit-lock-btn-placeholder"
+                    );
+                    if (!placeholder && span.closest(".service-item")) {
+                        placeholder = span
+                            .closest(".service-item")
+                            .querySelector(".edit-lock-btn-placeholder");
                     }
                     if (
-                        (!placeholder && (!span.nextElementSibling || !span.nextElementSibling.classList.contains("edit-lock-btn"))) ||
-                        (placeholder && !placeholder.querySelector('.edit-lock-btn'))
+                        (!placeholder &&
+                            (!span.nextElementSibling ||
+                                !span.nextElementSibling.classList.contains(
+                                    "edit-lock-btn"
+                                ))) ||
+                        (placeholder &&
+                            !placeholder.querySelector(".edit-lock-btn"))
                     ) {
                         const btn = document.createElement("button");
                         btn.type = "button";
@@ -1111,18 +1352,29 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                             btn,
                             fetchUrl: `/model/${span.dataset.model}/update-field/${span.dataset.id}`,
                             fetchBody: (value) => {
-                                const key = span.dataset.key ||
-                                    ("infos_" +
-                                        span.dataset.serviceKey?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ /g, "_"));
+                                const key =
+                                    span.dataset.key ||
+                                    "infos_" +
+                                        span.dataset.serviceKey
+                                            ?.toLowerCase()
+                                            .normalize("NFD")
+                                            .replace(/[\u0300-\u036f]/g, "")
+                                            .replace(/ /g, "_");
                                 return { field: key, value };
                             },
                             onSuccess: (el) => {
                                 el.style.background = "#678BD8";
-                                setTimeout(() => (el.style.background = ""), 500);
+                                setTimeout(
+                                    () => (el.style.background = ""),
+                                    500
+                                );
                             },
                             onError: (el) => {
                                 el.style.background = "#DB7171";
-                                setTimeout(() => (el.style.background = ""), 1000);
+                                setTimeout(
+                                    () => (el.style.background = ""),
+                                    1000
+                                );
                             },
                         });
                     }
@@ -1168,11 +1420,12 @@ function showConfirmModal(message = "Confirmer ?") {
         if (!modal) {
             modal = document.createElement("div");
             modal.id = "confirm-modal";
-            modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+            modal.className =
+                "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
             modal.innerHTML = `
-                <div class="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
+                <div class="bg-white rounded-lg p-6 max-w-xs w-full flex flex-col items-center">
                     <div class="mb-4 text-center text-primary-grey">${message}</div>
-                    <div class="flex gap-4">
+                    <div class="flex gap-2">
                         <button id="confirm-yes" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Oui</button>
                         <button id="confirm-no" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Non</button>
                     </div>
@@ -1203,44 +1456,48 @@ function handleLockSaveButton({
     onSuccess,
     onError,
     getValue = (el) => el.innerText.trim(),
-    setValue = (el, val) => { el.innerText = val; },
-    lockTitle = 'Déverrouiller pour éditer',
-    saveTitle = 'Sauvegarder',
+    setValue = (el, val) => {
+        el.innerText = val;
+    },
+    lockTitle = "Déverrouiller pour éditer",
+    saveTitle = "Sauvegarder",
 }) {
     let originalValue = getValue(editableElem);
     btn.onclick = function () {
         if (editableElem.isContentEditable) {
             // Utilise Promise.resolve pour garantir le comportement asynchrone
-            Promise.resolve(showConfirmModal('Sauvegarder la modification ?')).then((confirmed) => {
+            Promise.resolve(
+                showConfirmModal("Sauvegarder la modification ?")
+            ).then((confirmed) => {
                 if (confirmed) {
                     const value = getValue(editableElem);
                     fetch(fetchUrl, {
-                        method: 'POST',
+                        method: "POST",
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            Accept: 'application/json',
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
+                            Accept: "application/json",
                         },
                         body: JSON.stringify(fetchBody(value)),
                     })
-                    .then(res => res.json())
-                    .then(() => {
-                        if (onSuccess) onSuccess(editableElem);
-                    })
-                    .catch(() => {
-                        if (onError) onError(editableElem);
-                    });
+                        .then((res) => res.json())
+                        .then(() => {
+                            if (onSuccess) onSuccess(editableElem);
+                        })
+                        .catch(() => {
+                            if (onError) onError(editableElem);
+                        });
                     originalValue = value;
                 } else {
                     setValue(editableElem, originalValue);
                 }
-                editableElem.contentEditable = 'false';
+                editableElem.contentEditable = "false";
                 btn.innerHTML = '<i class="fa-solid fa-lock"></i>';
                 btn.title = lockTitle;
             });
         } else {
             originalValue = getValue(editableElem);
-            editableElem.contentEditable = 'true';
+            editableElem.contentEditable = "true";
             editableElem.focus();
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
             btn.title = saveTitle;

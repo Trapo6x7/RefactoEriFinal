@@ -31,7 +31,7 @@
     </x-slot>
     <!-- Modale pour le formulaire -->
     <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black hidden">
-        <div class="rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+        <div class="rounded-lg p-6 w-full max-w-lg relative">
             <button id="close-add-model-modal"
                 class="absolute top-2 right-2 text-red-accent hover:text-red-hover text-2xl">&times;</button>
             <div id="add-model-modal-content">
@@ -57,7 +57,7 @@
                             &times;
                         </button>
                         <div id="autocomplete-results"
-                            class="absolute left-0 top-full mt-1 w-full bg-off-white rounded-md shadow-lg z-50 flex flex-col">
+                            class="absolute left-0 top-full mt-1 w-full bg-off-white rounded-md z-50 flex flex-col">
                             <!-- Suggestions injectées ici -->
                         </div>
                     </div>
@@ -154,5 +154,6 @@
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
     </script>
-<script src="build/assets/dashboard-CdpTZ6GX.js" type="module"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    <script src="{{ asset('build/assets/dashboard-z2NASYLG.js') }}"></script>
 </x-app-layout>
