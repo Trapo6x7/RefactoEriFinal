@@ -41,7 +41,7 @@
             </ul>
         </div>
         <div class="flex justify-center mt-4">
-            <button id="delete-item-btn" class="px-2 py-1 text-sm bg-red-accent text-white rounded hover:bg-red-hover">
+            <button id="delete-item-btn" class="px-2 py-1 text-md bg-red-accent text-white rounded hover:bg-red-hover">
                 Supprimer
             </button>
         </div>

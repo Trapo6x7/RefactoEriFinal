@@ -10,12 +10,12 @@
 
             <nav class="w-2/4 gap-5 hidden lg:flex justify-between items-center">
                 <a href="{{ route('dashboard') }}"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-sm px-2 {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-accent' : '' }}">
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey text-sm px-2 {{ request()->routeIs('dashboard') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
                     ACCUEIL
                 </a>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey font-bold text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
                         EXTERNE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -35,7 +35,7 @@
                 </div>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-sm {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-sm {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
                         MAINTENANCE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
