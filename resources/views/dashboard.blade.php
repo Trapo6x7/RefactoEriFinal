@@ -2,8 +2,8 @@
     <x-slot name="header">
         @php
             $models = [
-                'societe' => 'societe',
-                'probleme' => 'probleme',
+                'societe' => 'Société',
+                'probleme' => 'Problème',
                 'interlocuteur' => 'Interlocuteur',
                 'environnement' => 'Environnement',
                 'outil' => 'Outil',
@@ -31,7 +31,7 @@
     </x-slot>
     <!-- Modale pour le formulaire -->
     <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black hidden">
-        <div class="rounded-lg p-6 w-full max-w-lg relative">
+        <div class="rounded-lg p-6 w-full min-w-2xl relative resize overflow-auto">
             <button id="close-add-model-modal"
                 class="absolute top-2 right-2 text-red-accent hover:text-red-hover text-2xl">&times;</button>
             <div id="add-model-modal-content">
@@ -136,6 +136,14 @@
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('add-model-modal-content').innerHTML = html;
+                    // Ajoute ceci juste après :
+                    if (window.ClassicEditor && document.getElementById('description')) {
+                        ClassicEditor
+                            .create(document.getElementById('description'))
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    }
                 });
         });
 
@@ -154,7 +162,7 @@
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
     </script>
-<script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
-@vite('resources/js/dashboard.js')
+    @vite('resources/js/dashboard.js')
 </x-app-layout>
