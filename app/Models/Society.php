@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
+
 use Illuminate\Database\Eloquent\Model;
 
 class Society extends Model
 {
-    use CrudTrait;
+
     protected $table = 'society';
     protected $fillable = [
         'id_main',
