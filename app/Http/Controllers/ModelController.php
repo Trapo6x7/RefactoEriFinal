@@ -298,7 +298,17 @@ class ModelController extends Controller
             abort(404);
         }
         $modelClass = $this->models[$model];
-        $item = $modelClass::findOrFail($id);
+
+        // On charge les relations connues pour chaque modèle
+        $with = [];
+        if ($model === 'probleme') {
+            $with = ['tool', 'env', 'society'];
+        } elseif ($model === 'interlocuteur') {
+            $with = ['society'];
+        }
+        // Ajoute ici d'autres modèles/relations si besoin
+
+        $item = $modelClass::with($with)->findOrFail($id);
 
         if (request()->wantsJson() || request()->ajax()) {
             $data = $item->toArray();

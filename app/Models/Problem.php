@@ -35,4 +35,5 @@ class Problem extends Model
     {
         return $query->orderBy('title', 'asc');
     }
+    
 }

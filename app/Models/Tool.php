@@ -23,4 +23,9 @@ class Tool extends Model
     {
         return $query->orderBy('name', 'asc');
     }
+    
+    public static function getById($id)
+    {
+        return self::find($id);
+    }
 }
