@@ -146,7 +146,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                     <button 
                                         class="w-full text-left font-semibold text-blue-accent hover:text-blue-hover problem-title-btn flex items-center gap-2"
                                         data-idx="${i}">
-                                        <h3 class="text-left">${
+                                        <h3 class="text-left uppercase">${
                                             p.title || ""
                                         }</h3>
                                     </button>
@@ -203,14 +203,16 @@ if (valueSearchInput && descDiv) {
         const q = this.value.trim().toLowerCase();
         const original = descDiv.getAttribute("data-original") || descDiv.innerHTML;
 
-        // Affiche ou masque la description selon la recherche
-        const plainText = descDiv.textContent.toLowerCase();
-        descDiv.parentElement.style.display = !q || plainText.includes(q) ? "" : "none";
+        // Toujours afficher la description
+        descDiv.parentElement.style.display = "";
 
-        // Highlight le texte si trouvé
+        // Stocke l'original si besoin
         if (!descDiv.getAttribute("data-original")) {
             descDiv.setAttribute("data-original", descDiv.innerHTML);
         }
+
+        // Highlight uniquement si trouvé, sinon affiche sans highlight
+        const plainText = descDiv.textContent.toLowerCase();
         if (q && plainText.includes(q)) {
             descDiv.innerHTML = highlightText(original, q);
         } else {
