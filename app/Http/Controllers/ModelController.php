@@ -24,7 +24,7 @@ class ModelController extends Controller
             abort(404);
         }
         $modelClass = $this->models[$model];
-        $items = $modelClass::all();
+        $items = $modelClass::alphabetical()->get();
         return view('model.index', [
             'items' => $items,
             'model' => $model
