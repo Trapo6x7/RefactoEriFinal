@@ -154,7 +154,7 @@
         @if (Auth::user() && Auth::user()->role === 'superadmin')
             <div class="flex flex-col gap-0">
                 <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-user-modal')" class="text-md">
-                   UTILISATEURS
+                    UTILISATEURS
                 </x-responsive-nav-link>
                 <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-tech-modal')" class="text-md">
                     TECHNICIENS
@@ -168,7 +168,7 @@
             @csrf
             <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();"
                 class="text-red-accent hover:text-red-800 text-md">
-              SE DECONNECTER
+                SE DECONNECTER
             </x-responsive-nav-link>
         </form>
 
