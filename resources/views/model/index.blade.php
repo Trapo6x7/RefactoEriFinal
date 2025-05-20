@@ -7,7 +7,7 @@
                 class="border rounded px-4 py-2 w-1/2">
         </div>
 
-        <div class=" rounded-lg" style="max-height: 600px; overflow-y: auto;">
+        <div class=" rounded-lg" style="max-height: 800px; overflow-y: auto;">
             <table class="w-full text-lg">
                 <thead>
                     <tr>
