@@ -173,12 +173,14 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                 if (problem && solutionContainer) {
                     solutionContainer.innerHTML = `
     <div class="bg-white text-lg rounded p-4">
-        <div id="pbTitle" class="flex items-center justify-between mb-2">
-            <h2 class="font-bold text-blue-accent mb-2">${
-                problem.title || ""
-            }</h2>
-            <span class="edit-lock-btn-placeholder"></span>
-        </div>
+    <div id="pbTitle" class="flex items-center justify-between mb-2">
+    <h2 class="font-bold text-blue-accent mb-2 uppercase">${
+        problem.title || ""
+    }</h2>
+    <span class="edit-lock-btn-placeholder"></span>
+    </div>
+
+    <input type="text" id="search-problemes-values" placeholder="Rechercher..." class="px-4 py-4 border text-lg rounded w-full" />
         
         <div 
             class="text-primary-grey editable-problem-solution"
@@ -192,11 +194,32 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         }</div>
     </div>
 `;
-                    // Ajout du formulaire d'upload sous la description
-                    const descDiv = solutionContainer.querySelector(
-                        ".editable-problem-solution"
-                    );
 
+const valueSearchInput = document.getElementById("search-problemes-values");
+const descDiv = document.querySelector("#problemes-list2 .editable-problem-solution");
+
+if (valueSearchInput && descDiv) {
+    valueSearchInput.addEventListener("input", function () {
+        const q = this.value.trim().toLowerCase();
+        const original = descDiv.getAttribute("data-original") || descDiv.innerHTML;
+
+        // Affiche ou masque la description selon la recherche
+        const plainText = descDiv.textContent.toLowerCase();
+        descDiv.parentElement.style.display = !q || plainText.includes(q) ? "" : "none";
+
+        // Highlight le texte si trouvé
+        if (!descDiv.getAttribute("data-original")) {
+            descDiv.setAttribute("data-original", descDiv.innerHTML);
+        }
+        if (q && plainText.includes(q)) {
+            descDiv.innerHTML = highlightText(original, q);
+        } else {
+            descDiv.innerHTML = original;
+        }
+    });
+}
+
+                    // Ajout du formulaire d'upload sous la description
                     if (descDiv) {
                         descDiv.insertAdjacentHTML(
                             "afterend",
@@ -620,7 +643,15 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         fetch("/problemes/search?" + params.toString())
             .then((res) => res.json())
             .then((data) => {
-                renderProblemes(data.problems, q, env, tool, societe);
+                // Filtrage JS côté client (si besoin)
+                let filtered = data.problems;
+                if (q) {
+                    filtered = filtered.filter((p) =>
+                        (p.title || "").toLowerCase().includes(q.toLowerCase())
+                    );
+                }
+                // Les filtres tool, env, societe sont déjà appliqués côté serveur via params
+                renderProblemes(filtered, q, env, tool, societe);
                 // Remplir les filtres au premier chargement
                 if (!document.getElementById("filter-tool").dataset.loaded) {
                     const toolSelect = document.getElementById("filter-tool");
@@ -898,7 +929,7 @@ function highlightText(text, query) {
     return text.replace(
         new RegExp(escaped, "gi"),
         (match) =>
-            `<mark style="background:#ffe066;color:#222;">${match}</mark>`
+            `<mark style="color:#678BD8;">${match}</mark>`
     );
 }
 
@@ -1981,7 +2012,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         else span.after(btnCk);
 
                         btnCk.onclick = function (event) {
-                              event.stopPropagation();
+                            event.stopPropagation();
                             function openCkeditor5() {
                                 let modal =
                                     document.getElementById("ckeditor-modal");
