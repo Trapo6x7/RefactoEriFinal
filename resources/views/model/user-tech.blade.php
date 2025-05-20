@@ -5,12 +5,12 @@
 @endif
 
 <x-app-layout>
-    <div class="flex gap-8 justify-center flex-col items-center w-full h-full">
+    <div class="flex gap-8 justify-center flex-col items-center w-full h-screen">
 
         <!-- Colonne Utilisateurs -->
-        <div class="w-full md:w-1/2 overflow-hidden h-1/2">
+        <div class="w-full md:w-1/2 h-1/2 flex flex-col">
             <h1 class="text-3xl font-extrabold my-8 text-center uppercase text-blue-accent">Liste des Utilisateurs</h1>
-            <div class="w-full mx-auto px-4 mb-10">
+            <div class="w-full mx-auto px-4 mb-10 flex-1 flex flex-col overflow-hidden">
                 <!-- Formulaire d'ajout -->
                 <form method="POST" action="{{ route('user-tech.user.store') }}"
                     class="mb-4 flex gap-2 justify-center items-center">
@@ -33,7 +33,7 @@
                         <i class="fa-solid fa-lock"></i>
                     </button>
                 </div>
-                <div class="rounded-lg" style="max-height: 600px; overflow-y: auto;">
+                <div class="rounded-lg flex-1 overflow-y-auto" style="max-height: calc(100% - 100px);">
                     <table class="w-full text-lg text-center">
                         <thead>
                             <tr>
@@ -79,9 +79,9 @@
         <div class="border-b border-blue-accent w-3/4"></div>
 
         <!-- Colonne Techniciens -->
-        <div class="w-full md:w-1/2">
+        <div class="w-full md:w-1/2 h-1/2 flex flex-col">
             <h1 class="text-3xl font-extrabold my-8 text-center uppercase text-blue-accent">Liste des Techniciens</h1>
-            <div class="w-full mx-auto px-4">
+            <div class="w-full mx-auto px-4 flex-1 flex flex-col overflow-hidden">
                 <!-- Formulaire d'ajout -->
                 <form method="POST" action="{{ route('user-tech.tech.store') }}"
                     class="mb-4 flex gap-2 justify-center items-center">
@@ -95,7 +95,7 @@
                         <i class="fa-solid fa-lock"></i>
                     </button>
                 </div>
-                <div class="rounded-lg" style="max-height: 600px; overflow-y: auto;">
+                <div class="rounded-lg flex-1 overflow-y-auto" style="max-height: calc(100% - 100px);">
                     <table class="w-full text-lg text-center">
                         <thead>
                             <tr>

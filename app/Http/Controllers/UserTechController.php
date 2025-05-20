@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Tech;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserTechController extends Controller
 {
@@ -17,9 +18,18 @@ class UserTechController extends Controller
 
     public function storeUser(Request $request)
     {
-        $request->validate(['name' => 'required', 'email' => 'required|email|unique:users']);
-        User::create($request->only('name', 'email'));
-        return redirect()->route('user-tech.index');
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'required|string',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+
+        User::create($validated);
+
+        return redirect()->back()->with('success', 'Utilisateur ajouté');
     }
 
     public function updateUser(Request $request, User $user)
