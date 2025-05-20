@@ -6,6 +6,7 @@ use App\Http\Controllers\ModelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocietyController;
 use App\Http\Controllers\UserSearchController;
+use App\Http\Controllers\UserTechController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -44,6 +45,9 @@ Route::post('/model/{model}/upload/{id}', [ModelController::class, 'uploadFile']
 Route::get('/model/{model}/show/{id}', [ModelController::class, 'show'])->name('model.show');
 
 Route::post('/model/{model}/update-field/{id}', [ModelController::class, 'updateField'])->name('model.updateField');
+
+Route::get('/user-tech', [UserTechController::class, 'index'])->name('user-tech.index');
+
 
 Route::get('/societe/{id}/interlocuteurs', function($id) {
     return \App\Models\Interlocutor::where('societe', $id)->get();
@@ -95,6 +99,16 @@ Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
     ];
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/user-tech', [UserTechController::class, 'index'])->name('user-tech.index');
+    Route::post('/user-tech/user', [UserTechController::class, 'storeUser'])->name('user-tech.user.store');
+    Route::put('/user-tech/user/{user}', [UserTechController::class, 'updateUser'])->name('user-tech.user.update');
+    Route::delete('/user-tech/user/{user}', [UserTechController::class, 'destroyUser'])->name('user-tech.user.destroy');
+
+    Route::post('/user-tech/tech', [UserTechController::class, 'storeTech'])->name('user-tech.tech.store');
+    Route::put('/user-tech/tech/{tech}', [UserTechController::class, 'updateTech'])->name('user-tech.tech.update');
+    Route::delete('/user-tech/tech/{tech}', [UserTechController::class, 'destroyTech'])->name('user-tech.tech.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/model/{model}', [ModelController::class, 'index'])

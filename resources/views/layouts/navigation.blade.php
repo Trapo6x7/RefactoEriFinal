@@ -72,7 +72,7 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button
-                                class="uppercase hidden lg:flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
+                                class="uppercase hidden lg:flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
                                 <div class="text-sm">{{ Auth::user()->name }}</div>
                                 <div class="ms-1">
                                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -84,39 +84,21 @@
                                 </div>
                             </button>
                         </x-slot>
-                        <x-slot name="content">
+                        <x-slot name="content" class="px-2 py-1 text-center w-80">
                             @if (Auth::user() && Auth::user()->role === 'superadmin')
-                                <div x-data="{ open: false }" class="relative w-80">
-                                    <button @mouseenter="open = true" @mouseleave="open = false"
-                                        class="text-left flex items-center gap-2 px-4 py-2 hover:text-blue-accent text-sm">
-                                        <p class="whitespace-nowrap">GÉRER LES UTILISATEURS</p>
-                                        <svg class="w-4 h-4 transform rotate-0" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </button>
-                                    <div x-show="open" @mouseenter="open = true" @mouseleave="open = false"
-                                        class="absolute left-full top-0 ml-2 bg-off-white rounded-lg z-50 py-1"
-                                        x-transition>
-                                        <x-dropdown-link href="#" @click.prevent="$dispatch('open-user-modal')" class="text-sm">
-                                            {{ __('UTILISATEURS') }}
-                                        </x-dropdown-link>
-                                        <x-dropdown-link href="#" @click.prevent="$dispatch('open-tech-modal')" class="text-sm">
-                                            {{ __('TECHNICIENS') }}
-                                        </x-dropdown-link>
-                                    </div>
-                                </div>
+                                <x-dropdown-link :href="route('user-tech.index')" class="text-sm">
+                                    <p class="whitespace-nowrap">GÉRER LES UTILISATEURS</p>
+                                </x-dropdown-link>
                             @endif
                             <x-dropdown-link :href="route('profile.edit')" class="text-sm">
-                                {{ __('PROFIL') }}
+                              PROFIL
                             </x-dropdown-link>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault(); this.closest('form').submit();"
                                     class="text-red-accent hover:text-red-800 text-sm">
-                                    {{ __('SE DECONNECTER') }}
+                                    SE DECONNECTER
                                 </x-dropdown-link>
                             </form>
                         </x-slot>
