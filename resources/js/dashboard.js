@@ -430,7 +430,8 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             btnCk.innerHTML = '<i class="fa-solid fa-pen"></i>';
                             placeholder.appendChild(btnCk);
 
-                            btnCk.onclick = function () {
+                            btnCk.onclick = function (event) {
+                                event.stopPropagation();
                                 let tryCount = 0;
                                 const maxTries = 30; // 3 secondes max (30 x 100ms)
 
@@ -1119,14 +1120,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                     ent1.model
                                 }" data-id="${ent1.id}" data-service-key="${
                                 service.label
-                            }" contenteditable="${
-                                window.currentUserRole &&
-                                ["admin", "superadmin"].includes(
-                                    window.currentUserRole.toLowerCase()
-                                )
-                                    ? "true"
-                                    : "false"
-                            }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
+                            }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
                                     ${service.info ?? "Oui"}
                                 </span>
                             </div>
@@ -1552,22 +1546,17 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                         <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
                             <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
                                 <p>${service.label}</p>
-                                <span class="edit-lock-btn-placeholder ml-auto"></span>
+                                <div class="flex items-center justify-between w-full">
                                 <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
+                                <span class="edit-lock-btn-placeholder ml-auto"></span>
+                                </div>
                             </button>
                             <div class="accordion-content" style="display:none;">
                                 <span class="editable-service-field" data-model="${
                                     ent2.model
                                 }" data-id="${ent2.id}" data-service-key="${
                                 service.label
-                            }" contenteditable="${
-                                window.currentUserRole &&
-                                ["admin", "superadmin"].includes(
-                                    window.currentUserRole.toLowerCase()
-                                )
-                                    ? "true"
-                                    : "false"
-                            }" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
+                            }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
                                     ${service.info ?? "Oui"}
                                 </span>
                             </div>
@@ -1901,9 +1890,10 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 window.currentUserRole.toLowerCase()
             )
         ) {
+            // Inline classique pour coordonnées (cards 1 et 3)
             document
                 .querySelectorAll(
-                    "#card-1 .editable-field, #card-3 .editable-field, #card-2 .editable-service-field, #card-4 .editable-service-field"
+                    "#card-1 .editable-field, #card-3 .editable-field"
                 )
                 .forEach((span) => {
                     span.setAttribute("contenteditable", "false");
@@ -1935,17 +1925,10 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                             editableElem: span,
                             btn,
                             fetchUrl: `/model/${span.dataset.model}/update-field/${span.dataset.id}`,
-                            fetchBody: (value) => {
-                                const key =
-                                    span.dataset.key ||
-                                    "infos_" +
-                                        span.dataset.serviceKey
-                                            ?.toLowerCase()
-                                            .normalize("NFD")
-                                            .replace(/[\u0300-\u036f]/g, "")
-                                            .replace(/ /g, "_");
-                                return { field: key, value };
-                            },
+                            fetchBody: (value) => ({
+                                field: span.dataset.key,
+                                value,
+                            }),
                             onSuccess: (el) => {
                                 el.style.background = "#678BD8";
                                 setTimeout(
@@ -1961,6 +1944,158 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                 );
                             },
                         });
+                    }
+                });
+
+            // Edition enrichie pour services (cards 2 et 4)
+            document
+                .querySelectorAll(
+                    "#card-2 .editable-service-field, #card-4 .editable-service-field"
+                )
+                .forEach((span) => {
+                    // Ajoute le bouton édition enrichie si pas déjà présent
+                    let placeholder = span.parentElement.querySelector(
+                        ".edit-lock-btn-placeholder"
+                    );
+                    if (!placeholder && span.closest(".service-item")) {
+                        placeholder = span
+                            .closest(".service-item")
+                            .querySelector(".edit-lock-btn-placeholder");
+                    }
+                    if (
+                        (!placeholder &&
+                            (!span.nextElementSibling ||
+                                !span.nextElementSibling.classList.contains(
+                                    "edit-ckeditor-btn"
+                                ))) ||
+                        (placeholder &&
+                            !placeholder.querySelector(".edit-ckeditor-btn"))
+                    ) {
+                        const btnCk = document.createElement("button");
+                        btnCk.type = "button";
+                        btnCk.className =
+                            "edit-ckeditor-btn ml-2 text-blue-accent";
+                        btnCk.title = "Édition enrichie";
+                        btnCk.innerHTML = '<i class="fa-solid fa-pen"></i>';
+                        if (placeholder) placeholder.appendChild(btnCk);
+                        else span.after(btnCk);
+
+                        btnCk.onclick = function (event) {
+                              event.stopPropagation();
+                            function openCkeditor5() {
+                                let modal =
+                                    document.getElementById("ckeditor-modal");
+                                if (!modal) {
+                                    modal = document.createElement("div");
+                                    modal.id = "ckeditor-modal";
+                                    modal.className =
+                                        "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                                    modal.innerHTML = `
+                                    <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                                        <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
+                                        <div class="flex gap-2 mt-4">
+                                            <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
+                                            <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
+                                        </div>
+                                    </div>
+                                `;
+                                    document.body.appendChild(modal);
+                                }
+                                modal.style.display = "flex";
+                                document.getElementById("ckeditor-area").value =
+                                    span.innerHTML;
+
+                                if (window.CKEDITOR5_INSTANCE) {
+                                    window.CKEDITOR5_INSTANCE.destroy();
+                                }
+                                ClassicEditor.create(
+                                    document.getElementById("ckeditor-area")
+                                )
+                                    .then((editor) => {
+                                        window.CKEDITOR5_INSTANCE = editor;
+                                        editor.setData(span.innerHTML);
+                                    })
+                                    .catch((error) => {
+                                        console.error(error);
+                                    });
+
+                                document.getElementById(
+                                    "ckeditor-save"
+                                ).onclick = function () {
+                                    if (window.CKEDITOR5_INSTANCE) {
+                                        const value =
+                                            window.CKEDITOR5_INSTANCE.getData();
+                                        fetch(
+                                            `/model/${span.dataset.model}/update-field/${span.dataset.id}`,
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type":
+                                                        "application/json",
+                                                    "X-CSRF-TOKEN": csrfToken,
+                                                    Accept: "application/json",
+                                                },
+                                                body: JSON.stringify({
+                                                    field:
+                                                        "infos_" +
+                                                        span.dataset.serviceKey
+                                                            .toLowerCase()
+                                                            .normalize("NFD")
+                                                            .replace(
+                                                                /[\u0300-\u036f]/g,
+                                                                ""
+                                                            )
+                                                            .replace(/ /g, "_"),
+                                                    value: value,
+                                                }),
+                                            }
+                                        )
+                                            .then((res) => res.json())
+                                            .then(() => {
+                                                span.innerHTML = value;
+                                                modal.style.display = "none";
+                                                window.CKEDITOR5_INSTANCE.destroy();
+                                                window.CKEDITOR5_INSTANCE =
+                                                    null;
+                                            })
+                                            .catch(() => {
+                                                modal.style.display = "none";
+                                                window.CKEDITOR5_INSTANCE.destroy();
+                                                window.CKEDITOR5_INSTANCE =
+                                                    null;
+                                            });
+                                    }
+                                };
+                                document.getElementById(
+                                    "ckeditor-cancel"
+                                ).onclick = function () {
+                                    modal.style.display = "none";
+                                    if (window.CKEDITOR5_INSTANCE) {
+                                        window.CKEDITOR5_INSTANCE.destroy();
+                                        window.CKEDITOR5_INSTANCE = null;
+                                    }
+                                };
+                            }
+
+                            function onCkeditor5Ready(callback) {
+                                if (
+                                    typeof window.ClassicEditor !== "undefined"
+                                ) {
+                                    callback();
+                                } else {
+                                    const interval = setInterval(() => {
+                                        if (
+                                            typeof window.ClassicEditor !==
+                                            "undefined"
+                                        ) {
+                                            clearInterval(interval);
+                                            callback();
+                                        }
+                                    }, 100);
+                                }
+                            }
+                            onCkeditor5Ready(openCkeditor5);
+                        };
                     }
                 });
         } else {
