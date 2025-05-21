@@ -309,7 +309,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             <button id="show-images-btn" class="mb-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Voir les images</button>
                             <div id="images-modal" class="w-full fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">                            
                                 <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
-                                    <button id="close-images-modal" class="absolute top-2 text-red-accent right-2 text-xl">&times;</button>
+                                    <button id="close-images-modal" class="absolute top-4 right-4 text-red-accent text-xl">&times;</button>
                                     <div id="images-carousel" class="relative w-full flex flex-col items-center">
                                         <button id="carousel-prev" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
                                         <img id="carousel-image" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />

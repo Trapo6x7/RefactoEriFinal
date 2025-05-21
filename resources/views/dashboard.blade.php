@@ -33,7 +33,7 @@
     <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black hidden">
         <div class="rounded-lg p-6 w-full min-w-2xl relative resize overflow-auto">
             <button id="close-add-model-modal"
-                class="absolute top-2 right-2 text-red-accent hover:text-red-hover text-2xl">&times;</button>
+                class="absolute xl:w-1/4 2xl:w-1/2 top-4 right-4 text-red-accent hover:text-red-hover text-3xl">&times;</button>
             <div id="add-model-modal-content">
                 <!-- Le formulaire sera chargé ici -->
                 <div class="flex justify-center items-center text-blue-accent">Chargement...</div>
@@ -164,5 +164,5 @@
     </script>
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
-    {{-- @vite('resources/js/dashboard.js') --}}
+
 </x-app-layout>

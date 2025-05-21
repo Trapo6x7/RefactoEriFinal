@@ -414,6 +414,9 @@ class ModelController extends Controller
             if (in_array($model, ['probleme', 'problem'])) {
                 $searchField = 'title';
             }
+            if (in_array($model, ['interlocuteur', 'interlocutor'])) {
+                $searchField = 'fullname';
+            }
 
             $items = $modelClass::when($query, function ($q) use ($searchField, $query) {
                 $q->where($searchField, 'like', "%$query%");
