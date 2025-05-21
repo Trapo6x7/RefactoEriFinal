@@ -10,12 +10,12 @@
 
             <nav class="w-2/4 gap-5 hidden lg:flex justify-between items-center">
                 <a href="{{ route('dashboard') }}"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey text-md px-2 {{ request()->routeIs('dashboard') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey text-sm px-2 {{ request()->routeIs('dashboard') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
                     ACCUEIL
                 </a>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey text-md px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
                         EXTERNE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -24,18 +24,18 @@
                     <div x-show="open" @click.away="open = false"
                         class="absolute left-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'societe']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/societe*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/societe*') ? 'font-bold text-blue-accent' : '' }}">
                             SOCIETES
                         </a>
                         <a href="{{ route('model.index', ['model' => 'interlocuteur']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
                             INTERLOCUTEURS
                         </a>
                     </div>
                 </div>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-md {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-sm {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
                         MAINTENANCE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -44,15 +44,15 @@
                     <div x-show="open" @click.away="open = false"
                         class="absolute left-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
                             ENVIRONNEMENTS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'outil']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
                             OUTILS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'probleme']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/probleme*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-sm  hover:text-blue-accent {{ request()->is('model/probleme*') ? 'font-bold text-blue-accent' : '' }}">
                             PROBLEMES
                         </a>
                     </div>
@@ -60,7 +60,7 @@
                 @if (request()->routeIs('dashboard'))
                     <button type="button"
                         onclick="document.getElementById('dashboard-header')?.classList.toggle('hidden')"
-                        class="ml-4 px-3 py-1 rounded bg-blue-accent text-off-white hover:bg-blue-hover transition text-md">
+                        class="ml-4 px-3 py-1 rounded bg-blue-accent text-off-white hover:bg-blue-hover transition text-sm">
                         +
                     </button>
                 @else
@@ -73,8 +73,8 @@
                 @if (Auth::check())
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open"
-                            class="uppercase hidden lg:flex items-center px-3 py-2 text-md leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
-                            <div class="text-md">{{ Auth::user()->name }}</div>
+                            class="uppercase hidden lg:flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
+                            <div class="text-sm">{{ Auth::user()->name }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
@@ -84,22 +84,22 @@
                             </div>
                         </button>
                         <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1 shadow-lg"
+                            class="absolute right-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1"
                             x-transition>
                             @if (Auth::user() && Auth::user()->role === 'superadmin')
                                 <a href="{{ route('user-tech.index') }}"
-                                    class="block px-4 py-2 text-md hover:text-blue-accent whitespace-nowrap">
+                                    class="block px-4 py-2 text-sm hover:text-blue-accent whitespace-nowrap">
                                     GÉRER LES UTILISATEURS
                                 </a>
                             @endif
                             <a href="{{ route('profile.edit') }}"
-                                class="block px-4 py-2 text-md hover:text-blue-accent">
+                                class="block px-4 py-2 text-sm hover:text-blue-accent">
                                 PROFIL
                             </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
-                                    class="block w-full text-left px-4 py-2 text-md text-red-accent hover:text-red-800">
+                                    class="block w-full text-left px-4 py-2 text-sm text-red-accent hover:text-red-800">
                                     SE DECONNECTER
                                 </button>
                             </form>
@@ -153,21 +153,21 @@
         </a>
         @if (Auth::user() && Auth::user()->role === 'superadmin')
             <div class="flex flex-col gap-0">
-                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-user-modal')" class="text-md">
+                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-user-modal')" class="text-sm">
                     UTILISATEURS
                 </x-responsive-nav-link>
-                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-tech-modal')" class="text-md">
+                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-tech-modal')" class="text-sm">
                     TECHNICIENS
                 </x-responsive-nav-link>
             </div>
         @endif
-        <x-responsive-nav-link :href="route('profile.edit')" class="text-md">
+        <x-responsive-nav-link :href="route('profile.edit')" class="text-sm">
             PROFIL
         </x-responsive-nav-link>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();"
-                class="text-red-accent hover:text-red-800 text-md">
+                class="text-red-accent hover:text-red-800 text-sm">
                 SE DECONNECTER
             </x-responsive-nav-link>
         </form>
@@ -180,7 +180,7 @@
     x-show="open" style="display: none;"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-off-white rounded-lg p-6 w-full max-w-xl relative">
-        <button @click="open = false" class="absolute top-2 right-2 text-red-accent text-md">&times;</button>
+        <button @click="open = false" class="absolute top-2 right-2 text-red-accent text-sm">&times;</button>
         @include('model.form_modal', ['model' => 'user', 'action' => 'create'])
     </div>
 </div>
@@ -190,7 +190,7 @@
     x-show="open" style="display: none;"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-off-white rounded-lg p-6 w-full max-w-xl relative">
-        <button @click="open = false" class="absolute top-2 right-2 text-red-accent text-md">&times;</button>
+        <button @click="open = false" class="absolute top-2 right-2 text-red-accent text-sm">&times;</button>
         @include('model.form_modal', ['model' => 'tech', 'action' => 'create'])
     </div>
 </div>

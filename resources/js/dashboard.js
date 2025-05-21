@@ -561,7 +561,20 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                         window.CKEDITOR5_INSTANCE.destroy();
                                     }
                                     ClassicEditor.create(
-                                        document.getElementById("ckeditor-area")
+                                        document.getElementById(
+                                            "ckeditor-area"
+                                        ),
+                                        {
+                                            toolbar: [
+                                                "bold",
+                                                "italic",
+                                                "link",
+                                                "bulletedList",
+                                                "numberedList",
+                                                "undo",
+                                                "redo",
+                                            ],
+                                        }
                                     )
                                         .then((editor) => {
                                             window.CKEDITOR5_INSTANCE = editor;
@@ -2228,7 +2241,18 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                     window.CKEDITOR5_INSTANCE.destroy();
                                 }
                                 ClassicEditor.create(
-                                    document.getElementById("ckeditor-area")
+                                    document.getElementById("ckeditor-area"),
+                                    {
+                                        toolbar: [
+                                            "bold",
+                                            "italic",
+                                            "link",
+                                            "bulletedList",
+                                            "numberedList",
+                                            "undo",
+                                            "redo",
+                                        ],
+                                    }
                                 )
                                     .then((editor) => {
                                         window.CKEDITOR5_INSTANCE = editor;
