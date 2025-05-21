@@ -32,20 +32,22 @@ use Illuminate\Support\Str;
         <div class="px-8" style="max-height:600px; overflow-y: auto;">
             <ul class="divide-y divide-primary-grey" id="details-list">
                 {{-- Sélecteur combiné Client/Distributeur --}}
-                <li class="p-3 flex items-start justify-between h-auto group">
-                    <span class="font-semibold text-blue-accent w-40 mr-20">
-                        Statut Client/Distributeur
-                    </span>
-                    <select name="status_combined" id="status_combined"
-                        class="px-4 py-2 border border-secondary-grey rounded-lg text-lg w-2/12 focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
-                        data-id="{{ $item->id }}" data-model="{{ $model }}">
-                        <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
-                        <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur
-                        </option>
-                        <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur
-                        </option>
-                    </select>
-                </li>
+                @if ($model === 'societe')
+                    <li class="p-3 flex items-start justify-between h-auto group">
+                        <span class="font-semibold text-blue-accent w-40 mr-20">
+                            Statut Client/Distributeur
+                        </span>
+                        <select name="status_combined" id="status_combined"
+                            class="px-4 py-2 border border-secondary-grey rounded-lg text-lg w-2/12 focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+                            data-id="{{ $item->id }}" data-model="{{ $model }}">
+                            <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
+                            <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur
+                            </option>
+                            <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur
+                            </option>
+                        </select>
+                    </li>
+                @endif
 
                 {{-- Champs non-service --}}
                 @foreach ($otherKeys as $key)

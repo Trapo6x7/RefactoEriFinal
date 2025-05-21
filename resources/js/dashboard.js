@@ -178,7 +178,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         if (!query && !env && !tool && !societe) {
             container.innerHTML = `
             <div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-lg text-left">
-                Commencez à taper pour rechercher un probleme...
+                Tapez * pour voir tous les problemes ou commencer a rechercher...
             </div>
         `;
             return;
@@ -753,6 +753,135 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     document
         .getElementById("filter-societe")
         .addEventListener("change", fetchAndRenderProblems);
+
+    const input = document.getElementById("search-problemes-global");
+
+    // Crée le conteneur suggestions si pas déjà là
+    let suggestionBox = document.getElementById(
+        "search-problemes-global-suggestions"
+    );
+    if (!suggestionBox) {
+        suggestionBox = document.createElement("div");
+        suggestionBox.id = "search-problemes-global-suggestions";
+        suggestionBox.className =
+            "absolute z-50 bg-white border rounded shadow w-1/2 max-w-xs hidden";
+        // Ajoute une hauteur fixe et scroll vertical
+        suggestionBox.style.maxHeight = "320px";
+        suggestionBox.style.overflowY = "auto";
+        input.parentNode.appendChild(suggestionBox);
+    } else {
+        // Si déjà présent, applique aussi le style
+        suggestionBox.style.maxHeight = "320px";
+        suggestionBox.style.overflowY = "auto";
+    }
+
+    let allProblems = [];
+    let selectedIndex = -1;
+
+    // Récupère tous les problèmes une seule fois
+    fetch("/problemes/search")
+        .then((res) => res.json())
+        .then((data) => {
+            allProblems = data.problems || [];
+        });
+
+    input.addEventListener("input", function () {
+        if (this.value.trim() === "*") {
+            // Affiche la liste de tous les problèmes
+            suggestionBox.innerHTML = allProblems.length
+                ? allProblems
+                      .map(
+                          (p, i) =>
+                              `<button type="button" class="block w-full text-left px-4 py-2 hover:bg-blue-accent hover:text-white suggestion-item" data-idx="${i}">${
+                                  p.title || ""
+                              }</button>`
+                      )
+                      .join("")
+                : '<div class="px-4 py-2 text-gray-400">Aucun problème trouvé.</div>';
+            suggestionBox.classList.remove("hidden");
+            suggestionBox.style.left = input.offsetLeft + "px";
+            suggestionBox.style.top =
+                input.offsetTop + input.offsetHeight + "px";
+            suggestionBox.style.width = input.offsetWidth + "px";
+            selectedIndex = -1;
+        } else {
+            suggestionBox.classList.add("hidden");
+            selectedIndex = -1;
+        }
+    });
+
+    // Navigation clavier
+    input.addEventListener("keydown", function (ev) {
+        const items = suggestionBox.querySelectorAll(".suggestion-item");
+        if (!items.length || suggestionBox.classList.contains("hidden")) return;
+        if (ev.key === "ArrowDown") {
+            ev.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            items.forEach((item, idx) => {
+                item.classList.toggle("bg-blue-accent", idx === selectedIndex);
+                item.classList.toggle("text-white", idx === selectedIndex);
+            });
+            items[selectedIndex].scrollIntoView({ block: "nearest" });
+        } else if (ev.key === "ArrowUp") {
+            ev.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            items.forEach((item, idx) => {
+                item.classList.toggle("bg-blue-accent", idx === selectedIndex);
+                item.classList.toggle("text-white", idx === selectedIndex);
+            });
+            items[selectedIndex].scrollIntoView({ block: "nearest" });
+        } else if (ev.key === "Enter") {
+            if (selectedIndex >= 0 && selectedIndex < items.length) {
+                ev.preventDefault();
+                items[selectedIndex].click();
+            }
+        } else if (ev.key === "Escape") {
+            suggestionBox.classList.add("hidden");
+        }
+    });
+
+    // Clic sur une suggestion : affiche dans problemes-list2
+    suggestionBox.addEventListener("click", function (e) {
+        if (e.target.classList.contains("suggestion-item")) {
+            const idx = e.target.getAttribute("data-idx");
+            const problem = allProblems[idx];
+            suggestionBox.classList.add("hidden");
+            // Réutilise le rendu déjà présent dans renderProblemes
+            const solutionContainer =
+                document.getElementById("problemes-list2");
+            if (problem && solutionContainer) {
+                solutionContainer.innerHTML = `
+    <div class="bg-white text-lg rounded p-4">
+        <div id="pbTitle" class="flex items-center justify-between mb-2">
+            <h2 class="font-bold text-blue-accent mb-2 uppercase">${
+                problem.title || ""
+            }</h2>
+            <span class="edit-lock-btn-placeholder"></span>
+        </div>
+        <input type="text" id="search-problemes-values" placeholder="Rechercher..." class="px-4 py-4 border text-lg rounded w-full" />
+        <div 
+            class="text-primary-grey editable-problem-solution"
+            data-problem-id="${problem.id || ""}"
+            contenteditable="false"
+            style="min-height:2em;"
+        >${
+            problem.description
+                ? problem.description
+                : "<em>Aucune solution enregistrée.</em>"
+        }</div>
+    </div>
+            `;
+                // (Optionnel) Ajoutez ici la logique pour la recherche dans la description, upload, etc.
+            }
+        }
+    });
+
+    // Ferme la box si clic ailleurs
+    document.addEventListener("click", function (e) {
+        if (!suggestionBox.contains(e.target) && e.target !== input) {
+            suggestionBox.classList.add("hidden");
+        }
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function () {

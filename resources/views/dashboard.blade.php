@@ -154,6 +154,15 @@
             header.classList.remove('modal-blur');
         });
 
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                mainContent.classList.remove('modal-blur');
+                header.classList.remove('modal-blur');
+            }
+        });
+
         window.userRoles = @json(Auth::user()
                 ? collect([Auth::user()->isAdmin() ? 'admin' : null, Auth::user()->isSuperAdmin() ? 'superadmin' : null])->filter()->values()
                 : []
@@ -164,5 +173,5 @@
     </script>
     <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
     <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
-
+    @vite('resources/js/dashboard.js')
 </x-app-layout>

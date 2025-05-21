@@ -11,12 +11,12 @@
             <table class="w-full text-lg">
                 <thead>
                     <tr>
-                        <th class="py-2 px-4 border-b text-center bg-blue-accent text-secondary-grey">NOM</th>
+                        <th class="py-2 px-4 border-b text-center bg-blue-accent text-secondary-grey"
+                            style="position: sticky; top: 0; left: 0; width: 100%; z-index: 10;"></th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
                     @foreach ($items as $item)
-    
                         <tr class="border-b">
                             <td class="py-2 px-4 text-center bg-off-white hover:text-blue-accent">
                                 <a href="{{ route('model.show', ['model' => $model, 'id' => $item->id]) }}"
@@ -33,10 +33,54 @@
                 </tbody>
             </table>
         </div>
+        <div class="py-2 px-4 border-b text-center bg-blue-accent text-secondary-grey rounded-lg"></div>
     </div>
 
     <script>
-        document.getElementById('search').addEventListener('input', function() {
+        const searchInput = document.getElementById('search');
+        const tableBody = document.getElementById('table-body');
+        let selectedIndex = -1;
+
+        function updateSelection() {
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach((row, idx) => {
+                const cell = row.querySelector('td');
+                if (idx === selectedIndex) {
+                    row.classList.add('bg-blue-accent', 'text-white');
+                    if (cell) {
+                        cell.classList.add('bg-blue-accent', 'text-white');
+                        cell.classList.remove('bg-off-white');
+                        cell.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                } else {
+                    row.classList.remove('bg-blue-accent', 'text-white');
+                    if (cell) {
+                        cell.classList.remove('bg-blue-accent', 'text-white');
+                        cell.classList.add('bg-off-white');
+                    }
+                }
+            });
+        }
+
+        searchInput.addEventListener('keydown', function(e) {
+            const rows = tableBody.querySelectorAll('tr');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (selectedIndex < rows.length - 1) selectedIndex++;
+                updateSelection();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (selectedIndex > 0) selectedIndex--;
+                updateSelection();
+            } else if (e.key === 'Enter') {
+                if (selectedIndex >= 0 && rows[selectedIndex]) {
+                    const link = rows[selectedIndex].querySelector('a');
+                    if (link) link.click();
+                }
+            }
+        });
+
+        searchInput.addEventListener('input', function() {
             let query = this.value;
             fetch(`{{ route('model-suggestions', ['model' => $model]) }}?q=${encodeURIComponent(query)}`, {
                     headers: {
@@ -45,8 +89,14 @@
                 })
                 .then(response => response.text())
                 .then(html => {
-                    document.getElementById('table-body').innerHTML = html;
+                    tableBody.innerHTML = html;
+                    // Sélectionne automatiquement la première ligne si elle existe
+                    const rows = tableBody.querySelectorAll('tr');
+                    selectedIndex = rows.length > 0 ? 0 : -1;
+                    updateSelection();
+                    searchInput.focus();
                 });
         });
     </script>
+
 </x-app-layout>
