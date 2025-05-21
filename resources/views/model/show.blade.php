@@ -3,7 +3,24 @@ use Illuminate\Support\Str;
 ?>
 @php
     $fields = __('fields');
+    $attributes = $item->getAttributes();
+
+    // Séparer les champs service_ des autres
+    $serviceKeys = [];
+    $otherKeys = [];
+    foreach ($attributes as $key => $value) {
+        if (str_starts_with($key, 'service_')) {
+            $serviceKeys[] = $key;
+        } elseif (!str_starts_with($key, 'infos_')) {
+            $otherKeys[] = $key;
+        }
+    }
+    // Statut combiné
+    $client = $attributes['status_client'] ?? 0;
+    $distrib = $attributes['status_distrib'] ?? 0;
+    $selectedStatus = $client && $distrib ? 'both' : ($client ? 'client' : ($distrib ? 'distrib' : 'none'));
 @endphp
+
 <x-app-layout>
     <h1 class="text-3xl text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}</h1>
 
@@ -14,145 +31,110 @@ use Illuminate\Support\Str;
         </div>
         <div class="px-8" style="max-height:600px; overflow-y: auto;">
             <ul class="divide-y divide-primary-grey" id="details-list">
-                @foreach ($item->getAttributes() as $key => $value)
-                    @php
-                        $isService = str_starts_with($key, 'service_');
-                        $isInfo = str_starts_with($key, 'infos_');
-                        $infoKey = $isService ? 'infos_' . Str::after($key, 'service_') : null;
-                        $infoValue =
-                            $infoKey && array_key_exists($infoKey, $item->getAttributes()) ? $item->$infoKey : '';
-                    @endphp
+                {{-- Sélecteur combiné Client/Distributeur --}}
+                <li class="p-3 flex items-start justify-between h-auto group">
+                    <span class="font-semibold text-blue-accent w-40 mr-20">
+                        Statut Client/Distributeur
+                    </span>
+                    <select name="status_combined" id="status_combined"
+                        class="px-4 py-2 border border-secondary-grey rounded-lg text-lg w-2/12 focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+                        data-id="{{ $item->id }}" data-model="{{ $model }}">
+                        <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
+                        <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur
+                        </option>
+                        <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur
+                        </option>
+                    </select>
+                </li>
 
+                {{-- Champs non-service --}}
+                @foreach ($otherKeys as $key)
+                    @php
+                        $value = $attributes[$key];
+                        $relationMap = [
+                            'tool' => 'tool',
+                            'env' => 'env',
+                            'societe' => 'society',
+                            'society' => 'society',
+                        ];
+                    @endphp
                     @if (
                         $key !== 'id' &&
                             $key !== 'created_at' &&
                             $key !== 'updated_at' &&
-                            ($isService ||
-                                (!$isService && !$isInfo && !is_null($value) && $value !== '' && $value !== 0 && $value !== '0')))
+                            $key !== 'status_client' &&
+                            $key !== 'status_distrib' &&
+                            !is_null($value) &&
+                            $value !== '' &&
+                            $value !== 0 &&
+                            $value !== '0')
                         <li class="p-3 flex items-start justify-between h-auto group">
                             <span class="font-semibold text-blue-accent w-40 mr-20">
                                 {{ $fields[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}
                             </span>
-                            @if ($isService)
-                                <div class="flex flex-col gap-2 w-full">
-                                    <select class="service-select border rounded px-2 py-1"
-                                        data-field="{{ $key }}" data-id="{{ $item->id }}"
-                                        data-model="{{ $model }}">
-                                        <option value="1" @if ($value == 1) selected @endif>Oui
-                                        </option>
-                                        <option value="0" @if ($value == 0) selected @endif>Non
-                                        </option>
-                                    </select>
-                                    <div class="service-info-wrapper"
-                                        style="@if ($value != 1) display:none; @endif">
-                                        <textarea class="service-info border rounded px-2 py-1 mt-2" placeholder="Infos service..."
-                                            data-field="{{ $infoKey }}" data-id="{{ $item->id }}" data-model="{{ $model }}">{!! $infoValue !!}</textarea>
-                                    </div>
-                                </div>
-                            @elseif ($model === 'probleme' && $key === 'description')
-                                @if (in_array(strtolower(auth()->user()->role ?? ''), ['admin', 'superadmin']))
-                                    <form id="desc-form" class="flex flex-col items-end gap-2 w-full">
-                                        <textarea id="ckeditor-description" name="description" class="w-[55rem] min-h-[120px]">{{ $value }}</textarea>
-                                        <div class="flex flex-row items-center justify-end w-[55rem] gap-2">
-                                            <span id="desc-status" class="text-sm order-1"></span>
-                                            <button type="submit" id="desc-save-btn"
-                                                class="order-2 px-3 py-1 bg-blue-accent text-white rounded">Enregistrer</button>
-                                        </div>
-                                    </form>
-                                    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
-                                    <script>
-                                        let ckeditorInstance;
-                                        ClassicEditor
-                                            .create(document.querySelector('#ckeditor-description'))
-                                            .then(editor => {
-                                                ckeditorInstance = editor;
-                                            })
-                                            .catch(error => {
-                                                console.error(error);
-                                            });
-
-                                        document.getElementById('desc-form').addEventListener('submit', function(e) {
-                                            e.preventDefault();
-                                            const btn = document.getElementById('desc-save-btn');
-                                            const status = document.getElementById('desc-status');
-                                            btn.disabled = true;
-                                            status.textContent = 'Sauvegarde...';
-                                            status.className = 'text-sm text-secondary-grey order-1';
-
-                                            fetch(`/model/{{ $model }}/update-field/{{ $item->id }}`, {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
-                                                            "content") || '{{ csrf_token() }}',
-                                                        Accept: 'application/json'
-                                                    },
-                                                    body: JSON.stringify({
-                                                        field: 'description',
-                                                        value: ckeditorInstance.getData()
-                                                    }),
-                                                })
-                                                .then(res => res.json())
-                                                .then(data => {
-                                                    if (!data.success) {
-                                                        status.textContent = 'Erreur lors de la mise à jour';
-                                                        status.className = 'text-sm text-red-accent order-1';
-                                                    } else {
-                                                        status.textContent = 'Enregistré !';
-                                                        status.className = 'text-sm text-blue-accent order-1';
-                                                    }
-                                                    btn.disabled = false;
-                                                })
-                                                .catch(() => {
-                                                    status.textContent = 'Erreur réseau';
-                                                    status.className = 'text-sm text-red-hover order-1';
-                                                    btn.disabled = false;
-                                                });
-                                        });
-                                    </script>
-                                @else
-                                    <div class="w-[55rem] px-2 py-1 rounded transition bg-white border border-off-white text-left prose text-md"
-                                        style="min-height:120px; display:block;">
-                                        {!! $value !!}
-                                    </div>
-                                @endif
+                            @if ($key === 'status')
+                                <select class="editable-select border rounded px-2 py-1 w-2/12" style="width: 15%;"
+                                    {{-- w-2/12 en inline pour uniformité --}} data-field="{{ $key }}" data-id="{{ $item->id }}"
+                                    data-model="{{ $model }}">
+                                    <option value="active" @if ($value === 'active') selected @endif>Active
+                                    </option>
+                                    <option value="inactive" @if ($value === 'inactive') selected @endif>Inactive
+                                    </option>
+                                </select>
+                            @elseif (array_key_exists($key, $relationMap) && isset($item->getRelations()[$relationMap[$key]]))
+                                <span
+                                    class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition cursor-text outline-none text-right focus:border-blue-accent border border-off-white group-hover:border-blue-hover"
+                                    contenteditable="false">
+                                    {{ $item->getRelations()[$relationMap[$key]]->name ??
+                                        ($item->getRelations()[$relationMap[$key]]->nom ?? $value) }}
+                                </span>
                             @else
-                                @php
-                                    $relationMap = [
-                                        'tool' => 'tool',
-                                        'env' => 'env',
-                                        'societe' => 'society',
-                                        'society' => 'society',
-                                    ];
-                                @endphp
-
-                                @if (array_key_exists($key, $relationMap) && isset($item->getRelations()[$relationMap[$key]]))
-                                    <span
-                                        class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition
-        cursor-text outline-none text-right
-        focus:border-blue-accent border border-off-white
-        group-hover:border-blue-hover"
-                                        contenteditable="false">
-                                        {{ $item->getRelations()[$relationMap[$key]]->name ?? ($item->getRelations()[$relationMap[$key]]->nom ?? $value) }}
-                                    </span>
-                                @else
-                                    <span
-                                        class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition
-        cursor-text outline-none text-right
-        focus:border-blue-accent border border-off-white
-        group-hover:border-blue-hover"
-                                        contenteditable="true" data-field="{{ $key }}"
-                                        data-id="{{ $item->id }}" data-model="{{ $model }}" tabindex="0">
-                                        @if ((in_array($key, ['status_client', 'status_distrib']) || str_starts_with($key, 'statut')) && $value == 1)
-                                            Oui
-                                        @else
-                                            {{ $value }}
-                                        @endif
-                                    </span>
-                                @endif
+                                <span
+                                    class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition cursor-text outline-none text-right focus:border-blue-accent border border-off-white group-hover:border-blue-hover"
+                                    contenteditable="true" data-field="{{ $key }}"
+                                    data-id="{{ $item->id }}" data-model="{{ $model }}" tabindex="0">
+                                    @if (str_starts_with($key, 'statut') && $value == 1)
+                                        Oui
+                                    @elseif (str_starts_with($key, 'statut') && $value == 0)
+                                        Non
+                                    @else
+                                        {{ $value }}
+                                    @endif
+                                </span>
                             @endif
                         </li>
                     @endif
+                @endforeach
+
+                {{-- Champs service (toujours à la fin) --}}
+                @foreach ($serviceKeys as $key)
+                    @php
+                        $value = $attributes[$key];
+                        $infoKey = 'infos_' . Str::after($key, 'service_');
+                        $infoValue = array_key_exists($infoKey, $attributes) ? $attributes[$infoKey] : '';
+                    @endphp
+                    <li class="p-3 flex items-start justify-between h-auto group">
+                        <span class="font-semibold text-blue-accent w-40 mr-20">
+                            {{ $fields[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}
+                        </span>
+                        <div class="flex flex-col gap-2 w-full">
+                            <div class="flex justify-end">
+                                <select class="service-select border rounded px-2 py-1 w-2/12"
+                                    data-field="{{ $key }}" data-id="{{ $item->id }}"
+                                    data-model="{{ $model }}">
+                                    <option value="1" @if ($value == 1) selected @endif>Oui
+                                    </option>
+                                    <option value="0" @if ($value == 0) selected @endif>Non
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="service-info-wrapper"
+                                style="@if ($value != 1) display:none; @endif">
+                                <textarea class="service-info w-full border rounded px-2 py-1 mt-2" placeholder="Infos service..."
+                                    data-field="{{ $infoKey }}" data-id="{{ $item->id }}" data-model="{{ $model }}">{!! $infoValue !!}</textarea>
+                            </div>
+                        </div>
+                    </li>
                 @endforeach
             </ul>
         </div>
@@ -211,9 +193,46 @@ use Illuminate\Support\Str;
                 document.querySelectorAll('.service-select').forEach(function(select) {
                     select.addEventListener('change', function() {
                         const value = this.value;
-                        const wrapper = this.parentElement.querySelector('.service-info-wrapper');
+                        const wrapper = this.closest('li').querySelector('.service-info-wrapper');
+                        const textarea = wrapper ? wrapper.querySelector('.service-info') : null;
                         if (wrapper) {
-                            wrapper.style.display = (value == "1") ? "" : "none";
+                            if (value == "1") {
+                                wrapper.style.display = "";
+                                // Initialiser CKEditor si pas déjà fait
+                                if (textarea && !textarea._ckeditorInstance) {
+                                    ClassicEditor.create(textarea, {
+                                        toolbar: ['bold', 'italic', 'link', 'bulletedList',
+                                            'numberedList', 'undo', 'redo'
+                                        ]
+                                    }).then(editor => {
+                                        textarea._ckeditorInstance = editor;
+                                        editor.model.document.on('change:data', function() {
+                                            const value = editor.getData();
+                                            const field = textarea.dataset.field;
+                                            const id = textarea.dataset.id;
+                                            const model = textarea.dataset.model;
+                                            fetch(`/model/${model}/update-field/${id}`, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': document
+                                                        .querySelector(
+                                                            'meta[name="csrf-token"]'
+                                                            ).getAttribute(
+                                                            "content"),
+                                                    Accept: 'application/json'
+                                                },
+                                                body: JSON.stringify({
+                                                    field,
+                                                    value
+                                                }),
+                                            });
+                                        });
+                                    });
+                                }
+                            } else {
+                                wrapper.style.display = "none";
+                            }
                         }
                     });
                 });
@@ -247,6 +266,90 @@ use Illuminate\Support\Str;
                         });
                     });
                 });
+
+                // Pour le select statut (active/inactive)
+                document.querySelectorAll('.editable-select').forEach(function(select) {
+                    select.addEventListener('change', function() {
+                        const value = this.value;
+                        const field = this.dataset.field;
+                        const id = this.dataset.id;
+                        const model = this.dataset.model;
+                        fetch(`/model/${model}/update-field/${id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                        'meta[name="csrf-token"]').getAttribute("content"),
+                                    Accept: 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    field,
+                                    value
+                                }),
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    alert('Erreur lors de la mise à jour');
+                                } else {
+                                    this.style.background = "#678BD8";
+                                    setTimeout(() => this.style.background = "", 500);
+                                }
+                            })
+                            .catch(() => {
+                                this.style.background = "#DB7171";
+                                setTimeout(() => this.style.background = "", 1000);
+                            });
+                    });
+                });
+
+                // Pour le select combiné Client/Distributeur
+                const statusCombined = document.getElementById('status_combined');
+                if (statusCombined) {
+                    statusCombined.addEventListener('change', function() {
+                        const value = this.value;
+                        const id = this.dataset.id;
+                        const model = this.dataset.model;
+                        let status_client = 0,
+                            status_distrib = 0;
+                        if (value === 'client') status_client = 1;
+                        if (value === 'distrib') status_distrib = 1;
+                        if (value === 'both') {
+                            status_client = 1;
+                            status_distrib = 1;
+                        }
+
+                        // Met à jour les deux champs côté serveur
+                        fetch(`/model/${model}/update-field/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute("content"),
+                                Accept: 'application/json'
+                            },
+                            body: JSON.stringify({
+                                field: 'status_client',
+                                value: status_client
+                            }),
+                        }).then(() => {
+                            fetch(`/model/${model}/update-field/${id}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                        'meta[name="csrf-token"]').getAttribute(
+                                        "content"),
+                                    Accept: 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    field: 'status_distrib',
+                                    value: status_distrib
+                                }),
+                            });
+                        });
+                    });
+                }
             }
         });
 
