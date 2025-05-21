@@ -56,6 +56,53 @@ function normalizeSelectedEntities(entities) {
     return result;
 }
 
+/**
+ * Active la navigation clavier sur une liste d'autocomplétion.
+ * @param {HTMLInputElement} input - L'input de recherche.
+ * @param {HTMLElement} suggestionBox - Le conteneur des suggestions (doit contenir des <button>).
+ */
+function enableAutocompleteKeyboardNavigation(input, suggestionBox) {
+    let selectedIndex = -1;
+
+    input.addEventListener("keydown", function (e) {
+        const items = suggestionBox.querySelectorAll("button");
+        if (!items.length || suggestionBox.classList.contains("hidden")) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            items.forEach((item, idx) => {
+                item.classList.toggle("bg-blue-accent", idx === selectedIndex);
+                item.classList.toggle("text-off-white", idx === selectedIndex);
+            });
+            items[selectedIndex].scrollIntoView({ block: "nearest" });
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            items.forEach((item, idx) => {
+                item.classList.toggle("bg-blue-accent", idx === selectedIndex);
+                item.classList.toggle("text-off-white", idx === selectedIndex);
+            });
+            items[selectedIndex].scrollIntoView({ block: "nearest" });
+        } else if (e.key === "Enter") {
+            if (selectedIndex >= 0 && selectedIndex < items.length) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            }
+        } else if (e.key === "Escape") {
+            selectedIndex = -1;
+            items.forEach((item) => {
+                item.classList.remove("bg-blue-accent", "text-off-white");
+            });
+        }
+    });
+
+    // Remet à zéro l'index à chaque nouvelle recherche
+    input.addEventListener("input", function () {
+        selectedIndex = -1;
+    });
+}
+
 function addEntityToSelection(entity) {
     // Ne pas stocker dans le localStorage, garder uniquement en mémoire
     // On veut societe uniquement sur card 1/2, interlocuteur uniquement sur card 3/4
@@ -195,31 +242,40 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     </div>
 `;
 
-const valueSearchInput = document.getElementById("search-problemes-values");
-const descDiv = document.querySelector("#problemes-list2 .editable-problem-solution");
+                    const valueSearchInput = document.getElementById(
+                        "search-problemes-values"
+                    );
+                    const descDiv = document.querySelector(
+                        "#problemes-list2 .editable-problem-solution"
+                    );
 
-if (valueSearchInput && descDiv) {
-    valueSearchInput.addEventListener("input", function () {
-        const q = this.value.trim().toLowerCase();
-        const original = descDiv.getAttribute("data-original") || descDiv.innerHTML;
+                    if (valueSearchInput && descDiv) {
+                        valueSearchInput.addEventListener("input", function () {
+                            const q = this.value.trim().toLowerCase();
+                            const original =
+                                descDiv.getAttribute("data-original") ||
+                                descDiv.innerHTML;
 
-        // Toujours afficher la description
-        descDiv.parentElement.style.display = "";
+                            // Toujours afficher la description
+                            descDiv.parentElement.style.display = "";
 
-        // Stocke l'original si besoin
-        if (!descDiv.getAttribute("data-original")) {
-            descDiv.setAttribute("data-original", descDiv.innerHTML);
-        }
+                            // Stocke l'original si besoin
+                            if (!descDiv.getAttribute("data-original")) {
+                                descDiv.setAttribute(
+                                    "data-original",
+                                    descDiv.innerHTML
+                                );
+                            }
 
-        // Highlight uniquement si trouvé, sinon affiche sans highlight
-        const plainText = descDiv.textContent.toLowerCase();
-        if (q && plainText.includes(q)) {
-            descDiv.innerHTML = highlightText(original, q);
-        } else {
-            descDiv.innerHTML = original;
-        }
-    });
-}
+                            // Highlight uniquement si trouvé, sinon affiche sans highlight
+                            const plainText = descDiv.textContent.toLowerCase();
+                            if (q && plainText.includes(q)) {
+                                descDiv.innerHTML = highlightText(original, q);
+                            } else {
+                                descDiv.innerHTML = original;
+                            }
+                        });
+                    }
 
                     // Ajout du formulaire d'upload sous la description
                     if (descDiv) {
@@ -815,6 +871,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     } else {
                         suggestionBox.classList.add("hidden");
                     }
+                    enableAutocompleteKeyboardNavigation(input, suggestionBox);
                 });
         });
 
@@ -930,8 +987,7 @@ function highlightText(text, query) {
     const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return text.replace(
         new RegExp(escaped, "gi"),
-        (match) =>
-            `<mark style="color:#678BD8;">${match}</mark>`
+        (match) => `<mark style="color:#678BD8;">${match}</mark>`
     );
 }
 
