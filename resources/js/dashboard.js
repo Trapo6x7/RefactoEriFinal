@@ -93,6 +93,7 @@ function enableAutocompleteKeyboardNavigation(input, suggestionBox) {
             selectedIndex = -1;
             items.forEach((item) => {
                 item.classList.remove("bg-blue-accent", "text-off-white");
+                suggestionBox.classList.add("hidden");
             });
         }
     });
@@ -779,7 +780,7 @@ document.addEventListener("DOMContentLoaded", function () {
             resetBtn.classList.toggle("hidden", !this.value.length);
             const q = this.value.trim();
             const table = tableSelect.value;
-            if (q.length < 2) {
+            if (q.length < 1) {
                 suggestionBox.innerHTML = "";
                 suggestionBox.classList.add("hidden");
                 return;
@@ -792,7 +793,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then((res) => res.json())
                 .then((data) => {
                     suggestionBox.innerHTML = "";
-                    const suggestions = data.slice(0, 5);
+                    const suggestions = data.slice(0, 10);
                     if (suggestions.length) {
                         suggestions.forEach((suggestion) => {
                             let item = document.createElement("button");
