@@ -145,6 +145,36 @@ document.querySelectorAll('.global-lock-btn').forEach(function(lockBtn) {
     let target = lockBtn.getAttribute('data-target');
     let icon = lockBtn.querySelector('i');
 
+    // Ajout : marquer les lignes modifiées
+    function markModifiedRows() {
+        if (target === 'users') {
+            document.querySelectorAll('tr[data-user-id]').forEach(function(tr) {
+                let input = tr.querySelector('.user-name');
+                let select = tr.querySelector('.user-role');
+                if (input) {
+                    input.addEventListener('input', function() {
+                        tr.classList.add('modified');
+                    });
+                }
+                if (select) {
+                    select.addEventListener('change', function() {
+                        tr.classList.add('modified');
+                    });
+                }
+            });
+        } else if (target === 'techs') {
+            document.querySelectorAll('tr[data-tech-id]').forEach(function(tr) {
+                let input = tr.querySelector('.tech-name');
+                if (input) {
+                    input.addEventListener('input', function() {
+                        tr.classList.add('modified');
+                    });
+                }
+            });
+        }
+    }
+    markModifiedRows();
+
     lockBtn.addEventListener('click', function() {
         let rows = [];
         if (target === 'users') {
@@ -173,9 +203,10 @@ document.querySelectorAll('.global-lock-btn').forEach(function(lockBtn) {
             // Gestion des boutons Oui / Non
             document.getElementById('confirm-yes').onclick = function() {
                 modal.classList.add('hidden');
-                // Sauvegarde toutes les lignes puis reverrouille
+                // Sauvegarde SEULEMENT les lignes modifiées puis reverrouille
                 let fetches = [];
                 rows.forEach(function(tr) {
+                    if (!tr.classList.contains('modified')) return; // <-- SEULEMENT modifiés
                     if (target === 'users') {
                         let userId = tr.getAttribute('data-user-id');
                         let name = tr.querySelector('.user-name').value;
@@ -219,6 +250,7 @@ document.querySelectorAll('.global-lock-btn').forEach(function(lockBtn) {
                         let select = tr.querySelector('select');
                         if (input) input.setAttribute('readonly', true);
                         if (select) select.setAttribute('disabled', true);
+                        tr.classList.remove('modified'); // Nettoie la classe modifiée
                     });
                     icon.classList.remove('fa-floppy-disk');
                     icon.classList.add('fa-lock');

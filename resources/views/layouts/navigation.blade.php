@@ -22,13 +22,13 @@
                         </svg>
                     </button>
                     <div x-show="open" @click.away="open = false"
-                        class="absolute left-0 mt-2 w-40 bg-off-white rounded-lg z-50 py-1" x-transition>
+                        class="absolute left-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'societe']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accen {{ request()->is('model/societe*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/societe*') ? 'font-bold text-blue-accent' : '' }}">
                             SOCIETES
                         </a>
                         <a href="{{ route('model.index', ['model' => 'interlocuteur']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accen {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/interlocuteur*') ? 'font-bold text-blue-accent' : '' }}">
                             INTERLOCUTEURS
                         </a>
                     </div>
@@ -42,17 +42,17 @@
                         </svg>
                     </button>
                     <div x-show="open" @click.away="open = false"
-                        class="absolute left-0 mt-2 bg-off-white rounded-lg z-50 py-1" x-transition>
+                        class="absolute left-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1" x-transition>
                         <a href="{{ route('model.index', ['model' => 'environnement']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accen {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/environnement*') ? 'font-bold text-blue-accent' : '' }}">
                             ENVIRONNEMENTS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'outil']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accen {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/outil*') ? 'font-bold text-blue-accent' : '' }}">
                             OUTILS
                         </a>
                         <a href="{{ route('model.index', ['model' => 'probleme']) }}"
-                            class="block px-4 py-2 text-md  hover:text-blue-accen {{ request()->is('model/probleme*') ? 'font-bold text-blue-accent' : '' }}">
+                            class="block px-4 py-2 text-md  hover:text-blue-accent {{ request()->is('model/probleme*') ? 'font-bold text-blue-accent' : '' }}">
                             PROBLEMES
                         </a>
                     </div>
@@ -71,40 +71,40 @@
             <!-- User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @if (Auth::check())
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button
-                                class="uppercase hidden lg:flex items-center px-3 py-2 text-md leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
-                                <div class="text-md">{{ Auth::user()->name }}</div>
-                                <div class="ms-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
-                        <x-slot name="content" class="px-2 py-1 text-center w-80">
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open"
+                            class="uppercase hidden lg:flex items-center px-3 py-2 text-md leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
+                            <div class="text-md">{{ Auth::user()->name }}</div>
+                            <div class="ms-1">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                        <div x-show="open" @click.away="open = false"
+                            class="absolute right-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1 shadow-lg"
+                            x-transition>
                             @if (Auth::user() && Auth::user()->role === 'superadmin')
-                                <x-dropdown-link :href="route('user-tech.index')" class="text-md">
-                                    <p class="whitespace-nowrap">GÉRER LES UTILISATEURS</p>
-                                </x-dropdown-link>
+                                <a href="{{ route('user-tech.index') }}"
+                                    class="block px-4 py-2 text-md hover:text-blue-accent whitespace-nowrap">
+                                    GÉRER LES UTILISATEURS
+                                </a>
                             @endif
-                            <x-dropdown-link :href="route('profile.edit')" class="text-md">
+                            <a href="{{ route('profile.edit') }}"
+                                class="block px-4 py-2 text-md hover:text-blue-accent">
                                 PROFIL
-                            </x-dropdown-link>
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();"
-                                    class="text-red-accent hover:text-red-800 text-md">
+                                <button type="submit"
+                                    class="block w-full text-left px-4 py-2 text-md text-red-accent hover:text-red-800">
                                     SE DECONNECTER
-                                </x-dropdown-link>
+                                </button>
                             </form>
-                        </x-slot>
-                    </x-dropdown>
+                        </div>
+                    </div>
                 @endif
             </div>
 
