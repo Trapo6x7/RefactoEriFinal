@@ -128,7 +128,7 @@
         </div>
     </div>
 <!-- Modale de confirmation -->
-<div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+<div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
         <h2 class="text-xl font-bold mb-4">Confirmer la sauvegarde</h2>
         <p class="mb-6">Voulez-vous vraiment enregistrer les modifications&nbsp;?</p>
@@ -199,10 +199,11 @@ document.querySelectorAll('.global-lock-btn').forEach(function(lockBtn) {
             // Affiche la modale de confirmation
             let modal = document.getElementById('confirm-modal');
             modal.classList.remove('hidden');
-
+            modal.classList.add('flex');
             // Gestion des boutons Oui / Non
             document.getElementById('confirm-yes').onclick = function() {
                 modal.classList.add('hidden');
+                modal.classList.remove('flex');
                 // Sauvegarde SEULEMENT les lignes modifiées puis reverrouille
                 let fetches = [];
                 rows.forEach(function(tr) {
