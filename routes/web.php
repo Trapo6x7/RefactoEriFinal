@@ -99,6 +99,9 @@ Route::get('/problemes/search', function (\Illuminate\Http\Request $request) {
     ];
 });
 
+Route::get('/model/{model}/services/{id}', [ModelController::class, 'getServices'])->name('model.getServices');
+Route::post('/model/{model}/services/{id}', [ModelController::class, 'updateServices'])->name('model.updateServices');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/user-tech', [UserTechController::class, 'index'])->name('user-tech.index');
     Route::post('/user-tech/user', [UserTechController::class, 'storeUser'])->name('user-tech.user.store');

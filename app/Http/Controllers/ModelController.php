@@ -479,4 +479,79 @@ class ModelController extends Controller
         }
         return response()->json(['files' => $files]);
     }
+
+    public function getServices($model, $id)
+    {
+        if (!isset($this->models[$model])) {
+            abort(404);
+        }
+        $modelClass = $this->models[$model];
+        $item = $modelClass::findOrFail($id);
+
+        // Liste des services à afficher (adapte selon ton modèle)
+        $serviceFields = [
+            'service_backup' => 'Sauvegarde',
+            'service_connect' => 'Connexion',
+            'service_cloody' => 'Cloody',
+            'service_maintenance' => 'Maintenance',
+            'service_heberg_web' => 'Hébergement Web',
+            'service_mail' => 'Mail',
+            'service_EBP' => 'EBP',
+            'service_maintenance_office' => 'Maintenance Office',
+            'service_maintenance_serveur' => 'Maintenance Serveur',
+            'service_maintenance_infra_rso' => 'Infra RSO',
+            'service_maintenance_equip_rso' => 'Equip RSO',
+            'service_maintenance_ESET' => 'ESET',
+            'service_maintenance_domaine_DNS' => 'Domaine DNS',
+            'service_comptes' => 'Comptes',
+        ];
+
+        $services = [];
+        foreach ($serviceFields as $field => $label) {
+            if (isset($item->$field)) {
+                $services[] = [
+                    'id' => $field,
+                    'label' => $label,
+                    'actif' => (bool)$item->$field,
+                ];
+            }
+        }
+
+        return response()->json(['services' => $services]);
+    }
+
+    public function updateServices(Request $request, $model, $id)
+    {
+        if (!isset($this->models[$model])) {
+            abort(404);
+        }
+        $modelClass = $this->models[$model];
+        $item = $modelClass::findOrFail($id);
+
+        // Même liste que dans getServices
+        $serviceFields = [
+            'service_backup',
+            'service_connect',
+            'service_cloody',
+            'service_maintenance',
+            'service_heberg_web',
+            'service_mail',
+            'service_EBP',
+            'service_maintenance_office',
+            'service_maintenance_serveur',
+            'service_maintenance_infra_rso',
+            'service_maintenance_equip_rso',
+            'service_maintenance_ESET',
+            'service_maintenance_domaine_DNS',
+            'service_comptes'
+        ];
+
+        $checked = $request->input('services', []);
+        foreach ($serviceFields as $field) {
+            $item->$field = in_array($field, $checked) ? 1 : 0;
+        }
+        $item->save();
+
+        return response()->json(['success' => true]);
+    }
 }

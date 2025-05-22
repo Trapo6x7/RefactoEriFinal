@@ -17,7 +17,8 @@
 
     <link rel="stylesheet" href="{{ asset('build/assets/app-Bu_bwFjy.css') }}">
     <script defer src="{{ asset('build/assets/app-Bf4POITK.js') }}" type="module"></script>
-    @vite(['resources/js/app.js', 'resources/css/app.css'])
+@vite(['resources/js/app.js', 'resources/css/app.css'])
+
 </head>
 
 <body class="text-sm md:text-md lg:text-lg font-sans antialiased min-h-screen flex flex-col bg-off-white">

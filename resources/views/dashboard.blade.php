@@ -10,11 +10,14 @@
             ];
         @endphp
 
-        <article class="w-full flex justify-center bg-white rounded-md" id="header">
-            <div class="rounded-lg p-2 md:p-4 flex flex-col items-center max-w-full md:max-w-sm w-full">
-                <div class="text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
-                <div class="flex gap-2 w-full">
-                    <select id="add-model-select" class="border rounded px-4 py-1 flex-1">
+        <article id="header" class="w-full flex justify-center rounded-md
+                bg-white">
+            <div
+                class="rounded-lg p-2 md:p-4 lg:p-6 xl:p-8 2xl:p-10 flex flex-col items-center max-w-full md:max-w-sm w-full">
+                <div class="text-base md:text-lg font-semibold mb-2 text-blue-accent">Ajouter une nouvelle entrée</div>
+                <div class="flex flex-col md:flex-row gap-2 w-full">
+                    <select id="add-model-select"
+                        class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-sm md:text-md lg:text-lg">
                         @foreach ($models as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
                         @endforeach
@@ -26,12 +29,11 @@
                 </div>
             </div>
         </article>
-
-
     </x-slot>
+
     <!-- Modale pour le formulaire -->
-    <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black hidden">
-        <div class="rounded-lg p-6 w-full min-w-2xl relative resize overflow-auto">
+    <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="rounded-lg p-6 w-full min-w-2xl relative resize overflow-auto bg-white">
             <button id="close-add-model-modal"
                 class="absolute xl:w-1/4 2xl:w-1/2 top-4 right-4 text-red-accent hover:text-red-hover text-3xl">&times;</button>
             <div id="add-model-modal-content">
@@ -44,34 +46,57 @@
     <section id="main-content" class="text-sm md:text-md lg:text-lg flex flex-col h-full min-h-0 flex-1">
         <section class="mx-0 bg-off-white rounded-lg text-sm md:text-md lg:text-lg">
 
-            <article class="max-w-4xl pt-4 mx-auto">
+            <article class="pt-4 mx-auto flex flex-col items-center justify-center w-full max-w-6xl">
                 <form id="user-search-form"
-                    class="flex flex-col md:flex-row items-center justify-center gap-4 relative">
-                    <div class="w-full md:w-1/2 relative">
-                        <input type="text" id="user-search-input" name="q" autocomplete="off"
-                            placeholder="Recherche..."
-                            class="w-full px-4 py-2 border text-sm md:text-md lg:text-lg border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-primary-grey">
-                        <button type="button" id="reset-search-input"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-accent text-xl hidden"
-                            aria-label="Effacer">
-                            &times;
-                        </button>
-                        <div id="autocomplete-results"
-                            class="absolute left-0 top-full mt-1 w-full bg-off-white rounded-md z-50 flex flex-col">
-                            <!-- Suggestions injectées ici -->
-                        </div>
+                    class="flex flex-col md:flex-row items-center justify-center gap-4 relative w-3/4"> <input
+                        type="text" id="user-search-input" name="q" autocomplete="off"
+                        placeholder="Recherche..."
+                        class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-sm md:text-md lg:text-lg">
+                    <button type="button" id="reset-search-input"
+                        class="absolute right-[12rem] top-1/2 -translate-y-1/2 text-red-accent hover:text-red-accent text-3xl hidden"
+                        aria-label="Effacer">
+                        &times;
+                    </button>
+                    <div id="autocomplete-results"
+                        class="absolute left-0 top-full mt-1 w-full bg-off-white rounded-md z-50 flex flex-col">
+                        <!-- Suggestions injectées ici -->
                     </div>
-
-                    <div class="w-full md:w-1/4">
+                    <div class="w-full md:w-1/4 mt-2 md:mt-0">
                         <select id="user-search-table" name="table"
-                            class="w-full px-4 py-2 border border-secondary-grey rounded-md focus:outline-none focus:ring-2 focus:ring-blue-accent text-sm md:text-md lg:text-lg">
+                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
                             <option value="" class="hover:bg-blue-accent">Tous</option>
                             <option value="interlocutors">Interlocuteurs</option>
                             <option value="societies">Sociétés</option>
                         </select>
                     </div>
                 </form>
-
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6 w-full mt-4">
+                    <div class="relative w-full md:w-1/4 flex flex-col items-center gap-1">
+                        <label for="societe-select" class="block mb-1 text-md uppercase text-sm">Société</label>
+                        <select id="societe-select"
+                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
+                            <option value="">Sélectionner...</option>
+                            @foreach (\App\Models\Society::orderBy('name')->get() as $societe)
+                                <option value="societe-{{ $societe->id }}">
+                                    {{ $societe->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="relative w-full md:w-1/4 flex flex-col items-center gap-1">
+                        <label for="societe-select" class="block mb-1 text-md uppercase text-sm">Interlocuteur</label>
+                        <select id="interlocuteur-select"
+                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
+                            <option value="" class="font-bold bg-blue-accent text-off-white">Sélectionner...
+                            </option>
+                            @foreach (\App\Models\Interlocutor::orderBy('fullname')->get() as $interlocuteur)
+                                <option value="interlocuteur-{{ $interlocuteur->id }}">
+                                    {{ $interlocuteur->fullname }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
             </article>
             <article class="mx-auto">
                 <div id="user-search-results" class="mt-4 flex justify-center items-center"></div>
@@ -79,19 +104,19 @@
         </section>
 
         <section id="selected-entity-card"
-            class="hidden lg:flex flex-col lg:flex-row gap-4 w-full min-w-0 p-1 sm:p-2 lg:p-4 flex-1 min-h-0 h-[40vh] lg:h-[50vh] bg-off-white rounded-lg">
+            class="hidden lg:flex flex-col lg:flex-row gap-4 w-full min-w-0 p-1 md:p-2 lg:p-4 flex-1 min-h-0 h-[40vh] lg:h-[50vh] bg-off-white rounded-lg">
             <article id="card-1"
-                class="relative w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-2"
-                class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="card-3"
-                class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-4"
-                class="w-full lg:w-1/4 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-[450px] bg-white rounded-lg flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
         </section>
 
@@ -100,13 +125,13 @@
         </div>
 
         <section
-            class="flex flex-col lg:flex-row h-[30vh] lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 sm:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
+            class="flex flex-col lg:flex-row h-[30vh] lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 md:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
             <article id="problemes-list1"
-                class="w-full lg:w-1/2 px-2 sm:px-4 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
+                class="w-full lg:w-1/2 px-2 md:px-4 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="problemes-list2"
-                class="w-full lg:w-1/2 px-2 sm:px-8 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
+                class="w-full lg:w-1/2 px-2 md:px-8 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
             </article>
         </section>
     </section>

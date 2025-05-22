@@ -40,6 +40,17 @@ function onCkeditor5Ready(callback) {
     }
 }
 
+function autoLink(text) {
+    // Remplace les URLs par des liens cliquables avec style
+    return text.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, function (url) {
+        let href = url;
+        if (!href.match(/^https?:\/\//)) {
+            href = "http://" + href;
+        }
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="underline text-blue-accent cursor-pointer">${url}</a>`;
+    });
+}
+
 function getEntityFromDataset(dataset) {
     const entity = {};
     for (const key in dataset) entity[key] = dataset[key];
@@ -149,22 +160,202 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     const liste = document.getElementById(containerId);
     if (!liste) return;
     liste.innerHTML = `
-        <div class="flex justify-center gap-2 mb-4 px-12 w-full">
-            <input type="text" id="search-problemes-global" placeholder="Rechercher un probleme..." 
-                class="p-2 border text-lg rounded max-w-xs w-1/2" />
-            <select id="filter-tool" class="p-2 text-lg border rounded w-1/5">
+        <div class="flex justify-center gap-2 mb-4 px-12 w-full relative">
+            <select id="all-problems-select" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition max-w-xs w-full ml-2">
+                <option value="">Tous les problèmes...</option>
+            </select>
+<div class="relative w-1/2 max-w-xs">
+    <input type="text" id="search-problemes-global"
+        placeholder="Rechercher un probleme..."
+        class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition w-full" />
+    <button type="button" id="reset-search-input2"
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-red-accent hover:text-red-accent text-3xl hidden z-10"
+        aria-label="Effacer">
+        &times;
+    </button>
+</div>
+            <select id="filter-tool" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/5 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
                 <option value="">Tous les outils</option>
             </select>
-            <select id="filter-env" class="p-2 border text-lg rounded w-1/5">
+            <select id="filter-env" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/5 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
                 <option value="">Tous les env...</option>
             </select>
-            <select id="filter-societe" class="p-2 border text-lg rounded w-1/5">
+            <select id="filter-societe" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/5 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
                 <option value="">Toutes les soc...</option>
             </select>
         </div>
         <div id="problemes-list-inner-global"></div>
     `;
 
+    const input2 = document.getElementById("search-problemes-global");
+    const resetBtn = document.getElementById("reset-search-input2");
+
+    if (input2 && resetBtn) {
+        input2.addEventListener("input", function () {
+            resetBtn.classList.remove("hidden", !this.value.length);
+            resetBtn.classList.add("flex", !this.value.length);
+        });
+        resetBtn.addEventListener("click", function () {
+            input2.value = "";
+            input2.focus();
+            resetBtn.classList.add("hidden");
+            resetBtn.classList.remove("flex");
+            // Optionnel : relancer la recherche ou vider les résultats
+            fetchAndRenderProblems();
+        });
+    }
+
+    const allProblemsSelect = document.getElementById("all-problems-select");
+    fetch("/problemes/search")
+        .then((res) => res.json())
+        .then((data) => {
+            const problems = data.problems || [];
+            problems.forEach((p) => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = p.title || "(Sans titre)";
+                allProblemsSelect.appendChild(opt);
+            });
+        });
+    allProblemsSelect.addEventListener("change", function () {
+        const problemId = this.value;
+        if (!problemId) return;
+        fetch(`/model/probleme/show/${problemId}`, {
+            headers: { Accept: "application/json" },
+        })
+            .then((res) => res.json())
+            .then((problem) => {
+                const solutionContainer =
+                    document.getElementById("problemes-list2");
+                if (solutionContainer) {
+                    solutionContainer.innerHTML = `
+    <div class="bg-white text-lg rounded p-4">
+        <div id="pbTitle" class="flex items-center justify-between mb-2">
+            <h2 class="font-bold text-blue-accent mb-2 uppercase">${
+                problem.title || ""
+            }</h2>
+            <button id="edit-description-btn" class="ml-2 px-2 py-1 text-blue-accent rounded hover:text-blue-hover" title="Éditer la description">
+                <i class="fa-solid fa-pen"></i>
+            </button>
+        </div>
+        <div id="problem-description" class="text-primary-grey" style="min-height:2em;">
+            ${
+                problem.description
+                    ? autoLink(problem.description)
+                    : "<em>Aucune solution enregistrée.</em>"
+            }
+        </div>
+    </div>
+`;
+                    const editBtn = document.getElementById(
+                        "edit-description-btn"
+                    );
+                    const descDiv = document.getElementById(
+                        "problem-description"
+                    );
+                    if (editBtn && descDiv) {
+                        editBtn.onclick = function () {
+                            // Crée la modale si besoin
+                            let modal =
+                                document.getElementById("ckeditor-modal");
+                            if (!modal) {
+                                modal = document.createElement("div");
+                                modal.id = "ckeditor-modal";
+                                modal.className =
+                                    "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                                modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                    <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
+                    <div class="flex gap-2 mt-4">
+                        <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
+                        <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
+                    </div>
+                </div>
+            `;
+                                document.body.appendChild(modal);
+                            }
+                            modal.style.display = "flex";
+                            document.getElementById("ckeditor-area").value =
+                                descDiv.innerHTML;
+
+                            // Charge CKEditor 5 si besoin
+                            if (window.CKEDITOR5_INSTANCE) {
+                                window.CKEDITOR5_INSTANCE.destroy();
+                            }
+                            ClassicEditor.create(
+                                document.getElementById("ckeditor-area"),
+                                {
+                                    toolbar: [
+                                        "bold",
+                                        "italic",
+                                        "link",
+                                        "bulletedList",
+                                        "numberedList",
+                                        "undo",
+                                        "redo",
+                                    ],
+                                }
+                            )
+                                .then((editor) => {
+                                    window.CKEDITOR5_INSTANCE = editor;
+                                    editor.setData(descDiv.innerHTML);
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+
+                            document.getElementById("ckeditor-save").onclick =
+                                function () {
+                                    if (window.CKEDITOR5_INSTANCE) {
+                                        const value =
+                                            window.CKEDITOR5_INSTANCE.getData();
+                                        fetch(
+                                            `/problemes/update-description/${problem.id}`,
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type":
+                                                        "application/json",
+                                                    "X-CSRF-TOKEN": csrfToken,
+                                                    Accept: "application/json",
+                                                },
+                                                body: JSON.stringify({
+                                                    description: value,
+                                                }),
+                                            }
+                                        )
+                                            .then((res) => res.json())
+                                            .then(() => {
+                                                descDiv.innerHTML = value;
+                                                descDiv.innerHTML = autoLink(
+                                                    descDiv.innerHTML
+                                                );
+                                                modal.style.display = "none";
+                                                window.CKEDITOR5_INSTANCE.destroy();
+                                                window.CKEDITOR5_INSTANCE =
+                                                    null;
+                                            })
+                                            .catch(() => {
+                                                modal.style.display = "none";
+                                                window.CKEDITOR5_INSTANCE.destroy();
+                                                window.CKEDITOR5_INSTANCE =
+                                                    null;
+                                            });
+                                    }
+                                };
+                            document.getElementById("ckeditor-cancel").onclick =
+                                function () {
+                                    modal.style.display = "none";
+                                    if (window.CKEDITOR5_INSTANCE) {
+                                        window.CKEDITOR5_INSTANCE.destroy();
+                                        window.CKEDITOR5_INSTANCE = null;
+                                    }
+                                };
+                        };
+                    }
+                }
+            });
+    });
     function renderProblemes(
         problemes,
         query = "",
@@ -178,7 +369,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
         if (!query && !env && !tool && !societe) {
             container.innerHTML = `
             <div class="mb-2 px-8 py-1 text-primary-grey font-semibold text-lg text-left">
-                Tapez * pour voir tous les problemes ou commencer a rechercher...
+                Commencer a rechercher...
             </div>
         `;
             return;
@@ -220,28 +411,31 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                     );
                 if (problem && solutionContainer) {
                     solutionContainer.innerHTML = `
-    <div class="bg-white text-lg rounded p-4">
-    <div id="pbTitle" class="flex items-center justify-between mb-2">
-    <h2 class="font-bold text-blue-accent mb-2 uppercase">${
-        problem.title || ""
-    }</h2>
-    <span class="edit-lock-btn-placeholder"></span>
-    </div>
-
-    <input type="text" id="search-problemes-values" placeholder="Rechercher..." class="px-4 py-4 border text-lg rounded w-full" />
-        
-        <div 
-            class="text-primary-grey editable-problem-solution"
-            data-problem-id="${problem.id || ""}"
-            contenteditable="false"
-            style="min-height:2em;"
-        >${
-            problem.description
-                ? problem.description
-                : "<em>Aucune solution enregistrée.</em>"
-        }</div>
-    </div>
-`;
+                        <div class="bg-white text-lg rounded p-4">
+                            <div id="pbTitle" class="flex items-center justify-between mb-2">
+                                <h2 class="font-bold text-blue-accent mb-2 uppercase">${
+                                    problem.title || ""
+                                }</h2>
+                                <span class="edit-lock-btn-placeholder"></span>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="search-problemes-values" 
+                                placeholder="Rechercher..." 
+                                class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition"
+                            />
+                            <div 
+                                class="text-primary-grey editable-problem-solution"
+                                data-problem-id="${problem.id || ""}"
+                                contenteditable="false"
+                                style="min-height:2em;"
+                            >${
+                                problem.description
+                                    ? problem.description
+                                    : "<em>Aucune solution enregistrée.</em>"
+                            }</div>
+                        </div>
+                    `;
 
                     const valueSearchInput = document.getElementById(
                         "search-problemes-values"
@@ -283,15 +477,23 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                         descDiv.insertAdjacentHTML(
                             "afterend",
                             `
-                <div id="file-upload-section" class="mt-4">
-                    <form id="upload-form" enctype="multipart/form-data">
-                        <label class="block mb-2 font-semibold">Ajouter un fichier :</label>
-                        <input type="file" name="file" id="file-input" class="mb-2" />
-                        <button type="submit" class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Uploader</button>
-                    </form>
-                    <div id="upload-result" class="mt-2 text-blue-accent"></div>
-                </div>
-                `
+                            <div id="file-upload-section" class="mt-1 flex flex-col w-full items-center justify-between">
+                                <form id="upload-form" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-2 w-full">
+                                    <label class="block font-semibold mb-0 md:mb-0 md:w-auto w-full text-left">Ajouter un fichier :</label>
+                                    <input 
+                                        type="file" 
+                                        name="file" 
+                                        id="file-input" 
+                                        class="rounded-lg px-4 py-2 mb-0 md:w-auto w-full" 
+                                    />
+                                    <button 
+                                        type="submit" 
+                                        class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover md:w-auto w-full"
+                                    >Uploader</button>
+                                </form>
+                                <div id="upload-result" class="mt-2 text-blue-accent"></div>
+                            </div>
+                            `
                         );
 
                         const h2 = solutionContainer.querySelector("#pbTitle");
@@ -309,7 +511,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             <button id="show-images-btn" class="mb-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Voir les images</button>
                             <div id="images-modal" class="w-full fixed inset-0 z-50  flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">                            
                                 <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
-                                    <button id="close-images-modal" class="absolute top-4 right-4 text-red-accent text-xl">&times;</button>
+                                    <button id="close-images-modal" class="absolute top-4 right-4 text-red-accent text-3xl">&times;</button>
                                     <div id="images-carousel" class="relative w-full flex flex-col items-center">
                                         <button id="carousel-prev" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
                                         <img id="carousel-image" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />
@@ -609,6 +811,10 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                                 .then((res) => res.json())
                                                 .then(() => {
                                                     descDiv.innerHTML = value;
+                                                    descDiv.innerHTML =
+                                                        autoLink(
+                                                            descDiv.innerHTML
+                                                        );
                                                     modal.style.display =
                                                         "none";
                                                     window.CKEDITOR5_INSTANCE.destroy();
@@ -798,31 +1004,6 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
             allProblems = data.problems || [];
         });
 
-    input.addEventListener("input", function () {
-        if (this.value.trim() === "*") {
-            // Affiche la liste de tous les problèmes
-            suggestionBox.innerHTML = allProblems.length
-                ? allProblems
-                      .map(
-                          (p, i) =>
-                              `<button type="button" class="block w-full text-left px-4 py-2 hover:bg-blue-accent hover:text-white suggestion-item" data-idx="${i}">${
-                                  p.title || ""
-                              }</button>`
-                      )
-                      .join("")
-                : '<div class="px-4 py-2 text-gray-400">Aucun problème trouvé.</div>';
-            suggestionBox.classList.remove("hidden");
-            suggestionBox.style.left = input.offsetLeft + "px";
-            suggestionBox.style.top =
-                input.offsetTop + input.offsetHeight + "px";
-            suggestionBox.style.width = input.offsetWidth + "px";
-            selectedIndex = -1;
-        } else {
-            suggestionBox.classList.add("hidden");
-            selectedIndex = -1;
-        }
-    });
-
     // Navigation clavier
     input.addEventListener("keydown", function (ev) {
         const items = suggestionBox.querySelectorAll(".suggestion-item");
@@ -916,6 +1097,62 @@ document.addEventListener("DOMContentLoaded", function () {
     const tableSelect = document.getElementById("user-search-table");
     const suggestionBox = document.getElementById("autocomplete-results");
     const resetBtn = document.getElementById("reset-search-input");
+
+    // --- Synchronisation des selects manuels Société/Interlocuteur avec les cards ---
+    const societeSelect = document.getElementById("societe-select");
+    const interlocuteurSelect = document.getElementById("interlocuteur-select");
+    if (societeSelect) {
+        societeSelect.addEventListener("change", function () {
+            const val = this.value;
+            if (val && val.startsWith("societe-")) {
+                const id = val.replace("societe-", "");
+                fetch(`/model/societe/show/${id}`, {
+                    headers: { Accept: "application/json" },
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        const allowed = allowedKeys["societe"] || [];
+                        const entity = { model: "societe" };
+                        allowed.forEach((key) => {
+                            if (data[key] !== undefined)
+                                entity[key] = data[key];
+                        });
+                        entity.id = data.id;
+                        if (data.active_services)
+                            entity.active_services = data.active_services;
+                        if (data.main_obj) entity.main_obj = data.main_obj;
+                        addEntityToSelection(entity);
+                    });
+            }
+        });
+    }
+
+    if (interlocuteurSelect) {
+        interlocuteurSelect.addEventListener("change", function () {
+            const val = this.value;
+            if (val && val.startsWith("interlocuteur-")) {
+                const id = val.replace("interlocuteur-", "");
+                fetch(`/model/interlocuteur/show/${id}`, {
+                    headers: { Accept: "application/json" },
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        const allowed = allowedKeys["interlocuteur"] || [];
+                        const entity = { model: "interlocuteur" };
+                        allowed.forEach((key) => {
+                            if (data[key] !== undefined)
+                                entity[key] = data[key];
+                        });
+                        entity.id = data.id;
+                        if (data.fullname) entity.fullname = data.fullname;
+                        if (data.active_services)
+                            entity.active_services = data.active_services;
+                        if (data.societe) entity.societe = data.societe;
+                        addEntityToSelection(entity);
+                    });
+            }
+        });
+    }
 
     if (input && tableSelect && suggestionBox && resetBtn) {
         input.addEventListener("input", function () {
@@ -1064,7 +1301,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     results.innerHTML = `
                     <div class="relative w-full">
                         <button id="close-search-results" type="button"
-                            class="absolute right-2 text-xl text-red-accent hover:text-red-hover font-bold z-10">&times;</button>
+                            class="absolute right-2 text-3xl text-red-accent hover:text-red-hover font-bold z-10">&times;</button>
                         <div class="pt-6 flex justify-center items-center">${html}</div>
                     </div>
                 `;
@@ -1228,9 +1465,9 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         const maisonMereHtml =
             ent1.model === "societe" && ent1.main_obj
                 ? `<p class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent1.main_obj.id}">Filiale de ${ent1.main_obj.name}</p>`
-                : "";
+                : "<p class=\"mb-6\"></p>";
         card1.innerHTML = `
-            <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
+            <button type="button" class="absolute top-2 right-2 text-3xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
             <div id="card1-content" class="flex flex-col items-center w-full h-full">
                 <h2 class="font-bold text-blue-accent text-lg uppercase">
                     ${
@@ -1260,7 +1497,8 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     const selectHtml = `
                         <div class="sticky bottom-0 z-10 bg-white w-full pt-2 pb-2">
                             <label for="interlocutor-select-1" class="block font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
-                            <select id="interlocutor-select-1" class="mt-1 p-2 border rounded w-full">
+                            <select id="interlocutor-select-1"
+                                class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition max-w-xs w-full">
                                 <option value="">-- Choisir --</option>
                                 ${interlocutors
                                     .map(
@@ -1334,33 +1572,34 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         const searchInputId = "services-search-1";
         let servicesHtml = `
             <div class="accordion-services">
-                <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." class="mb-4 p-2 border rounded w-full" />
-                <div id="services-list-1">
-                    ${services
-                        .map(
-                            (service, idx) => `
-                        <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
-                                <p>${service.label}</p>
-                                <div class="flex items-center justify-between w-full">
-                                <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
-                                <span class="edit-lock-btn-placeholder ml-auto"></span>
-                                </div>
-                            </button>
-                            <div class="accordion-content" style="display:none;">
-                                <span class="editable-service-field" data-model="${
-                                    ent1.model
-                                }" data-id="${ent1.id}" data-service-key="${
-                                service.label
-                            }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                    ${service.info ?? "Oui"}
-                                </span>
-                            </div>
-                        </div>
-                    `
-                        )
-                        .join("")}
+            <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." 
+                class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition mb-4" />
+            <div id="services-list-1">
+                ${services
+                    .map(
+                        (service, idx) => `
+                <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
+                    <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
+                    <p>${service.label}</p>
+                    <div class="flex items-center justify-between w-full">
+                    <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
+                    <span class="edit-lock-btn-placeholder ml-auto"></span>
+                    </div>
+                    </button>
+                    <div class="accordion-content" style="display:none;">
+                    <span class="editable-service-field" data-model="${
+                        ent1.model
+                    }" data-id="${ent1.id}" data-service-key="${
+                            service.label
+                        }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
+                        ${service.info ?? "Oui"}
+                    </span>
+                    </div>
                 </div>
+                `
+                    )
+                    .join("")}
+            </div>
             </div>
         `;
         setTimeout(() => {
@@ -1386,190 +1625,25 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     });
                 });
         }, 0);
+
         document.getElementById("card-2").innerHTML = `
             <div class="flex flex-col w-full h-full">
                 <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+                <div class="flex justify-center items-center mb-4">
+                <button id="manage-services-btn1" class="w-1/2 mb-4 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Gérer les services</button>
+                </div>
                 ${servicesHtml}
             </div>
         `;
 
-        // // Ajout upload tout en haut de la card (juste après le h2)
-        // if (ent1 && ent1.model === "societe") {
-        //     const card2 = document.getElementById("card-2");
-        //     const h2 = card2.querySelector("h2");
-        //     if (h2) {
-        //         h2.insertAdjacentHTML(
-        //             "afterend",
-        //             `
-        //             <div id="file-upload-section-societe-${ent1.id}" class="mt-4">
-        //                 <form id="upload-form-societe-${ent1.id}" enctype="multipart/form-data">
-        //                     <label class="block mb-2 font-semibold">Ajouter un fichier :</label>
-        //                     <input type="file" name="file" id="file-input-societe-${ent1.id}" class="mb-2" />
-        //                     <button type="submit" class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Uploader</button>
-        //                 </form>
-        //                 <div id="upload-result-societe-${ent1.id}" class="mt-2 text-blue-accent"></div>
-        //             </div>
-        //             `
-        //         );
-        //     }
-        //     // Bouton "Voir les images" juste après la barre de recherche
-        //     fetch(`/model/societe/files/${ent1.id}`)
-        //         .then((res) => res.json())
-        //         .then((data) => {
-        //             if (data.files && data.files.length) {
-        //                 const searchInput =
-        //                     card2.querySelector(`#services-search-1`);
-        //                 if (searchInput) {
-        //                     searchInput.insertAdjacentHTML(
-        //                         "afterend",
-        //                         `
-        //                 <button id="show-images-btn-societe-${ent1.id}" class="mb-4 mt-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover w-full">Voir les fichiers</button>
-        //                 <div id="images-modal-societe-${ent1.id}" class="w-full fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">
-        //                     <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
-        //                         <button id="close-images-modal-societe-${ent1.id}" class="absolute top-2 text-red-accent right-2 text-xl">&times;</button>
-        //                         <div id="images-carousel-societe-${ent1.id}" class="relative w-full flex flex-col items-center">
-        //                             <button id="carousel-prev-societe-${ent1.id}" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
-        //                             <img id="carousel-image-societe-${ent1.id}" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />
-        //                             <button id="carousel-next-societe-${ent1.id}" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&gt;</button>
-        //                             <div id="carousel-indicator-societe-${ent1.id}" class="mt-2 text-sm text-gray-500"></div>
-        //                         </div>
-        //                     </div>
-        //                 </div>
-        //                 `
-        //                     );
-        //                     // JS carrousel fichiers/images
-        //                     const showBtn = document.getElementById(
-        //                         `show-images-btn-societe-${ent1.id}`
-        //                     );
-        //                     const modal = document.getElementById(
-        //                         `images-modal-societe-${ent1.id}`
-        //                     );
-        //                     const closeBtn = document.getElementById(
-        //                         `close-images-modal-societe-${ent1.id}`
-        //                     );
-        //                     if (showBtn && modal && closeBtn) {
-        //                         showBtn.onclick = function () {
-        //                             modal.classList.remove("hidden");
-        //                             modal.classList.add("flex");
-        //                             const files = data.files || [];
-        //                             const carouselImg = document.getElementById(
-        //                                 `carousel-image-societe-${ent1.id}`
-        //                             );
-        //                             const prevBtn = document.getElementById(
-        //                                 `carousel-prev-societe-${ent1.id}`
-        //                             );
-        //                             const nextBtn = document.getElementById(
-        //                                 `carousel-next-societe-${ent1.id}`
-        //                             );
-        //                             const indicator = document.getElementById(
-        //                                 `carousel-indicator-societe-${ent1.id}`
-        //                             );
-        //                             let idx = 0;
-        //                             function showImage(i) {
-        //                                 if (!files.length) {
-        //                                     carouselImg.style.display = "none";
-        //                                     indicator.textContent =
-        //                                         "Aucun fichier trouvé.";
-        //                                     prevBtn.style.display = "none";
-        //                                     nextBtn.style.display = "none";
-        //                                     return;
-        //                                 }
-        //                                 const url = files[i];
-        //                                 const ext = url
-        //                                     .split(".")
-        //                                     .pop()
-        //                                     .toLowerCase();
-        //                                 const isImage = [
-        //                                     "jpg",
-        //                                     "jpeg",
-        //                                     "png",
-        //                                     "gif",
-        //                                     "webp",
-        //                                     "bmp",
-        //                                 ].includes(ext);
-        //                                 // Supprime tout lien précédent
-        //                                 carouselImg.parentElement
-        //                                     .querySelector(".file-link")
-        //                                     ?.remove();
-        //                                 if (isImage) {
-        //                                     carouselImg.src = url;
-        //                                     carouselImg.style.display = "block";
-        //                                 } else {
-        //                                     carouselImg.style.display = "none";
-        //                                     let fileLink =
-        //                                         document.createElement("a");
-        //                                     fileLink.className =
-        //                                         "file-link text-blue-accent underline mt-4";
-        //                                     fileLink.href = url;
-        //                                     fileLink.target = "_blank";
-        //                                     fileLink.innerHTML = `<i class="fa-solid fa-file mr-2"></i> Télécharger le fichier`;
-        //                                     carouselImg.parentElement.appendChild(
-        //                                         fileLink
-        //                                     );
-        //                                 }
-        //                                 indicator.textContent = `${i + 1} / ${
-        //                                     files.length
-        //                                 }`;
-        //                                 prevBtn.style.display =
-        //                                     files.length > 1 ? "block" : "none";
-        //                                 nextBtn.style.display =
-        //                                     files.length > 1 ? "block" : "none";
-        //                             }
-        //                             prevBtn.onclick = function () {
-        //                                 idx =
-        //                                     (idx - 1 + files.length) %
-        //                                     files.length;
-        //                                 showImage(idx);
-        //                             };
-        //                             nextBtn.onclick = function () {
-        //                                 idx = (idx + 1) % files.length;
-        //                                 showImage(idx);
-        //                             };
-        //                             idx = 0;
-        //                             showImage(idx);
-        //                         };
-        //                         closeBtn.onclick = function () {
-        //                             modal.classList.add("hidden");
-        //                             modal.classList.remove("flex");
-        //                         };
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     // Gestion upload
-        //     const uploadForm = document.getElementById(
-        //         `upload-form-societe-${ent1.id}`
-        //     );
-        //     if (uploadForm) {
-        //         uploadForm.addEventListener("submit", function (e) {
-        //             e.preventDefault();
-        //             const fileInput = document.getElementById(
-        //                 `file-input-societe-${ent1.id}`
-        //             );
-        //             if (!fileInput.files.length) return;
-        //             const formData = new FormData();
-        //             formData.append("file", fileInput.files[0]);
-        //             fetch(`/model/societe/upload/${ent1.id}`, {
-        //                 method: "POST",
-        //                 headers: { "X-CSRF-TOKEN": csrfToken },
-        //                 body: formData,
-        //             })
-        //                 .then((res) => res.json())
-        //                 .then((data) => {
-        //                     document.getElementById(
-        //                         `upload-result-societe-${ent1.id}`
-        //                     ).innerHTML = data.success
-        //                         ? `Fichier uploadé : <a href="${data.url}" target="_blank">${data.url}</a>`
-        //                         : data.message || "Erreur lors de l'upload";
-        //                 })
-        //                 .catch(() => {
-        //                     document.getElementById(
-        //                         `upload-result-societe-${ent1.id}`
-        //                     ).innerText = "Erreur lors de l'upload";
-        //                 });
-        //         });
-        //     }
-        // }
+        setTimeout(() => {
+            const manageBtn = document.getElementById("manage-services-btn1");
+            if (manageBtn) {
+                manageBtn.onclick = function () {
+                    showManageServicesModal(ent1); // ent1 = société ou interlocuteur
+                };
+            }
+        }, 0);
 
         setTimeout(() => {
             const input = document.getElementById(searchInputId);
@@ -1660,7 +1734,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 ? `<a href="#" class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent2.main_obj.id}">Filiale de ${ent2.main_obj.name}</a>`
                 : "";
         card3.innerHTML = `
-            <button type="button" class="absolute top-2 right-2 text-xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
+            <button type="button" class="absolute top-2 right-2 text-3xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="1" title="Supprimer">&times;</button>
             <div id="card3-content" class="flex flex-col items-center w-full h-full">
                 <h2 class="font-bold text-blue-accent text-lg uppercase">
                     ${
@@ -1770,33 +1844,34 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         const searchInputId = "services-search-2";
         let servicesHtml = `
             <div class="accordion-services">
-                <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." class="mb-4 p-2 border rounded w-full" />
-                <div id="services-list-2">
-                    ${services
-                        .map(
-                            (service, idx) => `
-                        <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                            <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
-                                <p>${service.label}</p>
-                                <div class="flex items-center justify-between w-full">
-                                <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
-                                <span class="edit-lock-btn-placeholder ml-auto"></span>
-                                </div>
-                            </button>
-                            <div class="accordion-content" style="display:none;">
-                                <span class="editable-service-field" data-model="${
-                                    ent2.model
-                                }" data-id="${ent2.id}" data-service-key="${
-                                service.label
-                            }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                                    ${service.info ?? "Oui"}
-                                </span>
-                            </div>
-                        </div>
-                    `
-                        )
-                        .join("")}
+            <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." 
+                class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition mb-4" />
+            <div id="services-list-2">
+                ${services
+                    .map(
+                        (service, idx) => `
+                <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
+                    <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
+                    <p>${service.label}</p>
+                    <div class="flex items-center justify-between w-full">
+                    <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
+                    <span class="edit-lock-btn-placeholder ml-auto"></span>
+                    </div>
+                    </button>
+                    <div class="accordion-content" style="display:none;">
+                    <span class="editable-service-field" data-model="${
+                        ent2.model
+                    }" data-id="${ent2.id}" data-service-key="${
+                            service.label
+                        }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
+                        ${service.info ?? "Oui"}
+                    </span>
+                    </div>
                 </div>
+                `
+                    )
+                    .join("")}
+            </div>
             </div>
         `;
         setTimeout(() => {
@@ -1822,190 +1897,25 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                     });
                 });
         }, 0);
+
         document.getElementById("card-4").innerHTML = `
             <div class="flex flex-col w-full h-full">
                 <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+                <div class="flex justify-center items-center mb-4">
+                <button id="manage-services-btn2" class="w-1/2 mb-4 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Gérer les services</button>
+                </div>
                 ${servicesHtml}
             </div>
         `;
 
-        // Ajout upload tout en haut de la card (juste après le h2)
-        // if (ent2 && ent2.model === "interlocuteur") {
-        //     const card4 = document.getElementById("card-4");
-        //     const h2 = card4.querySelector("h2");
-        //     if (h2) {
-        //         h2.insertAdjacentHTML(
-        //             "afterend",
-        //             `
-        //             <div id="file-upload-section-interlocuteur-${ent2.id}" class="mt-4">
-        //                 <form id="upload-form-interlocuteur-${ent2.id}" enctype="multipart/form-data">
-        //                     <label class="block mb-2 font-semibold">Ajouter un fichier :</label>
-        //                     <input type="file" name="file" id="file-input-interlocuteur-${ent2.id}" class="mb-2" />
-        //                     <button type="submit" class="px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Uploader</button>
-        //                 </form>
-        //                 <div id="upload-result-interlocuteur-${ent2.id}" class="mt-2 text-blue-accent"></div>
-        //             </div>
-        //             `
-        //         );
-        //     }
-        //     // Bouton "Voir les images" juste après la barre de recherche
-        //     fetch(`/model/interlocuteur/files/${ent2.id}`)
-        //         .then((res) => res.json())
-        //         .then((data) => {
-        //             if (data.files && data.files.length) {
-        //                 const searchInput =
-        //                     card4.querySelector(`#services-search-2`);
-        //                 if (searchInput) {
-        //                     searchInput.insertAdjacentHTML(
-        //                         "afterend",
-        //                         `
-        //                 <button id="show-images-btn-interlocuteur-${ent2.id}" class="mb-4 mt-2 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover w-full">Voir les fichiers</button>
-        //                 <div id="images-modal-interlocuteur-${ent2.id}" class="w-full fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-40 ml-auto mr-auto">
-        //                     <div class="bg-white w-1/2 rounded-lg p-6 max-w-2xl flex flex-col items-center relative">
-        //                         <button id="close-images-modal-interlocuteur-${ent2.id}" class="absolute top-2 text-red-accent right-2 text-xl">&times;</button>
-        //                         <div id="images-carousel-interlocuteur-${ent2.id}" class="relative w-full flex flex-col items-center">
-        //                             <button id="carousel-prev-interlocuteur-${ent2.id}" class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&lt;</button>
-        //                             <img id="carousel-image-interlocuteur-${ent2.id}" src="" alt="image" class="max-h-60 rounded shadow mx-auto" style="display:none;" />
-        //                             <button id="carousel-next-interlocuteur-${ent2.id}" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full shadow px-2 py-1 z-10">&gt;</button>
-        //                             <div id="carousel-indicator-interlocuteur-${ent2.id}" class="mt-2 text-sm text-gray-500"></div>
-        //                         </div>
-        //                     </div>
-        //                 </div>
-        //                 `
-        //                     );
-        //                     // JS carrousel fichiers/images
-        //                     const showBtn = document.getElementById(
-        //                         `show-images-btn-interlocuteur-${ent2.id}`
-        //                     );
-        //                     const modal = document.getElementById(
-        //                         `images-modal-interlocuteur-${ent2.id}`
-        //                     );
-        //                     const closeBtn = document.getElementById(
-        //                         `close-images-modal-interlocuteur-${ent2.id}`
-        //                     );
-        //                     if (showBtn && modal && closeBtn) {
-        //                         showBtn.onclick = function () {
-        //                             modal.classList.remove("hidden");
-        //                             modal.classList.add("flex");
-        //                             const files = data.files || [];
-        //                             const carouselImg = document.getElementById(
-        //                                 `carousel-image-interlocuteur-${ent2.id}`
-        //                             );
-        //                             const prevBtn = document.getElementById(
-        //                                 `carousel-prev-interlocuteur-${ent2.id}`
-        //                             );
-        //                             const nextBtn = document.getElementById(
-        //                                 `carousel-next-interlocuteur-${ent2.id}`
-        //                             );
-        //                             const indicator = document.getElementById(
-        //                                 `carousel-indicator-interlocuteur-${ent2.id}`
-        //                             );
-        //                             let idx = 0;
-        //                             function showImage(i) {
-        //                                 if (!files.length) {
-        //                                     carouselImg.style.display = "none";
-        //                                     indicator.textContent =
-        //                                         "Aucun fichier trouvé.";
-        //                                     prevBtn.style.display = "none";
-        //                                     nextBtn.style.display = "none";
-        //                                     return;
-        //                                 }
-        //                                 const url = files[i];
-        //                                 const ext = url
-        //                                     .split(".")
-        //                                     .pop()
-        //                                     .toLowerCase();
-        //                                 const isImage = [
-        //                                     "jpg",
-        //                                     "jpeg",
-        //                                     "png",
-        //                                     "gif",
-        //                                     "webp",
-        //                                     "bmp",
-        //                                 ].includes(ext);
-        //                                 // Supprime tout lien précédent
-        //                                 carouselImg.parentElement
-        //                                     .querySelector(".file-link")
-        //                                     ?.remove();
-        //                                 if (isImage) {
-        //                                     carouselImg.src = url;
-        //                                     carouselImg.style.display = "block";
-        //                                 } else {
-        //                                     carouselImg.style.display = "none";
-        //                                     let fileLink =
-        //                                         document.createElement("a");
-        //                                     fileLink.className =
-        //                                         "file-link text-blue-accent underline mt-4";
-        //                                     fileLink.href = url;
-        //                                     fileLink.target = "_blank";
-        //                                     fileLink.innerHTML = `<i class="fa-solid fa-file mr-2"></i> Télécharger le fichier`;
-        //                                     carouselImg.parentElement.appendChild(
-        //                                         fileLink
-        //                                     );
-        //                                 }
-        //                                 indicator.textContent = `${i + 1} / ${
-        //                                     files.length
-        //                                 }`;
-        //                                 prevBtn.style.display =
-        //                                     files.length > 1 ? "block" : "none";
-        //                                 nextBtn.style.display =
-        //                                     files.length > 1 ? "block" : "none";
-        //                             }
-        //                             prevBtn.onclick = function () {
-        //                                 idx =
-        //                                     (idx - 1 + files.length) %
-        //                                     files.length;
-        //                                 showImage(idx);
-        //                             };
-        //                             nextBtn.onclick = function () {
-        //                                 idx = (idx + 1) % files.length;
-        //                                 showImage(idx);
-        //                             };
-        //                             idx = 0;
-        //                             showImage(idx);
-        //                         };
-        //                         closeBtn.onclick = function () {
-        //                             modal.classList.add("hidden");
-        //                             modal.classList.remove("flex");
-        //                         };
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     // Gestion upload
-        //     const uploadForm = document.getElementById(
-        //         `upload-form-interlocuteur-${ent2.id}`
-        //     );
-        //     if (uploadForm) {
-        //         uploadForm.addEventListener("submit", function (e) {
-        //             e.preventDefault();
-        //             const fileInput = document.getElementById(
-        //                 `file-input-interlocuteur-${ent2.id}`
-        //             );
-        //             if (!fileInput.files.length) return;
-        //             const formData = new FormData();
-        //             formData.append("file", fileInput.files[0]);
-        //             fetch(`/model/interlocuteur/upload/${ent2.id}`, {
-        //                 method: "POST",
-        //                 headers: { "X-CSRF-TOKEN": csrfToken },
-        //                 body: formData,
-        //             })
-        //                 .then((res) => res.json())
-        //                 .then((data) => {
-        //                     document.getElementById(
-        //                         `upload-result-interlocuteur-${ent2.id}`
-        //                     ).innerHTML = data.success
-        //                         ? `Fichier uploadé : <a href="${data.url}" target="_blank">${data.url}</a>`
-        //                         : data.message || "Erreur lors de l'upload";
-        //                 })
-        //                 .catch(() => {
-        //                     document.getElementById(
-        //                         `upload-result-interlocuteur-${ent2.id}`
-        //                     ).innerText = "Erreur lors de l'upload";
-        //                 });
-        //         });
-        //     }
-        // }
+        setTimeout(() => {
+            const manageBtn = document.getElementById("manage-services-btn2");
+            if (manageBtn) {
+                manageBtn.onclick = function () {
+                    showManageServicesModal(ent2); // ent2 =  interlocuteur
+                };
+            }
+        }, 0);
 
         setTimeout(() => {
             const input = document.getElementById(searchInputId);
@@ -2409,6 +2319,115 @@ function showConfirmModal(message = "Confirmer ?") {
         };
     });
 }
+
+function showManageServicesModal(entity) {
+    // entity doit contenir model et id
+    fetch(`/model/${entity.model}/services/${entity.id}`, {
+        headers: { Accept: "application/json" },
+    })
+        .then((res) => res.json())
+        .then((data) => {
+            // data.services doit être un tableau [{label, actif, id}]
+            let modal = document.getElementById("manage-services-modal");
+            if (!modal) {
+                modal = document.createElement("div");
+                modal.id = "manage-services-modal";
+                modal.className =
+                    "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                document.body.appendChild(modal);
+            }
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-lg w-1/4 flex flex-col items-center">
+                    <h2 class="font-bold text-blue-accent text-lg mb-4 uppercase">Gérer les services</h2>
+                    <form id="manage-services-form" class="w-full flex flex-col gap-2">
+                        <div class="flex flex-col gap-2">
+                        ${data.services
+                            .map(
+                                (s) => `
+                            <label class="flex items-center gap-2 px-4 py-2 rounded border border-blue-accent bg-off-white hover:bg-blue-accent/10 transition">
+                                <input type="checkbox" name="services[]" value="${
+                                    s.id
+                                }" class="accent-blue-accent w-5 h-5" ${
+                                    s.actif ? "checked" : ""
+                                } />
+                                <span class="text-blue-accent font-semibold">${
+                                    s.label
+                                }</span>
+                            </label>
+                        `
+                            )
+                            .join("")}
+                        </div>
+                        <div class="flex gap-2 mt-6 justify-end">
+                            <button type="submit" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover transition">Enregistrer</button>
+                            <button type="button" id="close-manage-services" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white transition">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.style.display = "flex";
+
+            document.getElementById("close-manage-services").onclick =
+                function () {
+                    modal.style.display = "none";
+                };
+
+            document.getElementById("manage-services-form").onsubmit =
+                function (e) {
+                    e.preventDefault();
+                    const checked = Array.from(
+                        this.querySelectorAll('input[type="checkbox"]:checked')
+                    ).map((cb) => cb.value);
+                    fetch(`/model/${entity.model}/services/${entity.id}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify({ services: checked }),
+                    })
+                        .then((res) => res.json())
+                        .then(() => {
+                            modal.style.display = "none";
+                            // Recharge les données fraiches de l'entité avant d'afficher la card
+                            fetch(`/model/${entity.model}/show/${entity.id}`, {
+                                headers: { Accept: "application/json" },
+                            })
+                                .then((res) => res.json())
+                                .then((data) => {
+                                    const allowed =
+                                        allowedKeys[entity.model] || [];
+                                    const newEntity = { model: entity.model };
+                                    allowed.forEach((key) => {
+                                        if (data[key] !== undefined)
+                                            newEntity[key] = data[key];
+                                    });
+                                    newEntity.id = data.id;
+                                    if (data.active_services)
+                                        newEntity.active_services =
+                                            data.active_services;
+                                    if (data.main_obj)
+                                        newEntity.main_obj = data.main_obj;
+                                    if (data.fullname)
+                                        newEntity.fullname = data.fullname;
+                                    if (data.societe)
+                                        newEntity.societe = data.societe;
+
+                                    // Met à jour selectedEntities à la bonne position
+                                    selectedEntities = selectedEntities.map(
+                                        (e) =>
+                                            e.model === newEntity.model
+                                                ? newEntity
+                                                : e
+                                    );
+                                    showSelectedEntitiesCard(selectedEntities);
+                                });
+                        });
+                };
+        });
+}
+
 // Utilitaire pour gérer le lock/save sur un champ éditable
 function handleLockSaveButton({
     editableElem,

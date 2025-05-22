@@ -27,7 +27,7 @@ use Illuminate\Support\Str;
     <div class="bg-off-white rounded-lg p-6 max-w-[80%] mx-auto">
         <div class="mb-4 flex justify-center">
             <input type="text" id="detail-search" placeholder="Rechercher un champ ou une valeur..."
-                class="border rounded px-4 py-2 w-1/2">
+            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
         </div>
         <div class="px-8" style="max-height:600px; overflow-y: auto;">
             <ul class="divide-y divide-primary-grey" id="details-list">

@@ -3,8 +3,12 @@
     <div class="w-full mx-auto px-40">
 
         <div class="mb-4 flex justify-center">
-            <input type="text" id="search" placeholder="Rechercher un {{ strtolower($model) }}"
-                class="border rounded px-4 py-2 w-1/2">
+            <input 
+            type="text" 
+            id="search" 
+            placeholder="Rechercher un {{ strtolower($model) }}"
+            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition"
+            >
         </div>
 
         <div class=" rounded-lg" style="max-height: 800px; overflow-y: auto;">

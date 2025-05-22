@@ -10,12 +10,12 @@
 
             <nav class="w-2/4 gap-5 hidden lg:flex justify-between items-center">
                 <a href="{{ route('dashboard') }}"
-                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey text-sm px-2 {{ request()->routeIs('dashboard') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
+                    class="transition-colors duration-200 hover:text-blue-accent text-primary-grey text-sm px-2 {{ request()->routeIs('dashboard') ? 'font-bold border-b-2 border-blue-accent text-blue-accent' : '' }}">
                     ACCUEIL
                 </a>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200  hover:text-blue-accent text-primary-grey text-sm px-2 flex items-center gap-1 focus:outline-none {{ request()->is('model/societe*') || request()->is('model/interlocuteur*') ? 'font-bold border-b-2 border-blue-accent text-blue-accent' : '' }}">
                         EXTERNE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -35,7 +35,7 @@
                 </div>
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-sm {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'font-bold border-b-2 border-blue-accent' : '' }}">
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-sm {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'font-bold border-b-2 border-blue-accent text-blue-accent' : '' }}">
                         MAINTENANCE
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -76,7 +76,8 @@
                             class="uppercase hidden lg:flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md text-primary-grey bg-off-white hover:text-blue-accent focus:outline-none transition ease-in-out duration-15">
                             <div class="text-sm">{{ Auth::user()->name }}</div>
                             <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                         clip-rule="evenodd" />
@@ -84,8 +85,7 @@
                             </div>
                         </button>
                         <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1"
-                            x-transition>
+                            class="absolute right-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1" x-transition>
                             @if (Auth::user() && Auth::user()->role === 'superadmin')
                                 <a href="{{ route('user-tech.index') }}"
                                     class="block px-4 py-2 text-sm hover:text-blue-accent whitespace-nowrap">
