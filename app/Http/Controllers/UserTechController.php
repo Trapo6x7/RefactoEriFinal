@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Tech;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,8 +11,7 @@ class UserTechController extends Controller
     public function index()
     {
         $users = User::all();
-        $techs = Tech::all();
-        return view('model.user-tech', compact('users', 'techs'));
+        return view('model.user-tech', compact('users'));
     }
 
     public function storeUser(Request $request)
@@ -49,25 +47,4 @@ class UserTechController extends Controller
         return redirect()->route('user-tech.index');
     }
 
-    public function storeTech(Request $request)
-    {
-        $request->validate(['name' => 'required', 'description' => 'nullable']);
-        Tech::create($request->only('name', 'description'));
-        return redirect()->route('user-tech.index');
-    }
-
-    public function updateTech(Request $request, Tech $tech)
-    {
-        $request->validate([
-            'name' => 'required',
-        ]);
-        $tech->update($request->only('name'));
-        return response()->json(['success' => true]);
-    }
-
-    public function destroyTech(Tech $tech)
-    {
-        $tech->delete();
-        return redirect()->route('user-tech.index');
-    }
 }

@@ -22,29 +22,27 @@ use Illuminate\Support\Str;
 @endphp
 
 <x-app-layout>
-    <h1 class="text-3xl text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}</h1>
+    <h1 class="text-md md:text-lg text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}</h1>
 
-    <div class="bg-off-white rounded-lg p-6 max-w-[80%] mx-auto">
+    <div class="bg-off-white rounded-lg p-4 md:p-6 max-w-full md:max-w-[80%] mx-auto">
         <div class="mb-4 flex justify-center">
             <input type="text" id="detail-search" placeholder="Rechercher un champ ou une valeur..."
-            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
+                class="appearance-none border-2 border-blue-accent rounded-lg px-3 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition" />
         </div>
-        <div class="px-8" style="max-height:600px; overflow-y: auto;">
+        <div class="px-2 md:px-2" style="max-height:600px; overflow-y: auto;">
             <ul class="divide-y divide-primary-grey" id="details-list">
                 {{-- Sélecteur combiné Client/Distributeur --}}
                 @if ($model === 'societe')
-                    <li class="p-3 flex items-start justify-between h-auto group">
-                        <span class="font-semibold text-blue-accent w-40 mr-20">
+                    <li class="p-3 flex flex-col items-start justify-between h-auto group gap-2">
+                        <span class="font-semibold text-blue-accent w-full mb-2">
                             Statut Client/Distributeur
                         </span>
                         <select name="status_combined" id="status_combined"
-                            class="px-4 py-2 border border-secondary-grey rounded-lg text-lg w-2/12 focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+                            class="px-4 py-2 border border-secondary-grey rounded-lg text-base w-full focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
                             data-id="{{ $item->id }}" data-model="{{ $model }}">
                             <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
-                            <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur
-                            </option>
-                            <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur
-                            </option>
+                            <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur</option>
+                            <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur</option>
                         </select>
                     </li>
                 @endif
@@ -70,29 +68,26 @@ use Illuminate\Support\Str;
                             $value !== '' &&
                             $value !== 0 &&
                             $value !== '0')
-                        <li class="p-3 flex items-start justify-between h-auto group">
-                            <span class="font-semibold text-blue-accent w-40 mr-20">
+                        <li class="p-3 flex flex-col items-start justify-between h-auto group gap-2">
+                            <span class="font-semibold text-blue-accent w-full mb-2">
                                 {{ $fields[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}
                             </span>
                             @if ($key === 'status')
-                                <select class="editable-select border rounded px-2 py-1 w-2/12" style="width: 15%;"
-                                    {{-- w-2/12 en inline pour uniformité --}} data-field="{{ $key }}" data-id="{{ $item->id }}"
-                                    data-model="{{ $model }}">
-                                    <option value="active" @if ($value === 'active') selected @endif>Active
-                                    </option>
-                                    <option value="inactive" @if ($value === 'inactive') selected @endif>Inactive
-                                    </option>
+                                <select class="editable-select border rounded px-2 py-1 w-full text-base" style="width: 100%;"
+                                    data-field="{{ $key }}" data-id="{{ $item->id }}" data-model="{{ $model }}">
+                                    <option value="active" @if ($value === 'active') selected @endif>Active</option>
+                                    <option value="inactive" @if ($value === 'inactive') selected @endif>Inactive</option>
                                 </select>
                             @elseif (array_key_exists($key, $relationMap) && isset($item->getRelations()[$relationMap[$key]]))
                                 <span
-                                    class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition cursor-text outline-none text-right focus:border-blue-accent border border-off-white group-hover:border-blue-hover"
+                                    class="editable text-primary-grey w-full px-2 py-1 rounded transition cursor-text outline-none text-right focus:border-blue-accent border border-off-white group-hover:border-blue-hover"
                                     contenteditable="false">
                                     {{ $item->getRelations()[$relationMap[$key]]->name ??
                                         ($item->getRelations()[$relationMap[$key]]->nom ?? $value) }}
                                 </span>
                             @else
                                 <span
-                                    class="editable text-primary-grey w-[55rem] px-2 py-1 rounded transition cursor-text outline-none text-right focus:border-blue-accent border border-off-white group-hover:border-blue-hover"
+                                    class="editable text-primary-grey w-full px-2 py-1 rounded transition cursor-text outline-none text-right focus:border-blue-accent border border-off-white group-hover:border-blue-hover"
                                     contenteditable="true" data-field="{{ $key }}"
                                     data-id="{{ $item->id }}" data-model="{{ $model }}" tabindex="0">
                                     @if (str_starts_with($key, 'statut') && $value == 1)
@@ -115,19 +110,17 @@ use Illuminate\Support\Str;
                         $infoKey = 'infos_' . Str::after($key, 'service_');
                         $infoValue = array_key_exists($infoKey, $attributes) ? $attributes[$infoKey] : '';
                     @endphp
-                    <li class="p-3 flex items-start justify-between h-auto group">
-                        <span class="font-semibold text-blue-accent w-40 mr-20">
+                    <li class="p-3 flex flex-col items-start justify-between h-auto group gap-2">
+                        <span class="font-semibold text-blue-accent w-full mb-2">
                             {{ $fields[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}
                         </span>
                         <div class="flex flex-col gap-2 w-full">
                             <div class="flex justify-end">
-                                <select class="service-select border rounded px-2 py-1 w-2/12"
+                                <select class="service-select border rounded px-2 py-1 w-full text-base"
                                     data-field="{{ $key }}" data-id="{{ $item->id }}"
                                     data-model="{{ $model }}">
-                                    <option value="1" @if ($value == 1) selected @endif>Oui
-                                    </option>
-                                    <option value="0" @if ($value == 0) selected @endif>Non
-                                    </option>
+                                    <option value="1" @if ($value == 1) selected @endif>Oui</option>
+                                    <option value="0" @if ($value == 0) selected @endif>Non</option>
                                 </select>
                             </div>
                             <div class="service-info-wrapper"
@@ -141,7 +134,7 @@ use Illuminate\Support\Str;
             </ul>
         </div>
         <div class="flex justify-center mt-4">
-            <button id="delete-item-btn" class="px-2 py-1 text-md bg-red-accent text-white rounded hover:bg-red-hover">
+            <button id="delete-item-btn" class="px-4 py-2 text-base bg-red-accent text-white rounded hover:bg-red-hover w-1/2 md:w-1/4">
                 Supprimer
             </button>
         </div>

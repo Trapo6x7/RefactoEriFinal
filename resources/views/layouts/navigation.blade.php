@@ -152,24 +152,21 @@
             PROBLEMES
         </a>
         @if (Auth::user() && Auth::user()->role === 'superadmin')
-            <div class="flex flex-col gap-0">
-                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-user-modal')" class="text-sm">
-                    UTILISATEURS
-                </x-responsive-nav-link>
-                <x-responsive-nav-link href="#" @click.prevent="$dispatch('open-tech-modal')" class="text-sm">
-                    TECHNICIENS
-                </x-responsive-nav-link>
-            </div>
+            <a href="{{ route('user-tech.index') }}"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
+                GÉRER LES UTILISATEURS
+            </a>
         @endif
-        <x-responsive-nav-link :href="route('profile.edit')" class="text-sm">
+        <a href="{{ route('profile.edit') }}"
+            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
             PROFIL
-        </x-responsive-nav-link>
+        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();"
-                class="text-red-accent hover:text-red-800 text-sm">
+            <button type="submit"
+            class="transition-colors duration-200 text-red-accent font-bold text-s">
                 SE DECONNECTER
-            </x-responsive-nav-link>
+            </button>
         </form>
 
     </nav>
