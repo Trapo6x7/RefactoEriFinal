@@ -103,6 +103,13 @@ Route::get('/model/{model}/services/{id}', [ModelController::class, 'getServices
 Route::post('/model/{model}/services/{id}', [ModelController::class, 'updateServices'])->name('model.updateServices');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/service', [\App\Http\Controllers\ServiceController::class, 'index'])->name('service.index');
+    Route::post('/service', [\App\Http\Controllers\ServiceController::class, 'store'])->name('service.store');
+    Route::delete('/service/{service}', [\App\Http\Controllers\ServiceController::class, 'destroy'])->name('service.destroy');
+    Route::put('/service/{service}', [\App\Http\Controllers\ServiceController::class, 'update'])->name('service.update');
+});
+
+Route::middleware(['auth'])->group(function () {
     Route::get('/user-tech', [UserTechController::class, 'index'])->name('user-tech.index');
     Route::post('/user-tech/user', [UserTechController::class, 'storeUser'])->name('user-tech.user.store');
     Route::put('/user-tech/user/{user}', [UserTechController::class, 'updateUser'])->name('user-tech.user.update');

@@ -22,7 +22,8 @@ use Illuminate\Support\Str;
 @endphp
 
 <x-app-layout>
-    <h1 class="text-md md:text-lg text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}</h1>
+    <h1 class="text-md md:text-lg text-center uppercase font-bold my-6 text-blue-accent">Détail de {{ $model }}
+    </h1>
 
     <div class="bg-off-white rounded-lg p-4 md:p-6 max-w-full md:max-w-[80%] mx-auto">
         <div class="mb-4 flex justify-center">
@@ -41,8 +42,10 @@ use Illuminate\Support\Str;
                             class="px-4 py-2 border border-secondary-grey rounded-lg text-base w-full focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
                             data-id="{{ $item->id }}" data-model="{{ $model }}">
                             <option value="client" {{ $selectedStatus == 'client' ? 'selected' : '' }}>Client</option>
-                            <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur</option>
-                            <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client & Distributeur</option>
+                            <option value="distrib" {{ $selectedStatus == 'distrib' ? 'selected' : '' }}>Distributeur
+                            </option>
+                            <option value="both" {{ $selectedStatus == 'both' ? 'selected' : '' }}>Client &
+                                Distributeur</option>
                         </select>
                     </li>
                 @endif
@@ -73,10 +76,13 @@ use Illuminate\Support\Str;
                                 {{ $fields[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}
                             </span>
                             @if ($key === 'status')
-                                <select class="editable-select border rounded px-2 py-1 w-full text-base" style="width: 100%;"
-                                    data-field="{{ $key }}" data-id="{{ $item->id }}" data-model="{{ $model }}">
-                                    <option value="active" @if ($value === 'active') selected @endif>Active</option>
-                                    <option value="inactive" @if ($value === 'inactive') selected @endif>Inactive</option>
+                                <select class="editable-select border rounded px-2 py-1 w-full text-base"
+                                    style="width: 100%;" data-field="{{ $key }}" data-id="{{ $item->id }}"
+                                    data-model="{{ $model }}">
+                                    <option value="active" @if ($value === 'active') selected @endif>Active
+                                    </option>
+                                    <option value="inactive" @if ($value === 'inactive') selected @endif>Inactive
+                                    </option>
                                 </select>
                             @elseif (array_key_exists($key, $relationMap) && isset($item->getRelations()[$relationMap[$key]]))
                                 <span
@@ -119,8 +125,10 @@ use Illuminate\Support\Str;
                                 <select class="service-select border rounded px-2 py-1 w-full text-base"
                                     data-field="{{ $key }}" data-id="{{ $item->id }}"
                                     data-model="{{ $model }}">
-                                    <option value="1" @if ($value == 1) selected @endif>Oui</option>
-                                    <option value="0" @if ($value == 0) selected @endif>Non</option>
+                                    <option value="1" @if ($value == 1) selected @endif>Oui
+                                    </option>
+                                    <option value="0" @if ($value == 0) selected @endif>Non
+                                    </option>
                                 </select>
                             </div>
                             <div class="service-info-wrapper"
@@ -134,7 +142,8 @@ use Illuminate\Support\Str;
             </ul>
         </div>
         <div class="flex justify-center mt-4">
-            <button id="delete-item-btn" class="px-4 py-2 text-base bg-red-accent text-white rounded hover:bg-red-hover w-1/2 md:w-1/4">
+            <button id="delete-item-btn"
+                class="px-4 py-2 text-base bg-red-accent text-white rounded hover:bg-red-hover w-1/2 md:w-1/4">
                 Supprimer
             </button>
         </div>
@@ -213,7 +222,7 @@ use Illuminate\Support\Str;
                                                     'X-CSRF-TOKEN': document
                                                         .querySelector(
                                                             'meta[name="csrf-token"]'
-                                                            ).getAttribute(
+                                                        ).getAttribute(
                                                             "content"),
                                                     Accept: 'application/json'
                                                 },
@@ -359,6 +368,31 @@ use Illuminate\Support\Str;
                         const text = li.textContent.toLowerCase();
                         li.style.display = text.includes(query) ? '' : 'none';
                     });
+                });
+            }
+
+            const deleteBtn = document.getElementById('delete-item-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
+                        fetch(`/model/{{ $model }}/delete/{{ $item->id }}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        .getAttribute('content'),
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(res => {
+                                if (res.ok) {
+                                    window.location.href =
+                                        "{{ route('model.index', ['model' => $model]) }}";
+                                } else {
+                                    alert('Erreur lors de la suppression.');
+                                }
+                            })
+                            .catch(() => alert('Erreur lors de la suppression.'));
+                    }
                 });
             }
         });

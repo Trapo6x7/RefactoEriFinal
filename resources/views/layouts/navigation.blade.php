@@ -57,16 +57,37 @@
                         </a>
                     </div>
                 </div>
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open"
+                        class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bol px-2 flex items-center gap-1 focus:outline-none text-sm {{ request()->is('model/environnement*') || request()->is('model/outil*') || request()->is('model/probleme*') ? 'font-bold border-b-2 border-blue-accent text-blue-accent' : '' }}">
+                        SERVICES
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute left-0 mt-2 min-w-max bg-off-white rounded-lg z-50 py-1" x-transition>
+                        @forelse($navbar_services as $service)
+                            <a href="{{ $service->link }}" target="_blank"
+                                class="block uppercase px-4 py-2 text-sm hover:text-blue-accent whitespace-nowrap">
+                                {{ $service->name }}
+                            </a>
+                        @empty
+                            <span class="block px-4 py-2 text-sm text-gray-400">Aucun service</span>
+                        @endforelse
+                    </div>
+
+                </div>
                 @if (request()->routeIs('dashboard'))
                     <button type="button"
                         onclick="document.getElementById('dashboard-header')?.classList.toggle('hidden')"
                         class="ml-4 px-3 py-1 rounded bg-blue-accent text-off-white hover:bg-blue-hover transition text-sm">
                         +
                     </button>
-                                    <button type="button" id="btn-raz"
+                    <button type="button" id="btn-raz"
                         class="ml-4 px-3 py-1 rounded bg-red-accent text-off-white hover:bg-red-hover transition text-sm">
-                    -
-                </button>
+                        -
+                    </button>
                 @else
                     <div class="ml-4 px-3 py-1 rounded bg-off-white text-off-white"></div>
                     <div class="ml-4 px-3 py-1 rounded bg-off-white text-off-white"></div>
@@ -95,6 +116,10 @@
                                 <a href="{{ route('user-tech.index') }}"
                                     class="block px-4 py-2 text-sm hover:text-blue-accent whitespace-nowrap">
                                     GÉRER LES UTILISATEURS
+                                </a>
+                                <a href="{{ route('service.index') }}"
+                                    class="block px-4 py-2 text-sm hover:text-blue-accent whitespace-nowrap">
+                                    GÉRER LES SERVICES
                                 </a>
                             @endif
                             <a href="{{ route('profile.edit') }}"
@@ -156,6 +181,15 @@
             class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
             PROBLEMES
         </a>
+        @forelse($navbar_services as $service)
+            <a href="{{ $service->link }}" target="_blank"
+                class="uppercase transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
+                {{ $service->name }}
+            </a>
+        @empty
+            <span class="block px-4 py-2 text-sm text-gray-400 text-center">Aucun service</span>
+        @endforelse
+
         @if (Auth::user() && Auth::user()->role === 'superadmin')
             <a href="{{ route('user-tech.index') }}"
                 class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
