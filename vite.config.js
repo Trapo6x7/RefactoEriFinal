@@ -8,6 +8,7 @@ export default defineConfig({
                 "resources/css/app.css",
                 "resources/js/app.js",
                 "resources/js/dashboard.js",
+                "resources/js/navbar.js",
                 "resources/css/custom.css",
             ],
             refresh: true,

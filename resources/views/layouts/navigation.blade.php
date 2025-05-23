@@ -63,7 +63,12 @@
                         class="ml-4 px-3 py-1 rounded bg-blue-accent text-off-white hover:bg-blue-hover transition text-sm">
                         +
                     </button>
+                                    <button type="button" id="btn-raz"
+                        class="ml-4 px-3 py-1 rounded bg-red-accent text-off-white hover:bg-red-hover transition text-sm">
+                    -
+                </button>
                 @else
+                    <div class="ml-4 px-3 py-1 rounded bg-off-white text-off-white"></div>
                     <div class="ml-4 px-3 py-1 rounded bg-off-white text-off-white"></div>
                 @endif
             </nav>
@@ -153,7 +158,7 @@
         </a>
         @if (Auth::user() && Auth::user()->role === 'superadmin')
             <a href="{{ route('user-tech.index') }}"
-            class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
+                class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
                 GÉRER LES UTILISATEURS
             </a>
         @endif
@@ -163,8 +168,7 @@
         </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit"
-            class="transition-colors duration-200 text-red-accent font-bold text-s">
+            <button type="submit" class="transition-colors duration-200 text-red-accent font-bold text-s">
                 SE DECONNECTER
             </button>
         </form>
@@ -191,3 +195,5 @@
         @include('model.form_modal', ['model' => 'tech', 'action' => 'create'])
     </div>
 </div>
+
+@vite(['resources/js/navbar.js'])
