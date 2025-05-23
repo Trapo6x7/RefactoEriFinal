@@ -44,24 +44,24 @@
     </article>
 
     <section id="main-content" class="text-sm md:text-md lg:text-lg flex flex-col h-full min-h-0 flex-1">
-        <section class="mx-0 bg-off-white rounded-lg text-sm md:text-md lg:text-lg">
+        <section class="mx-0 bg-off-white rounded-lg text-sm md:text-md lg:text-lg px-8 lg:px-0">
 
             <article class="pt-4 mx-auto flex flex-col items-center justify-center w-full max-w-6xl">
                 <form id="user-search-form"
-                    class="flex flex-col md:flex-row items-center justify-center gap-4 relative w-3/4"> <input
+                    class="flex flex-col md:flex-row items-center justify-center gap-2 lg:gap-4 relative md:w-3/4 w-full"> <input
                         type="text" id="user-search-input" name="q" autocomplete="off"
                         placeholder="Recherche..."
                         class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-sm md:text-md lg:text-lg">
                     <button type="button" id="reset-search-input"
-                        class="absolute right-[12rem] top-1/2 -translate-y-1/2 text-red-accent hover:text-red-accent text-3xl hidden"
+                        class="absolute xl:right-[12rem] lg:right-[11rem] md:right-[8rem] lg:top-1/2 lg:-translate-y-1/2 md:-translate-y-[0.2rem] -translate-y-[1.7rem] right-[1rem] text-red-accent hover:text-red-accent text-3xl hidden"
                         aria-label="Effacer">
                         &times;
                     </button>
                     <div id="autocomplete-results"
-                        class="absolute left-0 top-full mt-1 w-full bg-off-white rounded-md z-50 flex flex-col">
+                        class="absolute left-0 top-full w-full bg-off-white rounded-md z-50 flex flex-col">
                         <!-- Suggestions injectées ici -->
                     </div>
-                    <div class="w-full md:w-1/4 mt-2 md:mt-0">
+                    <div class="w-full md:w-1/4 md:mt-0">
                         <select id="user-search-table" name="table"
                             class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
                             <option value="" class="hover:bg-blue-accent">Tous</option>
@@ -70,11 +70,11 @@
                         </select>
                     </div>
                 </form>
-                <div class="flex flex-col md:flex-row items-center justify-center gap-6 w-full mt-4">
-                    <div class="relative w-full md:w-1/4 flex flex-col items-center gap-1">
-                        <label for="societe-select" class="block mb-1 text-md uppercase text-sm">Société</label>
+                <div class="flex-col lg:flex-row items-center justify-center gap-1 w-full mt-4 hidden md:flex lg:px-24">
+                    <div class="relative w-full lg:w-1/2 flex lg:flex-col items-center justify-center lg:justify-between gap-1">
+                        <label for="societe-select" class="lg:block hidden mb-1 text-md uppercase text-sm">Société</label>
                         <select id="societe-select"
-                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
+                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/2 lg:w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
                             <option value="">Sélectionner...</option>
                             @foreach (\App\Models\Society::orderBy('name')->get() as $societe)
                                 <option value="societe-{{ $societe->id }}">
@@ -83,10 +83,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="relative w-full md:w-1/4 flex flex-col items-center gap-1">
-                        <label for="societe-select" class="block mb-1 text-md uppercase text-sm">Interlocuteur</label>
+                    <div class="relative w-full lg:w-1/2 flex lg:flex-col items-center justify-center lg:justify-between gap-1">
+                        <label for="societe-select" class="lg:block hidden mb-1 text-md uppercase text-sm">Interlocuteur</label>
                         <select id="interlocuteur-select"
-                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
+                            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/2 lg:w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
                             <option value="" class="font-bold bg-blue-accent text-off-white">Sélectionner...
                             </option>
                             @foreach (\App\Models\Interlocutor::orderBy('fullname')->get() as $interlocuteur)
@@ -121,11 +121,11 @@
         </section>
 
         <div class="hidden lg:flex flex-col items-center justify-center">
-            <div class="border-t border-blue-accent mb-2 w-4/5"></div>
+            <div class="border-t border-blue-accent lg:mb-2 w-4/5"></div>
         </div>
 
         <section
-            class="flex flex-col lg:flex-row h-[30vh] lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 md:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
+            class="flex flex-col lg:flex-row lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 md:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
             <article id="problemes-list1"
                 class="w-full lg:w-1/2 px-2 md:px-4 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
             </article>

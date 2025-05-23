@@ -64,6 +64,8 @@ function normalizeSelectedEntities(entities) {
     let result = [];
     if (societe) result.push(societe);
     if (interlocuteur) result.push(interlocuteur);
+    // Si aucun des deux, mais il y a une entité (ex: interlocuteur seul)
+    if (!societe && !interlocuteur && entities.length) result.push(entities[0]);
     return result;
 }
 
@@ -160,31 +162,35 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     const liste = document.getElementById(containerId);
     if (!liste) return;
     liste.innerHTML = `
-        <div class="flex justify-center gap-2 mb-4 px-12 w-full relative">
-            <select id="all-problems-select" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition max-w-xs w-full ml-2">
+        <div class="flex flex-col 2xl:flex-row justify-center gap-2 mb-4 px-4 w-full relative">
+            <div class="lg:flex-row lg:flex">
+            <select id="all-problems-select" class="lg:w-1/3 appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition w-full 2xl:w-auto 2xl:ml-2">
                 <option value="">Tous les problèmes...</option>
             </select>
-<div class="relative w-1/2 max-w-xs">
-    <input type="text" id="search-problemes-global"
-        placeholder="Rechercher un probleme..."
-        class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition w-full" />
-    <button type="button" id="reset-search-input2"
-        class="absolute right-2 top-1/2 -translate-y-1/2 text-red-accent hover:text-red-accent text-3xl hidden z-10"
-        aria-label="Effacer">
-        &times;
-    </button>
-</div>
-            <select id="filter-tool" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/5 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
-                <option value="">Tous les outils</option>
+            <div class="relative w-full lg:w-1/3 2xl:w-auto 2xl:flex-1">
+                <input type="text" id="search-problemes-global"
+                    placeholder="Rechercher un probleme..."
+                    class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition w-full" />
+                <button type="button" id="reset-search-input2"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-red-accent hover:text-red-accent text-3xl hidden z-10"
+                    aria-label="Effacer">
+                    &times;
+                </button>
+            </div>
+            </div>
+            <div class="flex">
+            <select id="filter-tool" class="appearance-none border-2 border-blue-accent rounded-lg py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
+                <option value="">Outils</option>
             </select>
-            <select id="filter-env" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/5 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
-                <option value="">Tous les env...</option>
+            <select id="filter-env" class="appearance-none border-2 border-blue-accent rounded-lg py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
+                <option value="">Env</option>
             </select>
-            <select id="filter-societe" class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/5 bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
-                <option value="">Toutes les soc...</option>
+            <select id="filter-societe" class="appearance-none border-2 border-blue-accent rounded-lg py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-lg">
+                <option value="">Société</option>
             </select>
+            </div>
         </div>
-        <div id="problemes-list-inner-global"></div>
+        <div id="problemes-list-inner-global" class="w-full px-8"></div>
     `;
 
     const input2 = document.getElementById("search-problemes-global");
@@ -1381,10 +1387,11 @@ function updateCardsVisibility(entities) {
     // Cherche la societe et l'interlocuteur peu importe l'ordre
     const hasSociete = entities.some((e) => e.model === "societe");
     const hasInterlocuteur = entities.some((e) => e.model === "interlocuteur");
+    const hasAny = entities.length > 0;
 
     if (window.innerWidth <= 1023) {
         // Affiche la section si au moins une entité sélectionnée
-        if (hasSociete || hasInterlocuteur) {
+        if (hasAny) {
             cardSection.classList.remove("hidden");
             cardSection.classList.add("flex");
         } else {
@@ -1392,10 +1399,24 @@ function updateCardsVisibility(entities) {
             cardSection.classList.remove("flex");
         }
 
-        if (card1) card1.classList.toggle("hidden", !hasSociete);
-        if (card2) card2.classList.toggle("hidden", !hasSociete);
-        if (card3) card3.classList.toggle("hidden", !hasInterlocuteur);
-        if (card4) card4.classList.toggle("hidden", !hasInterlocuteur);
+        if (card1) card1.classList.toggle("hidden", !hasAny);
+        if (card2)
+            card2.classList.toggle(
+                "hidden",
+                !(entities[0] && entities[0].active_services)
+            );
+        if (card3)
+            card3.classList.toggle(
+                "hidden",
+                !hasInterlocuteur || entities.length < 2
+            );
+        if (card4)
+            card4.classList.toggle(
+                "hidden",
+                !hasInterlocuteur ||
+                    entities.length < 2 ||
+                    !entities[1].active_services
+            );
     } else {
         // Desktop : tout visible, layout classique
         cardSection.classList.remove("hidden");
@@ -1417,8 +1438,8 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         }
     }
 
-    const ent1 = entities[0]; // societe ou interlocuteur
-    const ent2 = entities[1]; // interlocuteur si présent
+    const ent1 = entities[0]; // societe OU interlocuteur
+    const ent2 = entities[1]; // interlocuteur si présent ET société déjà en 1
 
     // --- CARD 1 ---
     if (ent1) {
@@ -1465,7 +1486,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         const maisonMereHtml =
             ent1.model === "societe" && ent1.main_obj
                 ? `<p class="text-xs text-blue-hover mb-2 maison-mere-link" data-main-id="${ent1.main_obj.id}">Filiale de ${ent1.main_obj.name}</p>`
-                : "<p class=\"mb-6\"></p>";
+                : '<p class="mb-6"></p>';
         card1.innerHTML = `
             <button type="button" class="absolute top-2 right-2 text-3xl text-red-accent hover:text-red-hover font-bold remove-entity-btn" data-idx="0" title="Supprimer">&times;</button>
             <div id="card1-content" class="flex flex-col items-center w-full h-full">
@@ -1566,42 +1587,42 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         }
     }
 
-    // --- CARD 2 (services societe) ---
+    // --- CARD 2 (services de l'entité sélectionnée, société OU interlocuteur) ---
     if (ent1 && ent1.active_services) {
         let services = Object.values(ent1.active_services);
         const searchInputId = "services-search-1";
         let servicesHtml = `
-            <div class="accordion-services">
-            <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." 
-                class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition mb-4" />
-            <div id="services-list-1">
-                ${services
-                    .map(
-                        (service, idx) => `
-                <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
-                    <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
-                    <p>${service.label}</p>
-                    <div class="flex items-center justify-between w-full">
-                    <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
-                    <span class="edit-lock-btn-placeholder ml-auto"></span>
-                    </div>
-                    </button>
-                    <div class="accordion-content" style="display:none;">
-                    <span class="editable-service-field" data-model="${
-                        ent1.model
-                    }" data-id="${ent1.id}" data-service-key="${
-                            service.label
-                        }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
-                        ${service.info ?? "Oui"}
-                    </span>
-                    </div>
+        <div class="accordion-services">
+        <input type="text" id="${searchInputId}" placeholder="Rechercher un service..." 
+            class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition mb-4" />
+        <div id="services-list-1">
+            ${services
+                .map(
+                    (service, idx) => `
+            <div class="mb-2 pr-2 w-full break-words flex flex-col service-item">
+                <button type="button" class="font-semibold text-blue-accent text-left accordion-label w-full flex items-center gap-2 py-1" data-idx="${idx}" style="background:none;border:none;outline:none;cursor:pointer;">
+                <p>${service.label}</p>
+                <div class="flex items-center justify-between w-full">
+                <span class="accordion-arrow" style="transition:transform 0.2s;">&#x25BE;</span>
+                <span class="edit-lock-btn-placeholder ml-auto"></span>
                 </div>
-                `
-                    )
-                    .join("")}
+                </button>
+                <div class="accordion-content" style="display:none;">
+                <span class="editable-service-field" data-model="${
+                    ent1.model
+                }" data-id="${ent1.id}" data-service-key="${
+                        service.label
+                    }" contenteditable="false" style="border-bottom:1px color-secondary-grey #ccc;min-height:1.5em;display:block;margin-top:0.5em;">
+                    ${service.info ?? "Oui"}
+                </span>
+                </div>
             </div>
-            </div>
-        `;
+            `
+                )
+                .join("")}
+        </div>
+        </div>
+    `;
         setTimeout(() => {
             document
                 .querySelectorAll("#services-list-1 .accordion-label")
@@ -1627,14 +1648,14 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
         }, 0);
 
         document.getElementById("card-2").innerHTML = `
-            <div class="flex flex-col w-full h-full">
-                <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
-                <div class="flex justify-center items-center mb-4">
-                <button id="manage-services-btn1" class="w-1/2 mb-4 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Gérer les services</button>
-                </div>
-                ${servicesHtml}
+        <div class="flex flex-col w-full h-full">
+            <h2 class="font-bold text-blue-accent text-lg mb-2 uppercase text-center">Services activés</h2>
+            <div class="flex justify-center items-center mb-4">
+            <button id="manage-services-btn1" class="w-1/2 mb-4 px-3 py-1 bg-blue-accent text-white rounded hover:bg-blue-hover">Gérer les services</button>
             </div>
-        `;
+            ${servicesHtml}
+        </div>
+    `;
 
         setTimeout(() => {
             const manageBtn = document.getElementById("manage-services-btn1");
