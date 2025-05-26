@@ -27,19 +27,6 @@ const csrfToken =
         .querySelector('meta[name="csrf-token"]')
         ?.getAttribute("content") || "";
 
-function onCkeditor5Ready(callback) {
-    if (window.CKEDITOR) {
-        callback();
-    } else {
-        const interval = setInterval(() => {
-            if (window.CKEDITOR) {
-                clearInterval(interval);
-                callback();
-            }
-        }, 100);
-    }
-}
-
 function autoLink(text) {
     // Remplace les URLs par des liens cliquables avec style
     return text.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, function (url) {
@@ -259,106 +246,89 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                     const descDiv = document.getElementById(
                         "problem-description"
                     );
-                    if (editBtn && descDiv) {
-                        editBtn.onclick = function () {
-                            // Crée la modale si besoin
-                            let modal =
-                                document.getElementById("ckeditor-modal");
-                            if (!modal) {
-                                modal = document.createElement("div");
-                                modal.id = "ckeditor-modal";
-                                modal.className =
-                                    "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
-                                modal.innerHTML = `
-                <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
-                    <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
-                    <div class="flex gap-2 mt-4">
-                        <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
-                        <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
-                    </div>
+                    // Remplacement CKEditor par TinyMCE pour l'édition enrichie (description problème)
+                    editBtn.onclick = function () {
+                        let modal = document.getElementById("ckeditor-modal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "ckeditor-modal";
+                            modal.className =
+                                "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                            modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
+                <div class="flex gap-2 mt-4">
+                    <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
+                    <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
                 </div>
-            `;
-                                document.body.appendChild(modal);
-                            }
-                            modal.style.display = "flex";
-                            document.getElementById("ckeditor-area").value =
-                                descDiv.innerHTML;
-
-                            // Charge CKEditor 5 si besoin
-                            if (window.CKEDITOR5_INSTANCE) {
-                                window.CKEDITOR5_INSTANCE.destroy();
-                            }
-                            ClassicEditor.create(
-                                document.getElementById("ckeditor-area"),
-                                {
-                                    toolbar: [
-                                        "bold",
-                                        "italic",
-                                        "link",
-                                        "bulletedList",
-                                        "numberedList",
-                                        "undo",
-                                        "redo",
-                                    ],
-                                }
-                            )
-                                .then((editor) => {
-                                    window.CKEDITOR5_INSTANCE = editor;
-                                    editor.setData(descDiv.innerHTML);
-                                })
-                                .catch((error) => {
-                                    console.error(error);
+            </div>
+        `;
+                            document.body.appendChild(modal);
+                        }
+                        modal.style.display = "flex";
+                        document.getElementById("ckeditor-area").value =
+                            descDiv.innerHTML;
+                        // Détruit TinyMCE si déjà présent
+                        if (tinymce.get("ckeditor-area"))
+                            tinymce.get("ckeditor-area").remove();
+                        tinymce.init({
+                            selector: "#ckeditor-area",
+                            menubar: false,
+                            plugins: "lists link",
+                            toolbar:
+                                "undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code",
+                            setup: function (editor) {
+                                editor.on("init", function () {
+                                    editor.setContent(descDiv.innerHTML);
                                 });
-
-                            document.getElementById("ckeditor-save").onclick =
-                                function () {
-                                    if (window.CKEDITOR5_INSTANCE) {
-                                        const value =
-                                            window.CKEDITOR5_INSTANCE.getData();
-                                        fetch(
-                                            `/problemes/update-description/${problem.id}`,
-                                            {
-                                                method: "POST",
-                                                headers: {
-                                                    "Content-Type":
-                                                        "application/json",
-                                                    "X-CSRF-TOKEN": csrfToken,
-                                                    Accept: "application/json",
-                                                },
-                                                body: JSON.stringify({
-                                                    description: value,
-                                                }),
-                                            }
-                                        )
-                                            .then((res) => res.json())
-                                            .then(() => {
-                                                descDiv.innerHTML = value;
-                                                descDiv.innerHTML = autoLink(
-                                                    descDiv.innerHTML
-                                                );
-                                                modal.style.display = "none";
-                                                window.CKEDITOR5_INSTANCE.destroy();
-                                                window.CKEDITOR5_INSTANCE =
-                                                    null;
-                                            })
-                                            .catch(() => {
-                                                modal.style.display = "none";
-                                                window.CKEDITOR5_INSTANCE.destroy();
-                                                window.CKEDITOR5_INSTANCE =
-                                                    null;
-                                            });
+                            },
+                        });
+                        document.getElementById("ckeditor-save").onclick =
+                            function () {
+                                const value = tinymce
+                                    .get("ckeditor-area")
+                                    .getContent();
+                                fetch(
+                                    `/problemes/update-description/${problem.id}`,
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "X-CSRF-TOKEN": csrfToken,
+                                            Accept: "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            description: value,
+                                        }),
                                     }
-                                };
-                            document.getElementById("ckeditor-cancel").onclick =
-                                function () {
-                                    modal.style.display = "none";
-                                    if (window.CKEDITOR5_INSTANCE) {
-                                        window.CKEDITOR5_INSTANCE.destroy();
-                                        window.CKEDITOR5_INSTANCE = null;
-                                    }
-                                };
-                        };
-                    }
+                                )
+                                    .then((res) => res.json())
+                                    .then(() => {
+                                        descDiv.innerHTML = value;
+                                        descDiv.innerHTML = autoLink(
+                                            descDiv.innerHTML
+                                        );
+                                        modal.style.display = "none";
+                                        if (tinymce.get("ckeditor-area"))
+                                            tinymce
+                                                .get("ckeditor-area")
+                                                .remove();
+                                    })
+                                    .catch(() => {
+                                        modal.style.display = "none";
+                                        if (tinymce.get("ckeditor-area"))
+                                            tinymce
+                                                .get("ckeditor-area")
+                                                .remove();
+                                    });
+                            };
+                        document.getElementById("ckeditor-cancel").onclick =
+                            function () {
+                                modal.style.display = "none";
+                                if (tinymce.get("ckeditor-area"))
+                                    tinymce.get("ckeditor-area").remove();
+                            };
+                    };
                 }
             });
     });
@@ -722,34 +692,14 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
 
                             btnCk.onclick = function (event) {
                                 event.stopPropagation();
-                                let tryCount = 0;
-                                const maxTries = 30; // 3 secondes max (30 x 100ms)
-
-                                function openCkeditor5() {
-                                    if (
-                                        typeof window.ClassicEditor ===
-                                        "undefined"
-                                    ) {
-                                        tryCount++;
-                                        if (tryCount > maxTries) {
-                                            alert(
-                                                "CKEditor 5 n'est pas chargé après plusieurs tentatives. Vérifiez votre connexion ou rechargez la page."
-                                            );
-                                            return;
-                                        }
-                                        setTimeout(openCkeditor5, 100);
-                                        return;
-                                    }
-                                    let modal =
-                                        document.getElementById(
-                                            "ckeditor-modal"
-                                        );
-                                    if (!modal) {
-                                        modal = document.createElement("div");
-                                        modal.id = "ckeditor-modal";
-                                        modal.className =
-                                            "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
-                                        modal.innerHTML = `
+                                let modal =
+                                    document.getElementById("ckeditor-modal");
+                                if (!modal) {
+                                    modal = document.createElement("div");
+                                    modal.id = "ckeditor-modal";
+                                    modal.className =
+                                        "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                                    modal.innerHTML = `
                 <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
                     <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
                     <div class="flex gap-2 mt-4">
@@ -758,151 +708,77 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                     </div>
                 </div>
             `;
-                                        document.body.appendChild(modal);
-                                    }
-                                    modal.style.display = "flex";
-                                    document.getElementById(
-                                        "ckeditor-area"
-                                    ).value = descDiv.innerHTML;
-
-                                    if (window.CKEDITOR5_INSTANCE) {
-                                        window.CKEDITOR5_INSTANCE.destroy();
-                                    }
-                                    ClassicEditor.create(
-                                        document.getElementById(
-                                            "ckeditor-area"
-                                        ),
+                                    document.body.appendChild(modal);
+                                }
+                                modal.style.display = "flex";
+                                document.getElementById("ckeditor-area").value =
+                                    descDiv.innerHTML;
+                                // Détruit TinyMCE si déjà présent
+                                if (tinymce.get("ckeditor-area"))
+                                    tinymce.get("ckeditor-area").remove();
+                                tinymce.init({
+                                    selector: "#ckeditor-area",
+                                    menubar: false,
+                                    plugins: "lists link",
+                                    toolbar:
+                                        "undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code",
+                                    setup: function (editor) {
+                                        editor.on("init", function () {
+                                            editor.setContent(
+                                                descDiv.innerHTML
+                                            );
+                                        });
+                                    },
+                                });
+                                document.getElementById(
+                                    "ckeditor-save"
+                                ).onclick = function () {
+                                    const value = tinymce
+                                        .get("ckeditor-area")
+                                        .getContent();
+                                    fetch(
+                                        `/problemes/update-description/${descDiv.dataset.problemId}`,
                                         {
-                                            toolbar: [
-                                                "bold",
-                                                "italic",
-                                                "link",
-                                                "bulletedList",
-                                                "numberedList",
-                                                "undo",
-                                                "redo",
-                                            ],
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                                "X-CSRF-TOKEN": csrfToken,
+                                                Accept: "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                description: value,
+                                            }),
                                         }
                                     )
-                                        .then((editor) => {
-                                            window.CKEDITOR5_INSTANCE = editor;
-                                            editor.setData(descDiv.innerHTML);
+                                        .then((res) => res.json())
+                                        .then(() => {
+                                            descDiv.innerHTML = value;
+                                            descDiv.innerHTML = autoLink(
+                                                descDiv.innerHTML
+                                            );
+                                            modal.style.display = "none";
+                                            if (tinymce.get("ckeditor-area"))
+                                                tinymce
+                                                    .get("ckeditor-area")
+                                                    .remove();
                                         })
-                                        .catch((error) => {
-                                            console.error(error);
+                                        .catch(() => {
+                                            modal.style.display = "none";
+                                            if (tinymce.get("ckeditor-area"))
+                                                tinymce
+                                                    .get("ckeditor-area")
+                                                    .remove();
                                         });
-
-                                    document.getElementById(
-                                        "ckeditor-save"
-                                    ).onclick = function () {
-                                        if (window.CKEDITOR5_INSTANCE) {
-                                            const value =
-                                                window.CKEDITOR5_INSTANCE.getData();
-                                            fetch(
-                                                `/problemes/update-description/${descDiv.dataset.problemId}`,
-                                                {
-                                                    method: "POST",
-                                                    headers: {
-                                                        "Content-Type":
-                                                            "application/json",
-                                                        "X-CSRF-TOKEN":
-                                                            csrfToken,
-                                                        Accept: "application/json",
-                                                    },
-                                                    body: JSON.stringify({
-                                                        description: value,
-                                                    }),
-                                                }
-                                            )
-                                                .then((res) => res.json())
-                                                .then(() => {
-                                                    descDiv.innerHTML = value;
-                                                    descDiv.innerHTML =
-                                                        autoLink(
-                                                            descDiv.innerHTML
-                                                        );
-                                                    modal.style.display =
-                                                        "none";
-                                                    window.CKEDITOR5_INSTANCE.destroy();
-                                                    window.CKEDITOR5_INSTANCE =
-                                                        null;
-                                                })
-                                                .catch(() => {
-                                                    modal.style.display =
-                                                        "none";
-                                                    window.CKEDITOR5_INSTANCE.destroy();
-                                                    window.CKEDITOR5_INSTANCE =
-                                                        null;
-                                                });
-                                        }
-                                    };
-                                    document.getElementById(
-                                        "ckeditor-cancel"
-                                    ).onclick = function () {
-                                        modal.style.display = "none";
-                                        if (window.CKEDITOR5_INSTANCE) {
-                                            window.CKEDITOR5_INSTANCE.destroy();
-                                            window.CKEDITOR5_INSTANCE = null;
-                                        }
-                                    };
-                                }
-
-                                // Utilise la fonction utilitaire pour attendre CKEditor 5
-                                function onCkeditor5Ready(callback) {
-                                    if (
-                                        typeof window.ClassicEditor !==
-                                        "undefined"
-                                    ) {
-                                        callback();
-                                    } else {
-                                        const interval = setInterval(() => {
-                                            if (
-                                                typeof window.ClassicEditor !==
-                                                "undefined"
-                                            ) {
-                                                clearInterval(interval);
-                                                callback();
-                                            }
-                                        }, 100);
-                                    }
-                                }
-                                onCkeditor5Ready(openCkeditor5);
+                                };
+                                document.getElementById(
+                                    "ckeditor-cancel"
+                                ).onclick = function () {
+                                    modal.style.display = "none";
+                                    if (tinymce.get("ckeditor-area"))
+                                        tinymce.get("ckeditor-area").remove();
+                                };
                             };
-
-                            // Bouton lock/save (édition inline)
-                            const btnLock = document.createElement("button");
-                            btnLock.type = "button";
-                            btnLock.className =
-                                "edit-lock-btn ml-2 text-blue-accent";
-                            btnLock.title = "Déverrouiller pour éditer";
-                            btnLock.innerHTML =
-                                '<i class="fa-solid fa-lock"></i>';
-                            placeholder.appendChild(btnLock);
-
-                            handleLockSaveButton({
-                                editableElem: descDiv,
-                                btn: btnLock,
-                                fetchUrl: `/problemes/update-description/${descDiv.dataset.problemId}`,
-                                fetchBody: (value) => ({ description: value }),
-                                onSuccess: (el) => {
-                                    el.style.background = "#678BD8";
-                                    setTimeout(
-                                        () => (el.style.background = ""),
-                                        500
-                                    );
-                                },
-                                onError: (el) => {
-                                    el.style.background = "#DB7171";
-                                    setTimeout(
-                                        () => (el.style.background = ""),
-                                        1000
-                                    );
-                                },
-                                getValue: (el) => el.innerHTML,
-                                setValue: (el, val) => {
-                                    el.innerHTML = val;
-                                },
-                            });
                         }
                     }
                 }
@@ -2158,130 +2034,94 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
 
                         btnCk.onclick = function (event) {
                             event.stopPropagation();
-                            function openCkeditor5() {
-                                let modal =
-                                    document.getElementById("ckeditor-modal");
-                                if (!modal) {
-                                    modal = document.createElement("div");
-                                    modal.id = "ckeditor-modal";
-                                    modal.className =
-                                        "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
-                                    modal.innerHTML = `
-                                    <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
-                                        <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
-                                        <div class="flex gap-2 mt-4">
-                                            <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
-                                            <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
-                                        </div>
-                                    </div>
-                                `;
-                                    document.body.appendChild(modal);
-                                }
-                                modal.style.display = "flex";
-                                document.getElementById("ckeditor-area").value =
-                                    span.innerHTML;
-
-                                if (window.CKEDITOR5_INSTANCE) {
-                                    window.CKEDITOR5_INSTANCE.destroy();
-                                }
-                                ClassicEditor.create(
-                                    document.getElementById("ckeditor-area"),
-                                    {
-                                        toolbar: [
-                                            "bold",
-                                            "italic",
-                                            "link",
-                                            "bulletedList",
-                                            "numberedList",
-                                            "undo",
-                                            "redo",
-                                        ],
-                                    }
-                                )
-                                    .then((editor) => {
-                                        window.CKEDITOR5_INSTANCE = editor;
-                                        editor.setData(span.innerHTML);
-                                    })
-                                    .catch((error) => {
-                                        console.error(error);
+                            let modal =
+                                document.getElementById("ckeditor-modal");
+                            if (!modal) {
+                                modal = document.createElement("div");
+                                modal.id = "ckeditor-modal";
+                                modal.className =
+                                    "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+                                modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                    <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
+                    <div class="flex gap-2 mt-4">
+                        <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
+                        <button id="ckeditor-cancel" class="px-4 py-2 bg-secondary-grey text-primary-grey rounded hover:bg-red-accent hover:text-white">Annuler</button>
+                    </div>
+                </div>
+            `;
+                                document.body.appendChild(modal);
+                            }
+                            modal.style.display = "flex";
+                            document.getElementById("ckeditor-area").value =
+                                span.innerHTML;
+                            if (tinymce.get("ckeditor-area"))
+                                tinymce.get("ckeditor-area").remove();
+                            tinymce.init({
+                                selector: "#ckeditor-area",
+                                menubar: false,
+                                plugins: "lists link",
+                                toolbar:
+                                    "undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code",
+                                setup: function (editor) {
+                                    editor.on("init", function () {
+                                        editor.setContent(span.innerHTML);
                                     });
-
-                                document.getElementById(
-                                    "ckeditor-save"
-                                ).onclick = function () {
-                                    if (window.CKEDITOR5_INSTANCE) {
-                                        const value =
-                                            window.CKEDITOR5_INSTANCE.getData();
-                                        fetch(
-                                            `/model/${span.dataset.model}/update-field/${span.dataset.id}`,
-                                            {
-                                                method: "POST",
-                                                headers: {
-                                                    "Content-Type":
-                                                        "application/json",
-                                                    "X-CSRF-TOKEN": csrfToken,
-                                                    Accept: "application/json",
-                                                },
-                                                body: JSON.stringify({
-                                                    field:
-                                                        "infos_" +
-                                                        span.dataset.serviceKey
-                                                            .toLowerCase()
-                                                            .normalize("NFD")
-                                                            .replace(
-                                                                /[\u0300-\u036f]/g,
-                                                                ""
-                                                            )
-                                                            .replace(/ /g, "_"),
-                                                    value: value,
-                                                }),
-                                            }
-                                        )
-                                            .then((res) => res.json())
-                                            .then(() => {
-                                                span.innerHTML = value;
-                                                modal.style.display = "none";
-                                                window.CKEDITOR5_INSTANCE.destroy();
-                                                window.CKEDITOR5_INSTANCE =
-                                                    null;
-                                            })
-                                            .catch(() => {
-                                                modal.style.display = "none";
-                                                window.CKEDITOR5_INSTANCE.destroy();
-                                                window.CKEDITOR5_INSTANCE =
-                                                    null;
-                                            });
-                                    }
-                                };
-                                document.getElementById(
-                                    "ckeditor-cancel"
-                                ).onclick = function () {
-                                    modal.style.display = "none";
-                                    if (window.CKEDITOR5_INSTANCE) {
-                                        window.CKEDITOR5_INSTANCE.destroy();
-                                        window.CKEDITOR5_INSTANCE = null;
-                                    }
-                                };
-                            }
-
-                            function onCkeditor5Ready(callback) {
-                                if (
-                                    typeof window.ClassicEditor !== "undefined"
-                                ) {
-                                    callback();
-                                } else {
-                                    const interval = setInterval(() => {
-                                        if (
-                                            typeof window.ClassicEditor !==
-                                            "undefined"
-                                        ) {
-                                            clearInterval(interval);
-                                            callback();
+                                },
+                            });
+                            document.getElementById("ckeditor-save").onclick =
+                                function () {
+                                    const value = tinymce
+                                        .get("ckeditor-area")
+                                        .getContent();
+                                    fetch(
+                                        `/model/${span.dataset.model}/update-field/${span.dataset.id}`,
+                                        {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                                "X-CSRF-TOKEN": csrfToken,
+                                                Accept: "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                field:
+                                                    "infos_" +
+                                                    span.dataset.serviceKey
+                                                        .toLowerCase()
+                                                        .normalize("NFD")
+                                                        .replace(
+                                                            /[\u0300-\u036f]/g,
+                                                            ""
+                                                        )
+                                                        .replace(/ /g, "_"),
+                                                value: value,
+                                            }),
                                         }
-                                    }, 100);
-                                }
-                            }
-                            onCkeditor5Ready(openCkeditor5);
+                                    )
+                                        .then((res) => res.json())
+                                        .then(() => {
+                                            span.innerHTML = value;
+                                            modal.style.display = "none";
+                                            if (tinymce.get("ckeditor-area"))
+                                                tinymce
+                                                    .get("ckeditor-area")
+                                                    .remove();
+                                        })
+                                        .catch(() => {
+                                            modal.style.display = "none";
+                                            if (tinymce.get("ckeditor-area"))
+                                                tinymce
+                                                    .get("ckeditor-area")
+                                                    .remove();
+                                        });
+                                };
+                            document.getElementById("ckeditor-cancel").onclick =
+                                function () {
+                                    modal.style.display = "none";
+                                    if (tinymce.get("ckeditor-area"))
+                                        tinymce.get("ckeditor-area").remove();
+                                };
                         };
                     }
                 });

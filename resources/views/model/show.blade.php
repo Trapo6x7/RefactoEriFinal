@@ -30,8 +30,8 @@ use Illuminate\Support\Str;
             <input type="text" id="detail-search" placeholder="Rechercher un champ ou une valeur..."
                 class="appearance-none border-2 border-blue-accent rounded-lg px-3 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition" />
         </div>
-        <div class="px-2 md:px-2" style="max-height:600px; overflow-y: auto;">
-            <ul class="divide-y divide-primary-grey" id="details-list">
+        <div class="px-2 md:px-2 w-full" style="max-height:600px; overflow-y: auto;">
+            <ul class="divide-y divide-primary-grey w-full" id="details-list">
                 {{-- Sélecteur combiné Client/Distributeur --}}
                 @if ($model === 'societe')
                     <li class="p-3 flex flex-col items-start justify-between h-auto group gap-2">
@@ -50,7 +50,7 @@ use Illuminate\Support\Str;
                     </li>
                 @endif
 
-                {{-- Champs non-service --}}
+                {{-- Champs non-service (hors description) --}}
                 @foreach ($otherKeys as $key)
                     @php
                         $value = $attributes[$key];
@@ -67,6 +67,7 @@ use Illuminate\Support\Str;
                             $key !== 'updated_at' &&
                             $key !== 'status_client' &&
                             $key !== 'status_distrib' &&
+                            $key !== 'description' &&
                             !is_null($value) &&
                             $value !== '' &&
                             $value !== 0 &&
@@ -109,6 +110,17 @@ use Illuminate\Support\Str;
                     @endif
                 @endforeach
 
+                {{-- Description du problème (TinyMCE, pas editable inline) --}}
+                @if (isset($attributes['description']))
+                    <li class="p-3 flex flex-col items-start justify-between h-auto group w-full gap-2">
+                        <span class="font-semibold text-blue-accent w-full mb-2">
+                            {{ $fields['description'] ?? 'Description' }}
+                        </span>
+                        <textarea id="descriptionProbleme" name="description" class="w-full border rounded px-2 py-1"
+                            style="max-width:100%;min-width:0;width:100%;" data-id="{{ $item->id }}" data-model="{{ $model }}">{{ $attributes['description'] }}</textarea>
+                    </li>
+                @endif
+
                 {{-- Champs service (toujours à la fin) --}}
                 @foreach ($serviceKeys as $key)
                     @php
@@ -149,27 +161,35 @@ use Illuminate\Support\Str;
         </div>
     </div>
 
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6.8.5-39/tinymce.min.js"
+        referrerpolicy="origin"></script>
+
     <script>
         window.currentUserRole = "{{ strtolower(auth()->user()->role ?? '') }}";
-        document.addEventListener('DOMContentLoaded', function() {
-            // CRUD inline pour les champs éditables
-            if (
-                window.currentUserRole && ["admin", "superadmin"].includes(window.currentUserRole)
-            ) {
+
+        // Fonction d'initialisation globale
+        function initTinyMCEAndApp() {
+            // --- Initialisation TinyMCE sur description et services ---
+            tinymce.init({
+                selector: '#descriptionProbleme, textarea.service-info',
+                menubar: false,
+                plugins: 'lists link',
+toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',            });
+
+            // --- Champs éditables inline ---
+            if (["admin", "superadmin"].includes(window.currentUserRole)) {
                 document.querySelectorAll('.editable').forEach(function(span) {
                     span.addEventListener('blur', function() {
                         const value = this.innerText;
                         const field = this.dataset.field;
                         const id = this.dataset.id;
                         const model = this.dataset.model;
-
                         fetch(`/model/${model}/update-field/${id}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute("content"),
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        .getAttribute("content"),
                                     Accept: 'application/json'
                                 },
                                 body: JSON.stringify({
@@ -193,7 +213,7 @@ use Illuminate\Support\Str;
                     });
                 });
 
-                // Pour le select Oui/Non des services
+                // --- Select Oui/Non des services ---
                 document.querySelectorAll('.service-select').forEach(function(select) {
                     select.addEventListener('change', function() {
                         const value = this.value;
@@ -202,128 +222,83 @@ use Illuminate\Support\Str;
                         if (wrapper) {
                             if (value == "1") {
                                 wrapper.style.display = "";
-                                // Initialiser CKEditor si pas déjà fait
-                                if (textarea && !textarea._ckeditorInstance) {
-                                    ClassicEditor.create(textarea, {
-                                        toolbar: ['bold', 'italic', 'link', 'bulletedList',
-                                            'numberedList', 'undo', 'redo'
-                                        ]
-                                    }).then(editor => {
-                                        textarea._ckeditorInstance = editor;
-                                        editor.model.document.on('change:data', function() {
-                                            const value = editor.getData();
-                                            const field = textarea.dataset.field;
-                                            const id = textarea.dataset.id;
-                                            const model = textarea.dataset.model;
-                                            fetch(`/model/${model}/update-field/${id}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': document
-                                                        .querySelector(
-                                                            'meta[name="csrf-token"]'
-                                                        ).getAttribute(
-                                                            "content"),
-                                                    Accept: 'application/json'
-                                                },
-                                                body: JSON.stringify({
-                                                    field,
-                                                    value
-                                                }),
-                                            });
-                                        });
-                                    });
-                                }
+                                // Si tu ajoutes dynamiquement un textarea, réinitialise TinyMCE :
+                                // tinymce.remove();
+                                // tinymce.init({ selector: '#descriptionProbleme, textarea.service-info', ... });
                             } else {
                                 wrapper.style.display = "none";
+                                // Optionnel : tu peux retirer l'éditeur si tu veux
+                                // if (textarea && tinymce.get(textarea.id)) tinymce.get(textarea.id).remove();
                             }
                         }
                     });
                 });
-                // Pour le textarea info service avec CKEditor
-                document.querySelectorAll('.service-info').forEach(function(textarea) {
-                    ClassicEditor.create(textarea, {
-                        toolbar: ['bold', 'italic', 'link', 'bulletedList', 'numberedList', 'undo',
-                            'redo'
-                        ]
-                    }).then(editor => {
-                        textarea._ckeditorInstance = editor;
-                        editor.model.document.on('change:data', function() {
-                            const value = editor.getData();
-                            const field = textarea.dataset.field;
-                            const id = textarea.dataset.id;
-                            const model = textarea.dataset.model;
-                            fetch(`/model/${model}/update-field/${id}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute(
-                                        "content"),
-                                    Accept: 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    field,
-                                    value
-                                }),
-                            });
+            }
+
+            // --- Select statut (active/inactive) ---
+            document.querySelectorAll('.editable-select').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    const value = this.value;
+                    const field = this.dataset.field;
+                    const id = this.dataset.id;
+                    const model = this.dataset.model;
+                    fetch(`/model/${model}/update-field/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute("content"),
+                                Accept: 'application/json'
+                            },
+                            body: JSON.stringify({
+                                field,
+                                value
+                            }),
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data.success) {
+                                alert('Erreur lors de la mise à jour');
+                            } else {
+                                this.style.background = "#678BD8";
+                                setTimeout(() => this.style.background = "", 500);
+                            }
+                        })
+                        .catch(() => {
+                            this.style.background = "#DB7171";
+                            setTimeout(() => this.style.background = "", 1000);
                         });
-                    });
                 });
+            });
 
-                // Pour le select statut (active/inactive)
-                document.querySelectorAll('.editable-select').forEach(function(select) {
-                    select.addEventListener('change', function() {
-                        const value = this.value;
-                        const field = this.dataset.field;
-                        const id = this.dataset.id;
-                        const model = this.dataset.model;
-                        fetch(`/model/${model}/update-field/${id}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute("content"),
-                                    Accept: 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    field,
-                                    value
-                                }),
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    alert('Erreur lors de la mise à jour');
-                                } else {
-                                    this.style.background = "#678BD8";
-                                    setTimeout(() => this.style.background = "", 500);
-                                }
-                            })
-                            .catch(() => {
-                                this.style.background = "#DB7171";
-                                setTimeout(() => this.style.background = "", 1000);
-                            });
-                    });
-                });
-
-                // Pour le select combiné Client/Distributeur
-                const statusCombined = document.getElementById('status_combined');
-                if (statusCombined) {
-                    statusCombined.addEventListener('change', function() {
-                        const value = this.value;
-                        const id = this.dataset.id;
-                        const model = this.dataset.model;
-                        let status_client = 0,
-                            status_distrib = 0;
-                        if (value === 'client') status_client = 1;
-                        if (value === 'distrib') status_distrib = 1;
-                        if (value === 'both') {
-                            status_client = 1;
-                            status_distrib = 1;
-                        }
-
-                        // Met à jour les deux champs côté serveur
+            // --- Select combiné Client/Distributeur ---
+            const statusCombined = document.getElementById('status_combined');
+            if (statusCombined) {
+                statusCombined.addEventListener('change', function() {
+                    const value = this.value;
+                    const id = this.dataset.id;
+                    const model = this.dataset.model;
+                    let status_client = 0,
+                        status_distrib = 0;
+                    if (value === 'client') status_client = 1;
+                    if (value === 'distrib') status_distrib = 1;
+                    if (value === 'both') {
+                        status_client = 1;
+                        status_distrib = 1;
+                    }
+                    fetch(`/model/${model}/update-field/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                "content"),
+                            Accept: 'application/json'
+                        },
+                        body: JSON.stringify({
+                            field: 'status_client',
+                            value: status_client
+                        }),
+                    }).then(() => {
                         fetch(`/model/${model}/update-field/${id}`, {
                             method: 'POST',
                             headers: {
@@ -333,32 +308,15 @@ use Illuminate\Support\Str;
                                 Accept: 'application/json'
                             },
                             body: JSON.stringify({
-                                field: 'status_client',
-                                value: status_client
+                                field: 'status_distrib',
+                                value: status_distrib
                             }),
-                        }).then(() => {
-                            fetch(`/model/${model}/update-field/${id}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]').getAttribute(
-                                        "content"),
-                                    Accept: 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    field: 'status_distrib',
-                                    value: status_distrib
-                                }),
-                            });
                         });
                     });
-                }
+                });
             }
-        });
 
-        // Fonction de recherche dans la liste des détails
-        document.addEventListener('DOMContentLoaded', function() {
+            // --- Recherche dans la liste des détails ---
             const searchInput = document.getElementById('detail-search');
             const detailsList = document.getElementById('details-list');
             if (searchInput && detailsList) {
@@ -371,6 +329,7 @@ use Illuminate\Support\Str;
                 });
             }
 
+            // --- Suppression ---
             const deleteBtn = document.getElementById('delete-item-btn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', function() {
@@ -385,8 +344,7 @@ use Illuminate\Support\Str;
                             })
                             .then(res => {
                                 if (res.ok) {
-                                    window.location.href =
-                                        "{{ route('model.index', ['model' => $model]) }}";
+                                    window.location.href = "{{ route('model.index', ['model' => $model]) }}";
                                 } else {
                                     alert('Erreur lors de la suppression.');
                                 }
@@ -395,6 +353,18 @@ use Illuminate\Support\Str;
                     }
                 });
             }
-        });
+        }
+
+        // Attendre que TinyMCE soit chargé avant d'initialiser
+        if (window.tinymce) {
+            initTinyMCEAndApp();
+        } else {
+            let check = setInterval(function() {
+                if (window.tinymce) {
+                    clearInterval(check);
+                    initTinyMCEAndApp();
+                }
+            }, 50);
+        }
     </script>
 </x-app-layout>

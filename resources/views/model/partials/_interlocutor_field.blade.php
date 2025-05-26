@@ -15,9 +15,9 @@
             <option value="1" {{ $serviceValue == 1 ? 'selected' : '' }}>Oui</option>
         </select>
         <div class="mt-2" id="container_{{ $infoField }}" style="display: {{ $serviceValue == 1 ? '' : 'none' }};">
-            <input type="text" name="{{ $infoField }}" id="{{ $infoField }}" value="{{ $infoValue }}"
-                class="w-full px-4 py-2 border border-secondary-grey rounded-lg text-lg"
-                placeholder="{{ __('fields.' . $infoField) }}">
+            <textarea name="{{ $infoField }}" id="{{ $infoField }}"
+                class="w-full px-4 py-2 border service-info h-auto border-secondary-grey rounded-lg text-lg"
+                placeholder="{{ __('fields.' . $infoField) }}">{{ $infoValue }}</textarea>
         </div>
     @elseif (!str_starts_with($name, 'infos_') && !str_starts_with($name, 'fullname'))
         <label for="{{ $name }}" class="block text-lg font-medium text-gray-700 mb-1 text-center uppercase">

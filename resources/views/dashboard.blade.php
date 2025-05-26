@@ -48,8 +48,8 @@
 
             <article class="pt-4 mx-auto flex flex-col items-center justify-center w-full max-w-6xl">
                 <form id="user-search-form"
-                    class="flex flex-col md:flex-row items-center justify-center gap-2 lg:gap-4 relative md:w-3/4 w-full"> <input
-                        type="text" id="user-search-input" name="q" autocomplete="off"
+                    class="flex flex-col md:flex-row items-center justify-center gap-2 lg:gap-4 relative md:w-3/4 w-full">
+                    <input type="text" id="user-search-input" name="q" autocomplete="off"
                         placeholder="Recherche..."
                         class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition text-sm md:text-md lg:text-lg">
                     <button type="button" id="reset-search-input"
@@ -71,8 +71,10 @@
                     </div>
                 </form>
                 <div class="flex-col lg:flex-row items-center justify-center gap-1 w-full mt-4 hidden md:flex lg:px-24">
-                    <div class="relative w-full lg:w-1/2 flex lg:flex-col items-center justify-center lg:justify-between gap-1">
-                        <label for="societe-select" class="lg:block hidden mb-1 text-md uppercase text-sm">Société</label>
+                    <div
+                        class="relative w-full lg:w-1/2 flex lg:flex-col items-center justify-center lg:justify-between gap-1">
+                        <label for="societe-select"
+                            class="lg:block hidden mb-1 text-md uppercase text-sm">Société</label>
                         <select id="societe-select"
                             class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/2 lg:w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
                             <option value="">Sélectionner...</option>
@@ -83,8 +85,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="relative w-full lg:w-1/2 flex lg:flex-col items-center justify-center lg:justify-between gap-1">
-                        <label for="societe-select" class="lg:block hidden mb-1 text-md uppercase text-sm">Interlocuteur</label>
+                    <div
+                        class="relative w-full lg:w-1/2 flex lg:flex-col items-center justify-center lg:justify-between gap-1">
+                        <label for="societe-select"
+                            class="lg:block hidden mb-1 text-md uppercase text-sm">Interlocuteur</label>
                         <select id="interlocuteur-select"
                             class="appearance-none border-2 border-blue-accent rounded-lg px-4 py-2 w-1/2 lg:w-full bg-white text-blue-accent focus:outline-none focus:ring-2 focus:ring-blue-accent transition">
                             <option value="" class="font-bold bg-blue-accent text-off-white">Sélectionner...
@@ -141,6 +145,7 @@
         const mainContent = document.getElementById('main-content');
         const header = document.getElementById('header');
 
+        // Ouvre la modale et charge le formulaire
         document.getElementById('add-model-link').addEventListener('click', function() {
             const model = document.getElementById('add-model-select').value;
             const url = "{{ route('model.form', ['model' => ':model', 'action' => 'create']) }}".replace(':model',
@@ -161,17 +166,12 @@
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('add-model-modal-content').innerHTML = html;
-                    // Ajoute ceci juste après :
-                    if (window.ClassicEditor && document.getElementById('description')) {
-                        ClassicEditor
-                            .create(document.getElementById('description'))
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    }
+                    initTinyMCEInModal();
+                    initServiceSelectTinyMCE();
                 });
         });
 
+        // Ferme la modale
         document.getElementById('close-add-model-modal').addEventListener('click', function() {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -179,6 +179,7 @@
             header.classList.remove('modal-blur');
         });
 
+        // Ferme la modale avec Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                 modal.classList.add('hidden');
@@ -188,6 +189,52 @@
             }
         });
 
+        // Initialise TinyMCE sur tous les textarea du modal
+        function initTinyMCEInModal() {
+            if (window.tinymce) {
+                tinymce.remove();
+                tinymce.init({
+                    selector: 'textarea.tinymce, textarea.service-info, #description_form',
+                    menubar: false,
+                    plugins: 'lists link',
+                    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+                });
+            }
+        }
+
+        // Gère TinyMCE sur les textarea de service affichés dynamiquement
+        function initServiceSelectTinyMCE() {
+            document.querySelectorAll('.service-select').forEach(function(select) {
+                select.addEventListener('change', function() {
+                    const wrapper = this.closest('li').querySelector('.service-info-wrapper');
+                    const textarea = wrapper ? wrapper.querySelector('.service-info') : null;
+                    if (wrapper && textarea) {
+                        if (this.value == "1") {
+                            wrapper.style.display = "";
+                            // Donne un id unique si besoin
+                            if (!textarea.id) {
+                                textarea.id = 'service_info_' + Math.random().toString(36).substr(2, 9);
+                            }
+                            // Initialise TinyMCE si pas déjà fait
+                            if (!tinymce.get(textarea.id)) {
+                                tinymce.init({
+                                    selector: '#' + textarea.id,
+                                    menubar: false,
+                                    plugins: 'lists link',
+                                    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+                                });
+                            }
+                        } else {
+                            wrapper.style.display = "none";
+                            if (textarea.id && tinymce.get(textarea.id)) {
+                                tinymce.get(textarea.id).remove();
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
         window.userRoles = @json(Auth::user()
                 ? collect([Auth::user()->isAdmin() ? 'admin' : null, Auth::user()->isSuperAdmin() ? 'superadmin' : null])->filter()->values()
                 : []
@@ -196,7 +243,8 @@
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
     </script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+    <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script>
     <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
     @vite('resources/js/dashboard.js')
 </x-app-layout>

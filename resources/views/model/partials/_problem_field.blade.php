@@ -51,13 +51,12 @@
     @endforeach
 </select>
 
-<label class="uppercase" for="description">Description</label>
-<textarea
-    id="description"
-    name="description"
-    placeholder="Description"
-    class="w-full px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
->{{ old('description', $instance->description ?? '') }}</textarea>
-
-{{-- CKEditor 5 CDN --}}
-<script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/classic/ckeditor.js"></script>
+<label class="uppercase" for="description_form">Description</label>
+<div class="mt-2">
+    <textarea
+        class="tinymce w-full h-48 px-4 py-2 border border-secondary-grey rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+        id="description_form"
+        name="description"
+        placeholder="Description"
+    >{{ old('description', $instance->description ?? '') }}</textarea>
+</div>
