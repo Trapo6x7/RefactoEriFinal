@@ -520,15 +520,16 @@ class ModelController extends Controller
         return response()->json(['services' => $services]);
     }
 
-    public function updateServices(Request $request, $model, $id)
-    {
-        if (!isset($this->models[$model])) {
-            abort(404);
-        }
-        $modelClass = $this->models[$model];
-        $item = $modelClass::findOrFail($id);
+public function updateServices(Request $request, $model, $id)
+{
+    if (!isset($this->models[$model])) {
+        abort(404);
+    }
+    $modelClass = $this->models[$model];
+    $item = $modelClass::findOrFail($id);
 
-        // Même liste que dans getServices
+    // Liste adaptée selon le modèle
+    if ($model === 'societe') {
         $serviceFields = [
             'service_backup',
             'service_connect',
@@ -543,15 +544,24 @@ class ModelController extends Controller
             'service_maintenance_equip_rso',
             'service_maintenance_ESET',
             'service_maintenance_domaine_DNS',
-            'service_comptes'
         ];
-
-        $checked = $request->input('services', []);
-        foreach ($serviceFields as $field) {
-            $item->$field = in_array($field, $checked) ? 1 : 0;
-        }
-        $item->save();
-
-        return response()->json(['success' => true]);
+    } elseif ($model === 'interlocuteur') {
+        $serviceFields = [
+            'service_connect',
+            'service_cloody',
+            'service_comptes',
+            'service_mail',
+        ];
+    } else {
+        abort(400, 'Modèle non supporté pour les services');
     }
+
+    $checked = $request->input('services', []);
+    foreach ($serviceFields as $field) {
+        $item->$field = in_array($field, $checked) ? 1 : 0;
+    }
+    $item->save();
+
+    return response()->json(['success' => true]);
+}
 }

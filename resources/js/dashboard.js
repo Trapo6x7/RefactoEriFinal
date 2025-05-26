@@ -1515,6 +1515,19 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
             })
                 .then((res) => res.json())
                 .then((interlocutors) => {
+                    interlocutors.sort((a, b) => {
+                        const nameA = (
+                            a.fullname ||
+                            a.name ||
+                            ""
+                        ).toLowerCase();
+                        const nameB = (
+                            b.fullname ||
+                            b.name ||
+                            ""
+                        ).toLowerCase();
+                        return nameA.localeCompare(nameB);
+                    });
                     const selectHtml = `
                         <div class="sticky bottom-0 z-10 bg-white w-full pt-2 pb-2">
                             <label for="interlocutor-select-1" class="block font-semibold text-blue-accent">Sélectionner un interlocuteur :</label>
