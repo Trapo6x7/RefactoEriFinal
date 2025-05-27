@@ -195,9 +195,13 @@
                 tinymce.remove();
                 tinymce.init({
                     selector: 'textarea.tinymce, textarea.service-info, #description_form',
+                    height: 400,
+                    language: 'fr',
                     menubar: false,
-                    plugins: 'lists link',
-                    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+                    plugins: 'code link lists align emoticons image table preview textcolor',
+                    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+                    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+
                 });
             }
         }
@@ -219,9 +223,13 @@
                             if (!tinymce.get(textarea.id)) {
                                 tinymce.init({
                                     selector: '#' + textarea.id,
+                                    height: 400,
+                                    language: 'fr',
                                     menubar: false,
-                                    plugins: 'lists link',
-                                    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+                                    plugins: 'code link lists align emoticons image table preview textcolor',
+                                    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+                                    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+
                                 });
                             }
                         } else {

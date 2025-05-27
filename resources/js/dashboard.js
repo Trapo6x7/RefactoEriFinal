@@ -273,11 +273,13 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             tinymce.get("ckeditor-area").remove();
                         tinymce.init({
                             selector: "#ckeditor-area",
-                            menubar: false,
-                            plugins: "lists link",
-                            toolbar:
-                                "undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code",
-                            setup: function (editor) {
+    height: 400,
+    language: 'fr',
+    menubar: false,
+    plugins: 'code link lists align emoticons image table preview textcolor',
+    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+    setup: function (editor) {
                                 editor.on("init", function () {
                                     editor.setContent(descDiv.innerHTML);
                                 });
@@ -718,11 +720,13 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                     tinymce.get("ckeditor-area").remove();
                                 tinymce.init({
                                     selector: "#ckeditor-area",
-                                    menubar: false,
-                                    plugins: "lists link",
-                                    toolbar:
-                                        "undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code",
-                                    setup: function (editor) {
+    height: 400,
+    language: 'fr',
+    menubar: false,
+    plugins: 'code link lists align emoticons image table preview textcolor',
+    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+    setup: function (editor) {
                                         editor.on("init", function () {
                                             editor.setContent(
                                                 descDiv.innerHTML
@@ -2059,11 +2063,13 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                 tinymce.get("ckeditor-area").remove();
                             tinymce.init({
                                 selector: "#ckeditor-area",
-                                menubar: false,
-                                plugins: "lists link",
-                                toolbar:
-                                    "undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code",
-                                setup: function (editor) {
+    height: 400,
+    language: 'fr',
+    menubar: false,
+    plugins: 'code link lists align emoticons image table preview textcolor',
+    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+    setup: function (editor) {
                                     editor.on("init", function () {
                                         editor.setContent(span.innerHTML);
                                     });

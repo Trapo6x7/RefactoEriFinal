@@ -172,9 +172,13 @@ use Illuminate\Support\Str;
             // --- Initialisation TinyMCE sur description et services ---
             tinymce.init({
                 selector: '#descriptionProbleme, textarea.service-info',
-                menubar: false,
-                plugins: 'lists link',
-toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',            });
+    height: 400,
+    language: 'fr',
+    menubar: false,
+    plugins: 'code link lists align emoticons image table preview textcolor',
+    toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
+    content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+  });
 
             // --- Champs éditables inline ---
             if (["admin", "superadmin"].includes(window.currentUserRole)) {
