@@ -201,7 +201,9 @@
                     plugins: 'code link lists align emoticons image table preview textcolor',
                     toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
                     content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-
+                    forced_root_block: false, // Ajoute ceci
+                    force_br_newlines: true, // Ajoute ceci
+                    force_p_newlines: false, // Ajoute ceci
                 });
             }
         }
@@ -229,7 +231,9 @@
                                     plugins: 'code link lists align emoticons image table preview textcolor',
                                     toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
                                     content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-
+                                    forced_root_block: false, // Ajoute ceci
+                                    force_br_newlines: true, // Ajoute ceci
+                                    force_p_newlines: false, // Ajoute ceci
                                 });
                             }
                         } else {
