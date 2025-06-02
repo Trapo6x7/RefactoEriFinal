@@ -47,4 +47,7 @@ return [
     'fullname' => 'Nom complet',
     'main_name' => 'societe principale',
     'id_main' => 'societe principale',
+    'societe' => 'Société',
+    'id_teamviewer' => 'ID TeamViewer',
+    'service_connect' => 'Service de connexion',
 ];
