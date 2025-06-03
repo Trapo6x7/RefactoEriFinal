@@ -177,12 +177,32 @@ use Illuminate\Support\Str;
                 menubar: false,
                 plugins: 'code link lists align emoticons image table preview textcolor',
                 toolbar: 'undo redo | formatselect | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | link image emoticons table | preview code',
-                content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:0.7; }",
-                forced_root_block: false, // Ajoute ceci
-                force_br_newlines: true, // Ajoute ceci
-                force_p_newlines: false, // Ajoute ceci
-            });
 
+                // suppression des <p>, forcer les <br> à la place
+                forced_root_block: false,
+                force_br_newlines: true,
+                force_p_newlines: false,
+
+                // styles stricts pour réduire l'interligne
+                content_style: `
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        margin: 0;
+        padding: 0;
+        line-height: 1.1;
+    }
+    p, div {
+        margin: 0;
+        padding: 0;
+    }
+    br {
+        display: block;
+        margin: 0;
+        padding: 0;
+    }
+`,
+            });
             // --- Champs éditables inline ---
             if (["admin", "superadmin"].includes(window.currentUserRole)) {
                 document.querySelectorAll('.editable').forEach(function(span) {
