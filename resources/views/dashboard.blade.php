@@ -208,12 +208,21 @@
 
                     // styles stricts pour réduire l'interligne
                     content_style: `
-    body {
+      body {
         font-family: Helvetica, Arial, sans-serif;
         font-size: 14px;
-        margin: 0;
-        padding: 0;
+        margin: 2;
+        padding: 2;
         line-height: 1.1;
+    }
+    p, div {
+        margin: 2;
+        padding: 2;
+    }
+    br {
+        display: block;
+        margin: 2;
+        padding: 2;
     }
     p, div {
         margin: 0;
@@ -259,12 +268,21 @@
 
                                     // styles stricts pour réduire l'interligne
                                     content_style: `
-    body {
+      body {
         font-family: Helvetica, Arial, sans-serif;
         font-size: 14px;
-        margin: 0;
-        padding: 0;
+        margin: 2;
+        padding: 2;
         line-height: 1.1;
+    }
+    p, div {
+        margin: 2;
+        padding: 2;
+    }
+    br {
+        display: block;
+        margin: 2;
+        padding: 2;
     }
     p, div {
         margin: 0;
