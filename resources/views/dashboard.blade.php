@@ -31,9 +31,12 @@
         </article>
     </x-slot>
 
+    <!-- Overlay pour le flou et l'assombrissement -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+
     <!-- Modale pour le formulaire -->
     <article id="add-model-modal" class="fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-40 hidden">
-        <div class="rounded-lg p-6 w-full min-w-2xl relative resize overflow-auto bg-white">
+        <div class="rounded-lg p-6 w-full min-w-2xl relative resize overflow-auto">
             <button id="close-add-model-modal"
                 class="absolute xl:w-1/4 2xl:w-1/2 top-4 right-4 text-red-accent hover:text-red-hover text-3xl">&times;</button>
             <div id="add-model-modal-content">
@@ -142,10 +145,11 @@
 
     <script>
         const modal = document.getElementById('add-model-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
         const mainContent = document.getElementById('main-content');
         const header = document.getElementById('header');
 
-        // Ouvre la modale et charge le formulaire
+        // Ouvre la modale et affiche l'overlay
         document.getElementById('add-model-link').addEventListener('click', function() {
             const model = document.getElementById('add-model-select').value;
             const url = "{{ route('model.form', ['model' => ':model', 'action' => 'create']) }}".replace(':model',
@@ -153,6 +157,7 @@
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            modalOverlay.classList.add('active'); // Affiche l'overlay
             mainContent.classList.add('modal-blur');
             header.classList.add('modal-blur');
             document.getElementById('add-model-modal-content').innerHTML =
@@ -171,10 +176,11 @@
                 });
         });
 
-        // Ferme la modale
+        // Ferme la modale et masque l'overlay
         document.getElementById('close-add-model-modal').addEventListener('click', function() {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            modalOverlay.classList.remove('active'); // Masque l'overlay
             mainContent.classList.remove('modal-blur');
             header.classList.remove('modal-blur');
         });
@@ -184,6 +190,7 @@
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+                modalOverlay.classList.remove('active'); // Masque l'overlay
                 mainContent.classList.remove('modal-blur');
                 header.classList.remove('modal-blur');
             }
@@ -254,7 +261,7 @@
                             // Initialise TinyMCE si pas déjà fait
                             if (!tinymce.get(textarea.id)) {
                                 tinymce.init({
-                                     selector: '#' + textarea.id,
+                                    selector: '#' + textarea.id,
                                     height: 400,
                                     language: 'fr',
                                     menubar: false,
@@ -314,9 +321,9 @@
 
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
+        
     </script>
-    <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6/tinymce.min.js"
-        referrerpolicy="origin"></script>
-    <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
-    @vite('resources/js/dashboard.js')
+    <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6/tinymce.min.js" c
+        referrerpolicy="origin"></script>s
+    <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>s @vite('resources/js/dashboard.js')
 </x-app-layout>

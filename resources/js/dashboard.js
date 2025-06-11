@@ -27,6 +27,28 @@ const csrfToken =
         .querySelector('meta[name="csrf-token"]')
         ?.getAttribute("content") || "";
 
+// Fonction pour ouvrir une modale CKEditor avec overlay
+function openCkEditorModal(modalId) {
+    const modal = document.getElementById(modalId);
+    const overlay = document.getElementById("modal-overlay");
+
+    if (modal && overlay) {
+        modal.style.display = "flex";
+        overlay.classList.add("active"); // Affiche l'overlay
+    }
+}
+
+// Fonction pour fermer une modale CKEditor avec overlay
+function closeCkEditorModal(modalId) {
+    const modal = document.getElementById(modalId);
+    const overlay = document.getElementById("modal-overlay");
+
+    if (modal && overlay) {
+        modal.style.display = "none";
+        overlay.classList.remove("active"); // Masque l'overlay
+    }
+}
+
 function autoLink(text) {
     // Remplace les URLs par des liens cliquables avec style
     return text.replace(/((https?:\/\/|www\.)[^\s<]+)/gi, function (url) {
@@ -256,6 +278,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                 "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
                             modal.innerHTML = `
             <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                            <h2 class="text-lg font-bold text-blue-accent mb-4 uppercase">Éditer</h2>
                 <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
                 <div class="flex gap-2 mt-4">
                     <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
@@ -315,6 +338,10 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     }
 `,
                         });
+
+                        // Ajoutez ici les fonctions openCkEditorModal et closeCkEditorModal
+                        openCkEditorModal("ckeditor-modal");
+
                         document.getElementById("ckeditor-save").onclick =
                             function () {
                                 const value = tinymce
@@ -356,7 +383,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                             };
                         document.getElementById("ckeditor-cancel").onclick =
                             function () {
-                                modal.style.display = "none";
+                                closeCkEditorModal("ckeditor-modal"); // Ferme la modale
                                 if (tinymce.get("ckeditor-area"))
                                     tinymce.get("ckeditor-area").remove();
                             };
@@ -733,6 +760,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                         "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
                                     modal.innerHTML = `
                 <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                <h2 class="text-lg font-bold text-blue-accent mb-4 uppercase">Éditer</h2>
                     <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
                     <div class="flex gap-2 mt-4">
                         <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
@@ -792,6 +820,10 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
     }
 `,
                                 });
+
+                                // Ajoutez ici les fonctions openCkEditorModal et closeCkEditorModal
+                                openCkEditorModal("ckeditor-modal");
+
                                 document.getElementById(
                                     "ckeditor-save"
                                 ).onclick = function () {
@@ -836,7 +868,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                 document.getElementById(
                                     "ckeditor-cancel"
                                 ).onclick = function () {
-                                    modal.style.display = "none";
+                                    closeCkEditorModal("ckeditor-modal"); // Ferme la modale
                                     if (tinymce.get("ckeditor-area"))
                                         tinymce.get("ckeditor-area").remove();
                                 };
@@ -2105,6 +2137,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                     "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
                                 modal.innerHTML = `
                 <div class="bg-white rounded-lg p-6 max-w-xl w-full flex flex-col items-center">
+                <h2 class="text-lg font-bold text-blue-accent mb-4 uppercase">Éditer</h2>
                     <textarea id="ckeditor-area" style="width:100%;min-height:20%;"></textarea>
                     <div class="flex gap-2 mt-4">
                         <button id="ckeditor-save" class="px-4 py-2 bg-blue-accent text-white rounded hover:bg-blue-hover">Sauvegarder</button>
@@ -2163,6 +2196,9 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
     }
 `,
                             });
+                            // Ajoutez ici les fonctions openCkEditorModal et closeCkEditorModal
+                            openCkEditorModal("ckeditor-modal");
+
                             document.getElementById("ckeditor-save").onclick =
                                 function () {
                                     const value = tinymce
@@ -2212,7 +2248,7 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                 };
                             document.getElementById("ckeditor-cancel").onclick =
                                 function () {
-                                    modal.style.display = "none";
+                                    closeCkEditorModal("ckeditor-modal"); // Ferme la modale
                                     if (tinymce.get("ckeditor-area"))
                                         tinymce.get("ckeditor-area").remove();
                                 };

@@ -86,7 +86,7 @@
                     </button>
                     <button type="button" id="btn-raz"
                         class="ml-4 px-3 py-1 rounded bg-red-accent text-off-white hover:bg-red-hover transition text-sm">
-                        -
+                        &#10227;
                     </button>
                 @else
                     <div class="ml-4 px-3 py-1 rounded bg-off-white text-off-white"></div>
@@ -230,4 +230,4 @@
     </div>
 </div>
 
-@vite(['resources/js/navbar.js'])
+<script src="{{ asset('build/assets/navbar-BWY1a_u5.js') }}"></script>

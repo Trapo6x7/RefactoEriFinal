@@ -9,6 +9,18 @@
     user-select: none;
 }
 
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40; /* Doit être inférieur à celui de la modale */
+    background-color: rgb(92, 125, 169, 0.3); /* Assombrissement */
+    backdrop-filter: blur(4px); /* Flou */
+    display: none; /* Caché par défaut */
+}
+.modal-overlay.active {
+    display: block; /* Affiché lorsque la modale est ouverte */
+}
+
 .border{
     border-width: 1px;
     border-style: solid;
