@@ -43,11 +43,17 @@ function closeCkEditorModal(modalId) {
     const modal = document.getElementById(modalId);
     const overlay = document.getElementById("modal-overlay");
 
-    if (modal && overlay) {
-        modal.style.display = "none";
+    if (modal) {
+        modal.style.display = "none"; // Masque la modale
+    }
+    if (overlay) {
         overlay.classList.remove("active"); // Masque l'overlay
     }
 }
+
+document.getElementById("modal-overlay").onclick = function () {
+    closeCkEditorModal("ckeditor-modal");
+};
 
 function autoLink(text) {
     // Remplace les URLs par des liens cliquables avec style
@@ -1148,7 +1154,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then((res) => res.json())
                 .then((data) => {
                     suggestionBox.innerHTML = "";
-                    const suggestions = data.slice(0, 10);
+                    const suggestions = data.slice(0, 15);
                     if (suggestions.length) {
                         suggestions.forEach((suggestion) => {
                             let item = document.createElement("button");

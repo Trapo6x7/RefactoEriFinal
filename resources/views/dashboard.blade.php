@@ -325,5 +325,6 @@
     </script>
     <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6/tinymce.min.js" c
         referrerpolicy="origin"></script>s
-    <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>s @vite('resources/js/dashboard.js')
+    <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
+     @vite('resources/js/dashboard.js')
 </x-app-layout>

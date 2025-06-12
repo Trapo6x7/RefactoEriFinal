@@ -62,7 +62,7 @@ class UserSearchController extends Controller
                 $suggestions,
                 \App\Models\Society::where('name', 'like', "%$q%")
                     ->alphabetical()
-                    ->limit(5)
+                    ->limit(15)
                     ->get()
                     ->map(fn($s) => [
                         'label' => $s->name,
@@ -79,7 +79,7 @@ class UserSearchController extends Controller
                 \App\Models\Interlocutor::where('fullname', 'like', "%$q%")
                     ->orWhere('name', 'like', "%$q%")
                     ->alphabetical()
-                    ->limit(5)
+                    ->limit(15)
                     ->get()
                     ->map(fn($i) => [
                         'label' => $i->fullname ?? $i->name,

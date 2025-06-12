@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 4. Vide les listes de problèmes (adapte l'id si besoin)
         let probList = document.getElementById('problemes-list2');
-        if (probList) probList.innerHTML = '';
+        if (probList) {
+            probList.innerHTML = '';
+            probList.dataset.loaded = false; // Réinitialise un éventuel état de chargement
+        }
 
         // 5. Cache les sections/cards si besoin
         let cardSection = document.getElementById('selected-entity-card');
@@ -26,15 +29,42 @@ document.addEventListener('DOMContentLoaded', function() {
             cardSection.classList.remove('flex');
         }
 
-        // 6. Si tu utilises des variables JS globales pour l'état, reset-les ici
-        // Ex: window.selectedEntities = [];
+        // 6. Réinitialise les variables globales
+        if (window.selectedEntities) {
+            window.selectedEntities = [];
+        }
 
-        // 7. Si tu utilises des fonctions d'affichage dynamique, relance-les ici
-        // Ex: afficherRechercheProblemeGlobaleAjax("problemes-list1");
+        // 7. Réinitialise les attributs data-* des éléments
+        document.querySelectorAll('[data-entity]').forEach(element => {
+            element.removeAttribute('data-entity');
+        });
 
-        // 8. Si tu veux aussi reset d'autres éléments, ajoute-les ici
+        // 8. Réinitialise les classes ou attributs spécifiques
+        document.querySelectorAll('.selected').forEach(element => {
+            element.classList.remove('selected');
+        });
 
-        // Optionnel : scroll en haut
+        // 9. Réinitialise les conteneurs d'interlocuteurs et de sociétés
+        const interlocuteurContainer = document.getElementById('interlocuteur-container');
+        if (interlocuteurContainer) {
+            interlocuteurContainer.innerHTML = ''; // Vide le conteneur des interlocuteurs
+        }
+
+        const societeContainer = document.getElementById('societe-container');
+        if (societeContainer) {
+            societeContainer.innerHTML = ''; // Vide le conteneur des sociétés
+        }
+
+        // 10. Réinitialise les données dynamiques si nécessaire
+        if (typeof afficherRechercheProblemeGlobaleAjax === 'function') {
+            afficherRechercheProblemeGlobaleAjax("problemes-list1");
+        }
+
+        // 11. Réinitialise les données stockées dans le localStorage ou sessionStorage
+        localStorage.removeItem('selectedEntities');
+        sessionStorage.removeItem('selectedEntities');
+
+        // 12. Optionnel : scroll en haut
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 });
