@@ -322,6 +322,51 @@
         window.translatedFields = @json(__('fields'));
         window.currentUserRole = window.userRoles && window.userRoles.length > 0 ? window.userRoles[0] : '';
         
+        // Ajout de la fermeture de la modale après un enregistrement réussi dans d'autres cas
+        function handleSaveSuccess() {
+            closeModalAfterSave(); // Ferme la modale et enlève le flou
+        }
+
+        // Exemple d'utilisation dans un autre contexte
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    handleSaveSuccess(); // Appelle la fonction pour fermer la modale
+                }
+            });
+
+        // Ajout d'une vérification globale pour fermer la modale et supprimer le flou après toute interaction réussie
+        function closeModalAfterAnySuccess() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modalOverlay.classList.remove('active'); // Masque l'overlay
+            mainContent.classList.remove('modal-blur');
+            header.classList.remove('modal-blur');
+        }
+
+        // Ajout de l'appel à cette fonction dans tous les fetch
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModalAfterAnySuccess(); // Ferme la modale et enlève le flou
+                }
+            });
     </script>
     <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6/tinymce.min.js" c
         referrerpolicy="origin"></script>s

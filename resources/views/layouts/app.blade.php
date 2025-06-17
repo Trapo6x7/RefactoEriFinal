@@ -17,7 +17,8 @@
 
     <link rel="stylesheet" href="{{ asset('build/assets/app-Bu_bwFjy.css') }}">
     <script defer src="{{ asset('build/assets/app-Bf4POITK.js') }}" type="module"></script>
-@vite(['resources/js/app.js', 'resources/css/app.css'])
+    <script defer src="{{ asset('build/assets/logout-yMO37DN8.js') }}" type="module"></script>
+@vite(['resources/js/app.js', 'resources/css/app.css', 'resources/js/logout.js'])
 
 </head>
 

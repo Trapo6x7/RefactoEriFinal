@@ -200,7 +200,7 @@
             class="transition-colors duration-200 hover:text-blue-accent text-primary-grey font-bold text-s">
             PROFIL
         </a>
-        <form method="POST" action="{{ route('logout') }}">
+        <form id='logout' method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="transition-colors duration-200 text-red-accent font-bold text-s">
                 SE DECONNECTER

@@ -67,11 +67,7 @@ use Illuminate\Support\Str;
                             $key !== 'updated_at' &&
                             $key !== 'status_client' &&
                             $key !== 'status_distrib' &&
-                            $key !== 'description' &&
-                            !is_null($value) &&
-                            $value !== '' &&
-                            $value !== 0 &&
-                            $value !== '0')
+                            $key !== 'description')
                         <li class="p-3 flex flex-col items-start justify-between h-auto group gap-2">
                             <span class="font-semibold text-blue-accent w-full mb-2">
                                 {{ $fields[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}

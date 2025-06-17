@@ -374,6 +374,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                             descDiv.innerHTML
                                         );
                                         modal.style.display = "none";
+                                        closeCkEditorModal("ckeditor-modal"); // Ferme la modale
                                         if (tinymce.get("ckeditor-area"))
                                             tinymce
                                                 .get("ckeditor-area")
@@ -381,6 +382,7 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                     })
                                     .catch(() => {
                                         modal.style.display = "none";
+                                        closeCkEditorModal("ckeditor-modal"); // Ferme la modale
                                         if (tinymce.get("ckeditor-area"))
                                             tinymce
                                                 .get("ckeditor-area")
@@ -858,6 +860,9 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                                 descDiv.innerHTML
                                             );
                                             modal.style.display = "none";
+                                            closeCkEditorModal(
+                                                "ckeditor-modal"
+                                            ); // Ferme la modale
                                             if (tinymce.get("ckeditor-area"))
                                                 tinymce
                                                     .get("ckeditor-area")
@@ -865,6 +870,9 @@ function afficherRechercheProblemeGlobaleAjax(containerId) {
                                         })
                                         .catch(() => {
                                             modal.style.display = "none";
+                                            closeCkEditorModal(
+                                                "ckeditor-modal"
+                                            ); // Ferme la modale
                                             if (tinymce.get("ckeditor-area"))
                                                 tinymce
                                                     .get("ckeditor-area")
@@ -2239,6 +2247,10 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                         .then(() => {
                                             span.innerHTML = value;
                                             modal.style.display = "none";
+                                            closeCkEditorModal(
+                                                "ckeditor-modal"
+                                            ); // Ferme la modale
+
                                             if (tinymce.get("ckeditor-area"))
                                                 tinymce
                                                     .get("ckeditor-area")
@@ -2246,6 +2258,10 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                                         })
                                         .catch(() => {
                                             modal.style.display = "none";
+                                            closeCkEditorModal(
+                                                "ckeditor-modal"
+                                            ); // Ferme la modale
+
                                             if (tinymce.get("ckeditor-area"))
                                                 tinymce
                                                     .get("ckeditor-area")

@@ -10,6 +10,7 @@ export default defineConfig({
                 "resources/js/dashboard.js",
                 "resources/js/navbar.js",
                 "resources/css/custom.css",
+                "resources/js/logout.js",
             ],
             refresh: true,
         }),
