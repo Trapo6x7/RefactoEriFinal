@@ -113,17 +113,17 @@
         <section id="selected-entity-card"
             class="hidden lg:flex flex-col lg:flex-row gap-4 w-full min-w-0 p-1 md:p-2 lg:p-4 flex-1 min-h-0 h-[40vh] lg:h-[50vh] bg-off-white rounded-lg">
             <article id="card-1"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-2"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="card-3"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-4"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[450px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
         </section>
 
@@ -326,7 +326,7 @@
         function handleSaveSuccess() {
             closeModalAfterSave(); // Ferme la modale et enlève le flou
         }
-
+      
         // Exemple d'utilisation dans un autre contexte
         fetch(url, {
             method: 'POST',
@@ -369,7 +369,7 @@
             });
     </script>
     <script src="https://cdn.tiny.cloud/1/{{ config('services.tinymce.api_key') }}/tinymce/6/tinymce.min.js" c
-        referrerpolicy="origin"></script>s
+        referrerpolicy="origin"></script>
     <script src="{{ asset('build/assets/dashboard-BzIr33HF.js') }}"></script>
      @vite('resources/js/dashboard.js')
 </x-app-layout>

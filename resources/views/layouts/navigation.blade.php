@@ -229,5 +229,5 @@
         @include('model.form_modal', ['model' => 'tech', 'action' => 'create'])
     </div>
 </div>
+<script src="{{ asset('build/assets/navbar-BWY1a_u5.js') }}"></script>
 @vite('resources/js/navbar.js')
-{{-- <script src="{{ asset('build/assets/navbar-BWY1a_u5.js') }}"></script> --}}
