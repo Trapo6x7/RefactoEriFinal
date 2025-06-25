@@ -9,7 +9,8 @@ function resetInactivityTimer() {
     inactivityTimeout = setTimeout(() => {
         // Déconnecte l'utilisateur après le délai d'inactivité
         alert("Vous avez été déconnecté pour cause d'inactivité.");
-        document.getElementById('logout').submit();
+        document.getElementById("logout").submit();
+        window.location.href = "/login";
     }, logoutDelay);
 }
 
@@ -18,9 +19,11 @@ function resetInactivityTimer() {
  */
 function initializeAutoLogout() {
     // Écoute les événements d'activité utilisateur
-    ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach((event) => {
-        window.addEventListener(event, resetInactivityTimer);
-    });
+    ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach(
+        (event) => {
+            window.addEventListener(event, resetInactivityTimer);
+        }
+    );
 
     // Démarre le timer d'inactivité
     resetInactivityTimer();
