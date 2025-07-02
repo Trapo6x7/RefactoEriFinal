@@ -50,4 +50,5 @@ return [
     'societe' => 'Société',
     'id_teamviewer' => 'ID TeamViewer',
     'service_connect' => 'Service de connexion',
+    'email' => 'E-mail',
 ];

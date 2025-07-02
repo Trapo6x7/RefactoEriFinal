@@ -47,4 +47,6 @@ return [
     'fullname' => 'Nom complet',
     'main_name' => 'societe principale',
     'id_main' => 'societe principale',
+    'email' => 'e-mail',
+
 ];

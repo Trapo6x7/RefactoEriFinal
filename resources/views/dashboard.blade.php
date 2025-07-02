@@ -111,19 +111,19 @@
         </section>
 
         <section id="selected-entity-card"
-            class="hidden lg:flex flex-col lg:flex-row gap-4 w-full min-w-0 p-1 md:p-2 lg:p-4 flex-1 min-h-0 h-[40vh] lg:h-[50vh] bg-off-white rounded-lg">
+            class="hidden lg:flex flex-col lg:flex-row gap-4 w-full min-w-0 p-1 md:p-2 lg:p-4 flex-1 bg-off-white rounded-lg">
             <article id="card-1"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[30vh] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-2"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[30vh] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <div class="border-r border-blue-accent"></div>
             <article id="card-3"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[30vh] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
             <article id="card-4"
-                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[400px] flex flex-col text-sm md:text-md lg:text-lg">
+                class="relative appearance-none rounded-lg px-4 py-2 w-full bg-white focus:outline-none focus:ring-2 focus:ring-blue-accent transition overflow-y-auto overflow-hidden h-[30vh] flex flex-col text-sm md:text-md lg:text-lg">
             </article>
         </section>
 
@@ -132,7 +132,7 @@
         </div>
 
         <section
-            class="flex flex-col lg:flex-row lg:h-[40vh] bg-off-white rounded-lg mt-1 px-2 md:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
+            class="flex flex-col lg:flex-row lg:h-[35vh] bg-off-white rounded-lg mt-1 px-2 md:px-4 lg:px-8 min-h-0 text-sm md:text-md lg:text-lg">
             <article id="problemes-list1"
                 class="w-full lg:w-1/2 px-2 md:px-4 py-4 overflow-y-auto overflow-hidden h-full min-h-0">
             </article>

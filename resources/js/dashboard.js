@@ -1729,9 +1729,11 @@ function showSelectedEntitiesCard(entities, { reset = true } = {}) {
                 coordonneesHtml += `
         <div class="my-1 pr-2 w-full break-words flex flex-col">
             <div class="flex items-center justify-between w-full">
-                <p class="font-semibold text-blue-accent mb-0">${
-                    window.translatedFields[key]
-                } :</p>
+               <p class="font-semibold text-blue-accent mb-0">${
+                   window.translatedFields && window.translatedFields[key]
+                       ? window.translatedFields[key]
+                       : key.charAt(0).toUpperCase() + key.slice(1)
+               } :</p>
                 <span class="edit-lock-btn-placeholder ml-auto"></span>
             </div>
             <span class="editable-field" data-model="${ent2.model}" data-id="${
